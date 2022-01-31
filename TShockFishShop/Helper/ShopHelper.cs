@@ -77,7 +77,6 @@ namespace Plugin
 
                 // 任务鱼
                 if( _id==UnlockID.ItemIDQuestFish ){
-
                     _id = Main.anglerQuestItemNetIDs[Main.anglerQuest];
                 }
 
@@ -201,11 +200,13 @@ namespace Plugin
             // 物品
             List<ItemData> costItems = GetCostItem(amount);
             List<string> msgs = new List<string>();
+            if( !string.IsNullOrEmpty(msg) )
+                msgs.Add(msg);
+
             foreach (ItemData _d in costItems){
                 msgs.Add( _d.GetItemDesc() );
             }
-            if( msgs.Count >0 )
-                msg = $"{msg}+{string.Join("+", msgs)}";
+            msg = string.Join("", msgs);
 
             // 任意类型的物品
             // string s = GetAnyItemDesc();

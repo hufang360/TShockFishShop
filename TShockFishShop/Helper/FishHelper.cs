@@ -16,7 +16,7 @@ namespace Plugin
             Main.AnglerQuestSwap();
             int itemID = Main.anglerQuestItemNetIDs[ Main.anglerQuest ];
             string itemName = MyUtils.GetItemDesc("", itemID);
-            player.SendSuccessMessage($"今日份的任务鱼已随机成 {itemName}");
+            TSPlayer.All.SendSuccessMessage($"{player.Name} 购买了 更换任务鱼，今天的任务鱼已随机成 {itemName}");
         }
 
         // 指定今天的任务鱼（物品id或物品名）
@@ -89,9 +89,7 @@ namespace Plugin
             }
 
             string itemName = MyUtils.GetItemDesc("", itemID);
-            player.SendInfoMessage($"任务鱼: {itemName}");
-            player.SendInfoMessage($"抓捕点: {questText}");
-
+            player.SendInfoMessage($"任务鱼: {itemName}（{questText}）");
             player.SendInfoMessage($"月相: {MyUtils.moonPhases[Main.moonPhase]}");
 
             // 时间
@@ -122,14 +120,20 @@ namespace Plugin
 			}
 
             int finished = 0;
+            string swarpStr;
             for (int i = 0; i < players.Count; i++)
             {
+                if( i%9==0 ){
+                    swarpStr = "\n";
+                } else {
+                    swarpStr = "";
+                }
                 if( Main.anglerWhoFinishedToday.Contains( players[i] ) )
                 {
                     finished ++;
-                    players[i] = $"✔{players[i]}";
+                    players[i] = $"{swarpStr}✔{players[i]}";
                 } else {
-                    players[i] = $"-{players[i]}";
+                    players[i] = $"{swarpStr}-{players[i]}";
                 }
             }
 

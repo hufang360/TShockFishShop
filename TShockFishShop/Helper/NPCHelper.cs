@@ -334,27 +334,33 @@ namespace Plugin
             }
 
             // 生成npc
+            List<string> names = new List<string>();
             foreach (int npcID in found)
             {
 				NPC npc = new NPC();
 				npc.SetDefaults(npcID);
 				TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, 1, op.TileX, op.TileY);
 
-
+                if( names.Count%10==0 ){
+                    names.Add("\n"+npc.FullName);
+                } else {
+                    names.Add(npc.FullName);
+                }
             }
 
             // 找家
-            for (int i = 0; i < Main.maxNPCs; i++)
-            {
-                if( !Main.npc[i].active || !Main.npc[i].townNPC )
-                    continue;
+            // for (int i = 0; i < Main.maxNPCs; i++)
+            // {
+            //     if( !Main.npc[i].active || !Main.npc[i].townNPC )
+            //         continue;
 
-                if( found.Contains(Main.npc[i].type) )
-                    WorldGen.QuickFindHome(i);
-            }
+            //     if( found.Contains(Main.npc[i].type) )
+            //         WorldGen.QuickFindHome(i);
+            // }
 
             if( found.Count>0 ){
-				TSPlayer.All.SendInfoMessage($"{op.Name} 复活了 {found.Count}个 NPC");
+				TSPlayer.All.SendInfoMessage($"{op.Name} 复活了 {found.Count}个 NPC:");
+				TSPlayer.All.SendInfoMessage($"{string.Join(",", names)}");
             } else {
                 op.SendInfoMessage("入住过的NPC都活着");
             }

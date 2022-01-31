@@ -4,7 +4,6 @@ using Terraria;
 using Terraria.ID;
 using TShockAPI;
 using Microsoft.Xna.Framework;
-using Terraria.GameContent.Bestiary;
 
 namespace Plugin
 {
@@ -46,7 +45,7 @@ namespace Plugin
 					TSPlayer.All.SendInfoMessage("{0} 让雨停了下来.", player.Name);
 					return;
 				} else {
-					player.SendInfoMessage("雨已经停下来了.");
+					player.SendInfoMessage("没在下雨");
 				}
 			}
 		}
@@ -72,9 +71,26 @@ namespace Plugin
 		}
 
 
-		public static void TPHereAll(TSPlayer op){
-			ExecuteRawCmd(op, ".tphere *");
-			TSPlayer.All.SendInfoMessage($"{op.Name} 购买了 集合打团，将所有玩家召唤到他那");
+		public static void TPHereAll(TSPlayer op)
+		{
+			for (int i = 0; i < Main.maxPlayers; i++)
+			{
+				if (Main.player[i].active && (Main.player[i] != op.TPlayer))
+				{
+					if (TShock.Players[i].Teleport(op.TPlayer.position.X, op.TPlayer.position.Y))
+						TShock.Players[i].SendSuccessMessage(String.Format("{0} 将你传送到他身边", op.Name));
+				}
+			}
+			TSPlayer.All.SendInfoMessage($"{op.Name} 购买了 集合打团，将所有玩家召唤到他身边");
+		}
+		public static void CelebrateAll(TSPlayer op)
+		{
+			foreach (TSPlayer ply in TShock.Players)
+			{
+				if (ply != null && ply.Active)
+					Jump(ply);
+			}
+			TSPlayer.All.SendInfoMessage($"{op.Name} 购买了集体庆祝");
 		}
 
 
@@ -173,8 +189,8 @@ namespace Plugin
 				return;
 			}
 
-			string message = "{0} 召唤 {1} {2} 次";
-			string spawnName;
+			string message = "{0} 召唤了 {1} {2} 次";
+			string spawnName="";
 			NPC npc = new NPC();
 			switch (args.Parameters[0].ToLower())
 			{
@@ -187,7 +203,7 @@ namespace Plugin
 						npc.SetDefaults(i);
 						TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
 					}
-					spawnName = "all bosses";
+					spawnName = "Boss全明星";
 					break;
 
 				case "brain":
@@ -195,28 +211,28 @@ namespace Plugin
 				case "boc":
 					npc.SetDefaults(266);
 					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = "the Brain of Cthulhu";
+					spawnName = npc.FullName;
 					break;
 
 				case "destroyer":
 					npc.SetDefaults(134);
 					TSPlayer.Server.SetTime(false, 0.0);
 					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = "the Destroyer";
+					spawnName = npc.FullName;
 					break;
 				case "duke":
 				case "duke fishron":
 				case "fishron":
 					npc.SetDefaults(370);
 					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = "Duke Fishron";
+					spawnName = npc.FullName;
 					break;
 				case "eater":
 				case "eater of worlds":
 				case "eow":
 					npc.SetDefaults(13);
 					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = "the Eater of Worlds";
+					spawnName = npc.FullName;
 					break;
 				case "eye":
 				case "eye of cthulhu":
@@ -224,23 +240,24 @@ namespace Plugin
 					npc.SetDefaults(4);
 					TSPlayer.Server.SetTime(false, 0.0);
 					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = "the Eye of Cthulhu";
+					spawnName = npc.FullName;
 					break;
 				case "golem":
 					npc.SetDefaults(245);
 					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = "the Golem";
+					spawnName = npc.FullName;
 					break;
 				case "king":
 				case "king slime":
 				case "ks":
 					npc.SetDefaults(50);
 					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = "the King Slime";
+					spawnName = npc.FullName;
 					break;
 				case "plantera":
 					npc.SetDefaults(262);
 					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
+					spawnName = npc.FullName;
 					spawnName = NPC.getNewNPCName(262) ;
 					break;
 				case "prime":
@@ -248,19 +265,19 @@ namespace Plugin
 					npc.SetDefaults(127);
 					TSPlayer.Server.SetTime(false, 0.0);
 					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = "Skeletron Prime";
+					spawnName = npc.FullName;
 					break;
 				case "queen bee":
 				case "qb":
 					npc.SetDefaults(222);
 					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = "the Queen Bee";
+					spawnName = npc.FullName;
 					break;
 				case "skeletron":
 					npc.SetDefaults(35);
 					TSPlayer.Server.SetTime(false, 0.0);
 					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = "Skeletron";
+					spawnName = npc.FullName;
 					break;
 				case "twins":
 					TSPlayer.Server.SetTime(false, 0.0);
@@ -268,7 +285,7 @@ namespace Plugin
 					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
 					npc.SetDefaults(126);
 					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = "the Twins";
+					spawnName = "双子魔眼";
 					break;
 				case "wof":
 				case "wall of flesh":
@@ -283,27 +300,27 @@ namespace Plugin
 						return;
 					}
 					NPC.SpawnWOF(new Vector2(args.Player.X, args.Player.Y));
-					spawnName = "the Wall of Flesh";
+					spawnName = "血肉墙";
 					break;
 				case "moon":
 				case "moon lord":
 				case "ml":
 					npc.SetDefaults(398);
 					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = "the Moon Lord";
+					spawnName = npc.FullName;
 					break;
 				case "empress":
 				case "empress of light":
 				case "eol":
 					npc.SetDefaults(636);
 					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = "the Empress of Light";
+					spawnName = npc.FullName;
 					break;
 				case "queen slime":
 				case "qs":
 					npc.SetDefaults(657);
 					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = "the Queen Slime";
+					spawnName = npc.FullName;
 					break;
 				case "lunatic":
 				case "lunatic cultist":
@@ -311,78 +328,78 @@ namespace Plugin
 				case "lc":
 					npc.SetDefaults(439);
 					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = "the Lunatic Cultist";
+					spawnName = npc.FullName;
 					break;
 				case "betsy":
 					npc.SetDefaults(551);
 					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = "Betsy";
+					spawnName = npc.FullName;
 					break;
 				case "flying dutchman":
 				case "flying":
 				case "dutchman":
 					npc.SetDefaults(491);
 					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = "the Flying Dutchman";
+					spawnName = npc.FullName;
 					break;
 				case "mourning wood":
 					npc.SetDefaults(325);
 					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = "Mourning Wood";
+					spawnName = npc.FullName;
 					break;
 				case "pumpking":
 					npc.SetDefaults(327);
 					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = "the Pumpking";
+					spawnName = npc.FullName;
 					break;
 				case "everscream":
 					npc.SetDefaults(344);
 					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = "Everscream";
+					spawnName = npc.FullName;
 					break;
 				case "santa-nk1":
 				case "santa":
 					npc.SetDefaults(346);
 					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = "Santa-NK1";
+					spawnName = npc.FullName;
 					break;
 				case "ice queen":
 					npc.SetDefaults(345);
 					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = "the Ice Queen";
+					spawnName = npc.FullName;
 					break;
 				case "martian saucer":
 					npc.SetDefaults(392);
 					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = "a Martian Saucer";
+					spawnName = npc.FullName;
 					break;
 				case "solar pillar":
 					npc.SetDefaults(517);
 					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = "a Solar Pillar";
+					spawnName = npc.FullName;
 					break;
 				case "nebula pillar":
 					npc.SetDefaults(507);
 					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = "a Nebula Pillar";
+					spawnName = npc.FullName;
 					break;
 				case "vortex pillar":
 					npc.SetDefaults(422);
 					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = "a Vortex Pillar";
+					spawnName = npc.FullName;
 					break;
 				case "stardust pillar":
 					npc.SetDefaults(493);
 					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = "a Stardust Pillar";
+					spawnName = npc.FullName;
 					break;
 				case "deerclops":
 					npc.SetDefaults(668);
 					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = "a Deerclops";
+					spawnName = npc.FullName;
 					break;
 				default:
-					args.Player.SendErrorMessage("Invalid boss type!");
+					args.Player.SendErrorMessage("无法识别此boss名!");
 					return;
 			}
 
@@ -402,6 +419,16 @@ namespace Plugin
 		{
 			// 火箭
 			player.TPlayer.velocity.Y = -50;
+			TSPlayer.All.SendData(PacketTypes.PlayerUpdate, "", player.Index);
+
+			// 烟花
+			Firework(player);
+		}
+
+		public static void Jump (TSPlayer player)
+		{
+			// 火箭
+			player.TPlayer.velocity.Y = -6;
 			TSPlayer.All.SendData(PacketTypes.PlayerUpdate, "", player.Index);
 
 			// 烟花

@@ -11,18 +11,12 @@ namespace Plugin
             name = _name;
             id = _id;
             stack = _stack;
-
-            if( _id==0 && _name != "" ){
-                id = IDSet.GetIDByName(_name);
-            }
-                
         }
 
         public void fixIDByName()
         {
-            if( id==0 && name != "" ){
+            if( id==0 && name != "" )
                 id = IDSet.GetIDByName(name);
-            }
         }
 
         public string GetItemDesc(){

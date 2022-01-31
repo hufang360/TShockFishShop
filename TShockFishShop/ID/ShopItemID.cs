@@ -68,6 +68,9 @@ namespace Plugin
         // 集合打团
         public const int TPHereAll = -162;
 
+        // 集体庆祝
+        public const int CelebrateAll = -163;
+
 
         // ------------------------------------------------------------------------------------------
         // 召唤NPC
@@ -108,6 +111,7 @@ namespace Plugin
                 case RawCmd: return $"指令{prefix}";
                 case ReliveNPC: return "复活NPC";
                 case TPHereAll: return "集合打团";
+                case CelebrateAll: return "集体庆祝";
             }
 
             int npcID = 0;
@@ -143,10 +147,10 @@ namespace Plugin
 
                 case "烟花": return Firework;
                 case "烟花起飞": return FireworkRocket;
-                case "更换任务鱼": return AnglerQuestSwap;
-                case "雨来": return RainingStart;
+                case "更换任务鱼": case "更换钓鱼任务":  case "切换任务鱼": case "切换钓鱼任务": return AnglerQuestSwap;
+                case "雨来": case "下雨": return RainingStart;
                 case "雨停": return RainingStop;
-                case "跳过入侵": return InvasionStop;
+                case "跳过入侵": case "停止入侵": return InvasionStop;
                 case "调白天": return TimeToDay;
                 case "调晚上": return TimeToNight;
                 case "召唤血月": return BloodMoonStart;
@@ -156,6 +160,7 @@ namespace Plugin
                 case "指令": return RawCmd;
                 case "复活npc": return ReliveNPC ;
                 case "集合打团": return TPHereAll;
+                case "集体庆祝": return CelebrateAll;
 
 
                 // 原生物品

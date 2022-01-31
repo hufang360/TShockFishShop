@@ -44,7 +44,7 @@ namespace Plugin
             unlock.Add( new ItemData("渔夫任务",0,1) );
 
             // 定义货架物品
-            ShopItem goods = new ShopItem("蠕虫罐头", 4345, 10);
+            ShopItem goods = new ShopItem("蠕虫罐头", 0, 10);
             goods.AddCost("金币", 0, 10);
             shop.Add(goods);
 

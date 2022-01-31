@@ -285,21 +285,6 @@ namespace Plugin
         /// 更新货架
         private List<ShopItem> UpdateShelf(TSPlayer player)
         {
-            // 筛选出已解锁的物品
-            // string s="";
-            // bool passed = true;
-            // List<ShopItem> founds = new List<ShopItem>();
-            // foreach(ShopItem item in _config.shop)
-            // {
-            //     passed = true;
-            //     foreach( ItemData d in item.unlock )
-            //     {
-            //         passed = UnlockHelper.CheckUnlock(d, player, out s);
-            //     }
-            //     if( passed )
-            //         founds.Add(item);
-            // }
-            // return founds;
             return _config.shop;
         }
 
@@ -811,6 +796,9 @@ namespace Plugin
 
                     // 集合打团
                     case ShopItemID.TPHereAll: CmdHelper.TPHereAll(player); return;
+
+                    // 集合打团
+                    case ShopItemID.CelebrateAll: CmdHelper.CelebrateAll(player); return;
 
 
                     default:
