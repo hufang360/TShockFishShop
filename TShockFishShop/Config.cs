@@ -105,6 +105,10 @@ namespace Plugin
             goods = new ShopItem("集合打团");
             goods.AddCost("金币", 0, 5);
             shop.Add(goods);
+
+            goods = new ShopItem("集体庆祝");
+            goods.AddCost("银币", 0, 10);
+            shop.Add(goods);
         }
     }
 

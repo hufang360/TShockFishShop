@@ -247,6 +247,8 @@ namespace Plugin
                 case TimeToNight:
                 case RawCmd:
                 case ReliveNPC:
+                case TPHereAll:
+                case CelebrateAll:
                     return false;
             }
 

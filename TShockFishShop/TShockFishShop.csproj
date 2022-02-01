@@ -59,6 +59,7 @@
     <Compile Include="ItemData.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="MyUtils.cs" />
+    <Compile Include="Compatible.cs" />
     
     <Compile Include="ID\IDSet.cs" />
     <Compile Include="ID\ShopItemID.cs" />

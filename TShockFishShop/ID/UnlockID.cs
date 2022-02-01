@@ -190,8 +190,7 @@ namespace Plugin
                     break;
 
                 case downedDeerclops:
-                    if( !NPC.downedDeerclops )
-                        s = "未击败 鹿角怪";
+                    s = Compatible.CheckUnlockDownedDeerclops();
                     break;
 
                 case downedBoss2:

@@ -120,7 +120,7 @@ namespace Plugin
 			}
 		}
 
-        public static void SpawnBoss(TSPlayer player, int npcID, int times=0){
+        public static void SpawnNPC(TSPlayer player, int npcID, int times=0){
 
 			string bossType = "";
 			switch (npcID)
@@ -169,7 +169,16 @@ namespace Plugin
 				// 生成npc
 				NPC npc = new NPC();
 				npc.SetDefaults(npcID);
-				TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, times, player.TileX, player.TileY);
+
+				bool pass = true;
+				if( npc.townNPC ){
+					if(NPCHelper.CheckNPCActive(npcID.ToString())){
+						pass = false;
+					}
+				}
+
+				if( pass )
+					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, times, player.TileX, player.TileY);
 			}
         }
 
@@ -425,14 +434,28 @@ namespace Plugin
 			Firework(player);
 		}
 
-		public static void Jump (TSPlayer player)
+		public static void Jump (TSPlayer op)
 		{
-			// 火箭
-			player.TPlayer.velocity.Y = -6;
-			TSPlayer.All.SendData(PacketTypes.PlayerUpdate, "", player.Index);
+			float x = op.TPlayer.position.X;
+			float y = op.TPlayer.position.Y;
+			for (int i = 0; i < Main.maxPlayers; i++)
+			{
+				if (!Main.player[i].active)
+					continue;
 
-			// 烟花
-			Firework(player);
+				Player op2 = Main.player[i];
+				float x2 = op2.position.X;
+				float y2 = op2.position.Y;
+				if( x2<=x+60 && x2>=x-60 && y2<=y+35 && y2>=y-35 )
+				{
+					// 起跳
+					op2.velocity.Y = -6;
+					TSPlayer.All.SendData(PacketTypes.PlayerUpdate, "", i );
+					
+					// 烟花
+					Firework(op);
+				}
+			}
 		}
 
 		public static void Firework(TSPlayer player)

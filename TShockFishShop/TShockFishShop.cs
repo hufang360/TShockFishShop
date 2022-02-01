@@ -24,6 +24,7 @@ namespace Plugin
         public static readonly string PermissionFinish = "fishshop.finish";
         public static readonly string PermissionChange = "fishshop.change";
         public static readonly string PermissionChangeSuper = "fishshop.changesuper";
+        public static readonly string PermissionSpecial= "fishshop.special";
 
         public static readonly string savedir = Path.Combine(TShock.SavePath, "FishShop");
 
@@ -54,24 +55,32 @@ namespace Plugin
 
         private void FishShop(CommandArgs args)
         {
+            TSPlayer op = args.Player;
             void ShowHelpText()
             {
-                args.Player.SendInfoMessage("/fish list，查看货架");
-                args.Player.SendInfoMessage("/fish ask <编号>，问价格");
-                args.Player.SendInfoMessage("/fish buy <编号>，购买");
-                args.Player.SendInfoMessage("/fish info，显示钓鱼信息");
+                op.SendInfoMessage("/fish list，查看货架");
+                op.SendInfoMessage("/fish ask <编号>，问价格");
+                op.SendInfoMessage("/fish buy <编号>，购买");
+                op.SendInfoMessage("/fish info，显示钓鱼信息");
 
-                if( args.Player.HasPermission(PermissionFinish) )
-                    args.Player.SendInfoMessage("/fish finish <次数>，修改自己的渔夫任务完成次数");
-                if( args.Player.HasPermission(PermissionChange) )
-                    args.Player.SendInfoMessage("/fish change，更换今天的任务鱼");
-                if( args.Player.HasPermission(PermissionChangeSuper) )
-                    args.Player.SendInfoMessage("/fish changesuper <物品id|物品名>，指定今天的任务鱼");
+                if( op.HasPermission(PermissionFinish) )
+                    op.SendInfoMessage("/fish finish <次数>，修改自己的渔夫任务完成次数");
+                if( op.HasPermission(PermissionChange) )
+                    op.SendInfoMessage("/fish change，更换今天的任务鱼");
+                if( op.HasPermission(PermissionChangeSuper) )
+                    op.SendInfoMessage("/fish changesuper <物品id|物品名>，指定今天的任务鱼");
+
+                if( op.HasPermission(PermissionSpecial) ){
+                    op.SendInfoMessage("/fish relive，复活NPC");
+                    op.SendInfoMessage("/fish tpall，集合");
+                    op.SendInfoMessage("/fish jump，集体庆祝");
+                    op.SendInfoMessage("/fish firework，烟花");
+                }
             }
 
             if (args.Parameters.Count<string>() == 0)
             {
-                args.Player.SendErrorMessage("语法错误，使用 /fish help 查询用法");
+                op.SendErrorMessage("语法错误，使用 /fish help 查询用法");
                 return;
             }
 
@@ -84,7 +93,7 @@ namespace Plugin
                     return;
 
                 default:
-                    args.Player.SendErrorMessage("请输入 /fish help 查询用法");
+                    op.SendErrorMessage("请输入 /fish help 查询用法");
                     break;
 
                 // 浏览
@@ -115,33 +124,33 @@ namespace Plugin
                 // 钓鱼信息
                 case "info":
                 case "i":
-                    FishHelper.FishInfo(args.Player);
+                    FishHelper.FishInfo(op);
                     break;
 
 
                 // 修改钓鱼次数
                 case "finish":
                 case "f":
-                    if ( !args.Player.RealPlayer ){
-                        args.Player.SendErrorMessage("此指令需要在游戏内才能执行！");
+                    if ( !op.RealPlayer ){
+                        op.SendErrorMessage("此指令需要在游戏内才能执行！");
                         break;
                     }
-                    if( !args.Player.HasPermission(PermissionFinish) ){
-                        args.Player.SendErrorMessage("你无权更改钓鱼次数！");
+                    if( !op.HasPermission(PermissionFinish) ){
+                        op.SendErrorMessage("你无权更改钓鱼次数！");
                         break;
                     }
                     if( args.Parameters.Count <2 ){
-                        args.Player.SendErrorMessage("需要输入完成次数，例如: /fish finish 10");
+                        op.SendErrorMessage("需要输入完成次数，例如: /fish finish 10");
                         break;
                     }
                     int finished = 0;
                     if ( int.TryParse(args.Parameters[1], out finished) ){
-                        args.Player.TPlayer.anglerQuestsFinished = finished;
-                        NetMessage.SendData(76, args.Player.Index, -1, NetworkText.Empty, args.Player.Index);
-                        NetMessage.SendData(76, -1, -1, NetworkText.Empty, args.Player.Index);
-                        args.Player.SendSuccessMessage($"你的渔夫任务完成次数已改成 {finished} 次");
+                        op.TPlayer.anglerQuestsFinished = finished;
+                        NetMessage.SendData(76, op.Index, -1, NetworkText.Empty, op.Index);
+                        NetMessage.SendData(76, -1, -1, NetworkText.Empty, op.Index);
+                        op.SendSuccessMessage($"你的渔夫任务完成次数已改成 {finished} 次");
                     } else {
-                        args.Player.SendErrorMessage("次数输入错误，例如: /fish finish 10");
+                        op.SendErrorMessage("次数输入错误，例如: /fish finish 10");
                     }
                     break;
 
@@ -151,25 +160,57 @@ namespace Plugin
                 case "swap":
                 case "next":
                 case "pass":
-                    if( !args.Player.HasPermission(PermissionChange) )
-                        args.Player.SendErrorMessage("你无权切换钓鱼任务！");
+                    if( !op.HasPermission(PermissionChange) )
+                        op.SendErrorMessage("你无权切换钓鱼任务！");
                     else
-                        FishHelper.AnglerQuestSwap(args.Player);
+                        FishHelper.AnglerQuestSwap(op);
                     break;
 
 
                 // 指定今天的任务鱼
                 case "changesuper":
                 case "cs":
-                    if( !args.Player.HasPermission(PermissionChangeSuper) ){
-                        args.Player.SendErrorMessage("你无权指定今天的任务鱼！");
+                    if( !op.HasPermission(PermissionChangeSuper) ){
+                        op.SendErrorMessage("你无权指定今天的任务鱼！");
                     } else {
                         if( args.Parameters.Count<2 ){
-                            args.Player.SendErrorMessage("需输入任务鱼的 名称/物品id！，例如: /fish cs 向导巫毒鱼");
+                            op.SendErrorMessage("需输入任务鱼的 名称/物品id！，例如: /fish cs 向导巫毒鱼");
                             break;
                         }
-                        FishHelper.FishQuestSwap( args.Player, args.Parameters[1]  );
+                        FishHelper.FishQuestSwap( op, args.Parameters[1]  );
                     }
+                    break;
+
+
+                // 供测试用的指令
+                case "jump":
+                    if( !op.HasPermission(PermissionSpecial) ){
+                        op.SendErrorMessage("你无权执行此指令！");
+                    } else {
+                        CmdHelper.CelebrateAll(op);
+                    }
+                    break;
+
+                case "firework":
+                case "fw":
+                    if( !op.HasPermission(PermissionSpecial) )
+                        op.SendErrorMessage("你无权执行此指令！");
+                    else
+                        CmdHelper.FireworkRocket(op);
+                    break;
+
+                case "relive":
+                    if( !op.HasPermission(PermissionSpecial) )
+                        op.SendErrorMessage("你无权执行此指令！");
+                    else
+                        NPCHelper.ReliveNPC(op);
+                    break;
+
+                case "tpall":
+                    if( !op.HasPermission(PermissionSpecial) )
+                        op.SendErrorMessage("你无权执行此指令！");
+                    else
+                        CmdHelper.TPHereAll(op);
                     break;
             }
         }
@@ -809,7 +850,7 @@ namespace Plugin
                 if( id>ShopItemID.SpawnEnd && id<ShopItemID.SpawnStart )
                 {
                     int npcID = ShopItemID.SpawnStart-id;
-                    CmdHelper.SpawnBoss(player, npcID, amount);
+                    CmdHelper.SpawnNPC(player, npcID, amount);
                 }
 
             } else {
