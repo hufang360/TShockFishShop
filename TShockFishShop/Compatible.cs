@@ -1,5 +1,4 @@
 using Terraria;
-using TShockAPI;
 using System;
 using System.Reflection;
 

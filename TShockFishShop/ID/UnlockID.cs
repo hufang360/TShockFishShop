@@ -141,6 +141,7 @@ namespace Plugin
                 case "生命<400": case "血量<400": case "hp<400": return HpUnder400;
 
 
+                case "骷髅王后": return downedBoss3;
                 case "一王后": return downedAnyMech;
                 case "三王后": return downedAllMech;
                 case "一柱后": return downedAnyTower;
@@ -149,6 +150,7 @@ namespace Plugin
                 case "肉后": case "困难模式": return downedWallofFlesh;
                 case "花后": return downedPlantBoss;
                 case "石后": return downedGolemBoss;
+                case "月后": return downedMoonlord;
             }
 
             string s = "";

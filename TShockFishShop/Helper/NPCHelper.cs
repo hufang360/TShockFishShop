@@ -136,9 +136,9 @@ namespace Plugin
                 case "受缚巫师":    return 106;
 
                 // boss
-                case "肉后": case "血肉墙": case "困难模式": return 113;
-                case "花后": case "世纪之花": case "世花": return 262;
-                case "石后": case "石巨人": case "石巨人后": return 245;
+                case "血肉墙": return 113;
+                case "世纪之花": case "世花": return 262;
+                case "石巨人": return 245;
 
                 case "史王": case "史莱姆王": return 50;
                 case "克眼": case "克苏鲁之眼": return 4;
@@ -156,7 +156,7 @@ namespace Plugin
                 case "光女": case "光之女皇": return 636;
                 case "猪鲨": case "猪龙鱼公爵": return 370;
                 case "邪教徒": case "拜月教邪教徒": return 439;
-                case "月后": case "月总": case "月亮领主后": return 396;
+                case "月总": case "月亮领主": return 396;
 
                 case "哀木": return 325;
                 case "南瓜王": return 327;
@@ -164,6 +164,8 @@ namespace Plugin
                 case "常绿尖叫怪": return 344;
                 case "冰雪皇后": case "冰雪女王": return 345;
                 case "坦克": case "圣诞坦克": return 346;
+
+                case "火星飞碟": case "外星飞碟": return 395;
 
                 case "日耀": case "日耀柱": case "日曜": case "日曜柱": return 517;
                 case "星旋": case "星旋柱": return 422;
@@ -246,6 +248,9 @@ namespace Plugin
         {
             List<int> found = new List<int>();
 
+            // 向导 
+            found.Add(22);
+
             // 解救状态
             // 渔夫
             if( NPC.savedAngler )
@@ -293,7 +298,7 @@ namespace Plugin
 
             // 怪物图鉴解锁情况
             List<int> remains = new List<int>() {
-                22, //向导
+                // 22, //向导
                 19, //军火商
                 54, //服装商
                 38, //爆破专家
@@ -341,7 +346,7 @@ namespace Plugin
 				npc.SetDefaults(npcID);
 				TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, 1, op.TileX, op.TileY);
 
-                if( names.Count%10==0 ){
+                if( names.Count!=0 && names.Count%10==0 ){
                     names.Add("\n"+npc.FullName);
                 } else {
                     names.Add(npc.FullName);
@@ -360,7 +365,7 @@ namespace Plugin
 
             if( found.Count>0 ){
 				TSPlayer.All.SendInfoMessage($"{op.Name} 复活了 {found.Count}个 NPC:");
-				TSPlayer.All.SendInfoMessage($"{string.Join(",", names)}");
+				TSPlayer.All.SendInfoMessage($"{string.Join("、", names)}");
             } else {
                 op.SendInfoMessage("入住过的NPC都活着");
             }

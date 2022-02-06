@@ -9,7 +9,7 @@ namespace Plugin
 {
     public class CmdHelper
     {
-		public static void SwitchTime(TSPlayer player, string type="day")
+		public static void SwitchTime(TSPlayer player, string type="noon")
 		{
 			switch (type)
 			{
@@ -18,9 +18,19 @@ namespace Plugin
 					TSPlayer.All.SendInfoMessage("{0} 将时间调到 早上 （4:30）。", player.Name);
 					break;
 
+				case "noon":
+					TSPlayer.Server.SetTime(true, 27000.0);
+					TSPlayer.All.SendInfoMessage("{0} 将时间调到 中午 （12:00）。", player.Name);
+					break;
+
 				case "night":
 					TSPlayer.Server.SetTime(false, 0.0);
 					TSPlayer.All.SendInfoMessage("{0} 将时间调到 晚上（19:30）。", player.Name);
+					break;
+
+				case "midnight":
+					TSPlayer.Server.SetTime(false, 16200.0);
+					TSPlayer.All.SendInfoMessage("{0} 将时间调到 午夜（00:00）。", player.Name);
 					break;
 			}
 		}
@@ -85,11 +95,7 @@ namespace Plugin
 		}
 		public static void CelebrateAll(TSPlayer op)
 		{
-			foreach (TSPlayer ply in TShock.Players)
-			{
-				if (ply != null && ply.Active)
-					Jump(ply);
-			}
+			Jump(op);
 			TSPlayer.All.SendInfoMessage($"{op.Name} 购买了集体庆祝");
 		}
 
@@ -136,8 +142,10 @@ namespace Plugin
 				case 127: bossType="skeletron prime"; break;
 				case 222: bossType="queen bee"; break;
 				case 35: bossType="skeletron"; break;
+				
 				case 125: bossType="twins"; break;
 				case 126: bossType="twins"; break;
+				
 				case 113: bossType="wall of flesh"; break;
 				case 396: bossType="moon lord"; break;
 				case 636: bossType="empress of light"; break;
@@ -150,7 +158,12 @@ namespace Plugin
 				case 344: bossType="everscream"; break;
 				case 346: bossType="santa-nk1"; break;
 				case 345: bossType="ice queen"; break;
+				
 				case 392: bossType="martian saucer"; break;
+				case 393: bossType="martian saucer"; break;
+				case 394: bossType="martian saucer"; break;
+				case 395: bossType="martian saucer"; break;
+				
 				case 517: bossType="solar pillar"; break;
 				case 507: bossType="nebula pillar"; break;
 				case 422: bossType="vortex pillar"; break;
@@ -378,7 +391,7 @@ namespace Plugin
 					spawnName = npc.FullName;
 					break;
 				case "martian saucer":
-					npc.SetDefaults(392);
+					npc.SetDefaults(395);
 					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
 					spawnName = npc.FullName;
 					break;
@@ -436,25 +449,25 @@ namespace Plugin
 
 		public static void Jump (TSPlayer op)
 		{
-			float x = op.TPlayer.position.X;
-			float y = op.TPlayer.position.Y;
+			// float x = op.TPlayer.position.X;
+			// float y = op.TPlayer.position.Y;
 			for (int i = 0; i < Main.maxPlayers; i++)
 			{
 				if (!Main.player[i].active)
 					continue;
 
 				Player op2 = Main.player[i];
-				float x2 = op2.position.X;
-				float y2 = op2.position.Y;
-				if( x2<=x+60 && x2>=x-60 && y2<=y+35 && y2>=y-35 )
-				{
+				// float x2 = op2.position.X;
+				// float y2 = op2.position.Y;
+				// if( x2<=x+60 && x2>=x-60 && y2<=y+35 && y2>=y-35 )
+				// {
 					// 起跳
 					op2.velocity.Y = -6;
 					TSPlayer.All.SendData(PacketTypes.PlayerUpdate, "", i );
 					
 					// 烟花
 					Firework(op);
-				}
+				// }
 			}
 		}
 

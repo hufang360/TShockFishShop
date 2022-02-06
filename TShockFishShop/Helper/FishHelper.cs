@@ -75,7 +75,7 @@ namespace Plugin
             itemName = MyUtils.GetItemDesc("", itemID);
             player.SendSuccessMessage($"今日份的任务鱼已指定成 {itemName}");
 		}
-    
+
         public static void FishInfo(TSPlayer player)
         {
             int itemID = Main.anglerQuestItemNetIDs[ Main.anglerQuest ];
@@ -102,7 +102,7 @@ namespace Plugin
 
             if( player.RealPlayer )
                 player.SendInfoMessage($"渔夫任务完成数: {player.TPlayer.anglerQuestsFinished} ");
-            
+
             // 在线玩家任务完成情况
             player.SendInfoMessage(ShowAnglerFinishedDetail());
         }
@@ -113,17 +113,15 @@ namespace Plugin
             List<string> players = new List<string>();
 			foreach (TSPlayer ply in TShock.Players)
 			{
-				if (ply != null && ply.Active)
-				{
+				if (ply!=null && ply.Active)
                     players.Add(ply.Name);
-				}
 			}
 
             int finished = 0;
             string swarpStr;
             for (int i = 0; i < players.Count; i++)
             {
-                if( i%9==0 ){
+                if( i!=0 && i%9==0 ){
                     swarpStr = "\n";
                 } else {
                     swarpStr = "";
@@ -131,13 +129,13 @@ namespace Plugin
                 if( Main.anglerWhoFinishedToday.Contains( players[i] ) )
                 {
                     finished ++;
-                    players[i] = $"{swarpStr}✔{players[i]}";
+                    players[i] = $"{swarpStr}[c/96FF96:✔{players[i]}]";
                 } else {
                     players[i] = $"{swarpStr}-{players[i]}";
                 }
             }
 
-            return $"今日完成渔夫任务情况({finished}/{players.Count}):\n {string.Join(", ", players)}";
+            return $"今日完成渔夫任务情况({finished}/{players.Count}):\n {string.Join("、", players)}";
 		}
 
         public static void ChangeMoonPhaseByID(TSPlayer player, int id, int amount=1)

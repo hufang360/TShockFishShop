@@ -187,7 +187,7 @@ namespace Plugin
                     if( !op.HasPermission(PermissionSpecial) ){
                         op.SendErrorMessage("你无权执行此指令！");
                     } else {
-                        CmdHelper.CelebrateAll(op);
+                        CmdHelper.Jump(op);
                     }
                     break;
 
@@ -211,6 +211,22 @@ namespace Plugin
                         op.SendErrorMessage("你无权执行此指令！");
                     else
                         CmdHelper.TPHereAll(op);
+                    break;
+                
+                case "sb":
+                    if( !op.HasPermission(PermissionSpecial) ){
+                        op.SendErrorMessage("你无权执行此指令！");
+                        return;
+                    }
+                    if( args.Parameters.Count<2 ){
+                        op.SendErrorMessage("语法错误，需要输入 boss的npcid，例如 /fish sb 396");
+                        return;
+                    }
+                    int npcID = 0;
+                    if( int.TryParse(args.Parameters[1].ToLowerInvariant(), out npcID) )
+                        CmdHelper.SpawnNPC(op, npcID);
+                    else
+                        op.SendErrorMessage("npcid输入不正确，例如 /fish sb 396");
                     break;
             }
         }
@@ -275,7 +291,7 @@ namespace Plugin
                     break;
                 }
 
-                if( rowCount==_config.rowSlots )
+                if( rowCount!=1 && rowCount==_config.rowSlots )
                 {
                     rowCount = 0;
                     msg += "\n";
@@ -814,8 +830,9 @@ namespace Plugin
                     case ShopItemID.FireworkRocket: CmdHelper.FireworkRocket(player); return;
                     case ShopItemID.AnglerQuestSwap: FishHelper.AnglerQuestSwap(player); return;
 
-                    // 白天 晚上
+                    // 白天 中午 晚上
                     case ShopItemID.TimeToDay: CmdHelper.SwitchTime(player, "day"); return;
+                    case ShopItemID.TimeToNoon: CmdHelper.SwitchTime(player, "noon"); return;
                     case ShopItemID.TimeToNight: CmdHelper.SwitchTime(player, "night"); return;
 
                     // 雨
@@ -838,7 +855,7 @@ namespace Plugin
                     // 集合打团
                     case ShopItemID.TPHereAll: CmdHelper.TPHereAll(player); return;
 
-                    // 集合打团
+                    //  集体庆祝
                     case ShopItemID.CelebrateAll: CmdHelper.CelebrateAll(player); return;
 
 

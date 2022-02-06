@@ -71,6 +71,9 @@ namespace Plugin
         // 集体庆祝
         public const int CelebrateAll = -163;
 
+        // 调中午
+        public const int TimeToNoon = -164;
+
 
         // ------------------------------------------------------------------------------------------
         // 召唤NPC
@@ -106,6 +109,7 @@ namespace Plugin
                 case InvasionStop: return "跳过入侵";
                 case TimeToDay: return "调白天";
                 case TimeToNight: return "调晚上";
+                case TimeToNoon: return "调中午";
                 case BloodMoonStart: return "召唤血月";
                 case BloodMoonStop: return "跳过血月";
                 case RawCmd: return $"指令{prefix}";
@@ -153,6 +157,7 @@ namespace Plugin
                 case "跳过入侵": case "停止入侵": return InvasionStop;
                 case "调白天": return TimeToDay;
                 case "调晚上": return TimeToNight;
+                case "调中午": return TimeToNoon;
                 case "召唤血月": return BloodMoonStart;
                 case "跳过血月": return BloodMoonStop;
 
@@ -245,6 +250,7 @@ namespace Plugin
                 case BloodMoonStop:
                 case TimeToDay:
                 case TimeToNight:
+                case TimeToNoon:
                 case RawCmd:
                 case ReliveNPC:
                 case TPHereAll:
