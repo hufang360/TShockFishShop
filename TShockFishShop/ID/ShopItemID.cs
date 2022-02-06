@@ -151,7 +151,7 @@ namespace Plugin
 
                 case "烟花": return Firework;
                 case "烟花起飞": return FireworkRocket;
-                case "更换任务鱼": case "更换钓鱼任务":  case "切换任务鱼": case "切换钓鱼任务": return AnglerQuestSwap;
+                case "更换任务鱼": case "更换钓鱼任务":  case "切换任务鱼": case "切换钓鱼任务": case "换鱼": return AnglerQuestSwap;
                 case "雨来": case "下雨": return RainingStart;
                 case "雨停": return RainingStop;
                 case "跳过入侵": case "停止入侵": return InvasionStop;

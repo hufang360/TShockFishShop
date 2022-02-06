@@ -466,7 +466,7 @@ namespace Plugin
 					TSPlayer.All.SendData(PacketTypes.PlayerUpdate, "", i );
 					
 					// 烟花
-					Firework(op);
+					Firework(TShock.Players[i]);
 				// }
 			}
 		}
