@@ -863,11 +863,16 @@ namespace Plugin
                         break;
                 }
 
-                // 召唤npc类
                 if( id>ShopItemID.SpawnEnd && id<ShopItemID.SpawnStart )
                 {
+                    // 召唤NPC类
                     int npcID = ShopItemID.SpawnStart-id;
                     CmdHelper.SpawnNPC(player, npcID, amount);
+                } else if( id>ShopItemID.ClearNPCEnd && id<ShopItemID.ClearNPCStart )
+                {
+                    // 清除NPC类
+                    int npcID = ShopItemID.ClearNPCStart-id;
+                    CmdHelper.ClearNPC(player, npcID, amount);
                 }
 
             } else {

@@ -82,6 +82,10 @@ namespace Plugin
                 case 422: return "星旋柱";
                 case 507: return "星云柱";
                 case 493: return "星尘柱";
+                case 551: return "双足翼龙";
+                case 491: return "荷兰飞盗船";
+                case 392: return "火星飞碟";
+                case 395: return "火星飞碟";
             }
 
             // 其它NPC
@@ -166,6 +170,8 @@ namespace Plugin
                 case "坦克": case "圣诞坦克": return 346;
 
                 case "火星飞碟": case "外星飞碟": return 395;
+                case "荷兰飞盗船": case "海盗船": return 491;
+                case "双足翼龙": return 551;
 
                 case "日耀": case "日耀柱": case "日曜": case "日曜柱": return 517;
                 case "星旋": case "星旋柱": return 422;

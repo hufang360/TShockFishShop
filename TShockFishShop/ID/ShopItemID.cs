@@ -78,11 +78,19 @@ namespace Plugin
         // ------------------------------------------------------------------------------------------
         // 召唤NPC
         // -1000-[npcID]
-        // 召唤 骷髅王
         public const int SpawnStart = -1000;
         public const int SpawnEnd = -1999;
 
+        // ------------------------------------------------------------------------------------------
+        // 清除NPC
+        // -5000-[buffID]
+        public const int ClearNPCStart = -5000;
+        public const int ClearNPCEnd = -5999;
+
+
         private static int GetSpawnID(int id)    {return -(1000+id);}
+
+        private static int GetClearNPCID(int id)    {return -(5000+id);}
 
 
         public static string GetNameByID(int id, string prefix="")
@@ -103,7 +111,6 @@ namespace Plugin
                 case Firework: return "烟花";
                 case AnglerQuestSwap: return "更换任务鱼";
 
-
                 case RainingStart: return "雨来";
                 case RainingStop: return "雨停";
                 case InvasionStop: return "跳过入侵";
@@ -120,11 +127,21 @@ namespace Plugin
 
             int npcID = 0;
             string npcName = "";
+
+            // 召唤NPC
             if( id>=SpawnEnd && id<= SpawnStart ){
                 npcID = SpawnStart-id;
                 npcName = NPCHelper.GetNameByID(npcID);
                 if( !string.IsNullOrEmpty(npcName) )
                     return $"召唤{npcName}";
+            }
+
+            // 清除NPC
+            if( id>=ClearNPCEnd && id<= ClearNPCStart ){
+                npcID = ClearNPCStart-id;
+                npcName = NPCHelper.GetNameByID(npcID);
+                if( !string.IsNullOrEmpty(npcName) )
+                    return $"清除{npcName}";
             }
 
             return "";
@@ -211,6 +228,14 @@ namespace Plugin
                     return GetSpawnID(npcID);
             }
 
+            // 清除npc
+            if( name.Contains("清除") ){
+                string s = name.Replace(" ", "").Replace("清除","").ToLowerInvariant();
+                int npcID = NPCHelper.GetIDByName(s);
+                if( npcID!=0 )
+                    return GetClearNPCID(npcID);
+            }
+
             // 尝试使用物品名匹配
             int id = GetItemIDByName(name);
             if( id!=0 )
@@ -257,6 +282,9 @@ namespace Plugin
                 case CelebrateAll:
                     return false;
             }
+
+            if( id>=ClearNPCEnd && id<=ClearNPCStart )
+                return false;
 
             return true;
         }

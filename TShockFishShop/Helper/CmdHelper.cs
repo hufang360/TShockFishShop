@@ -4,11 +4,15 @@ using Terraria;
 using Terraria.ID;
 using TShockAPI;
 using Microsoft.Xna.Framework;
+using System.Linq;
+
 
 namespace Plugin
 {
     public class CmdHelper
     {
+
+		// 调时间
 		public static void SwitchTime(TSPlayer player, string type="noon")
 		{
 			switch (type)
@@ -35,6 +39,7 @@ namespace Plugin
 			}
 		}
 
+		// 调雨
 		public static void ToggleRaining(TSPlayer player, bool on)
 		{
 			if( on ){
@@ -59,6 +64,8 @@ namespace Plugin
 				}
 			}
 		}
+
+		// 跳过入侵
 		public static void StopInvasion(TSPlayer player)
 		{
 			if(Main.invasionSize>0){
@@ -80,7 +87,7 @@ namespace Plugin
 			op.tempGroup = null;
 		}
 
-
+		// 集合打团
 		public static void TPHereAll(TSPlayer op)
 		{
 			for (int i = 0; i < Main.maxPlayers; i++)
@@ -93,13 +100,15 @@ namespace Plugin
 			}
 			TSPlayer.All.SendInfoMessage($"{op.Name} 购买了 集合打团，将所有玩家召唤到他身边");
 		}
+
+		// 集体庆祝
 		public static void CelebrateAll(TSPlayer op)
 		{
 			Jump(op);
 			TSPlayer.All.SendInfoMessage($"{op.Name} 购买了集体庆祝");
 		}
 
-
+		// 血月开关
 		public static void ToggleBloodMoon(TSPlayer player, bool on)
 		{
 
@@ -126,8 +135,9 @@ namespace Plugin
 			}
 		}
 
-        public static void SpawnNPC(TSPlayer player, int npcID, int times=0){
-
+		// 生成NPC
+        public static void SpawnNPC(TSPlayer op, int npcID, int times=0)
+		{
 			string bossType = "";
 			switch (npcID)
 			{
@@ -177,7 +187,7 @@ namespace Plugin
 				List<string> args = new List<string>() {bossType};
 				if( times>0 )
 					args.Add( times.ToString() );
-				SpawnBossRaw( new CommandArgs("", player, args ) );
+				SpawnBossRaw( new CommandArgs("", op, args ) );
 			} else {
 				// 生成npc
 				NPC npc = new NPC();
@@ -191,8 +201,44 @@ namespace Plugin
 				}
 
 				if( pass )
-					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, times, player.TileX, player.TileY);
+					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, times, op.TileX, op.TileY);
 			}
+        }
+
+		// 清除NPC
+        public static void ClearNPC(TSPlayer op, int npcID, int times=0)
+		{
+			List<NPC> npcs = TShock.Utils.GetNPCByIdOrName(npcID.ToString());
+			if (npcs.Count == 0)
+			{
+				op.SendErrorMessage("找不到对应的 NPC");
+			}
+			else if (npcs.Count > 1)
+			{
+				op.SendMultipleMatchError(npcs.Select(n => $"{n.FullName}({n.type})"));
+			}
+			else
+			{
+				var npc = npcs[0];
+				TSPlayer.All.SendSuccessMessage("{0} 清理了 {1} 个 {2}", op.Name, ClearNPCByID(npc.netID), npc.FullName);
+			}
+		}
+		
+		// 通过npcid清理npc
+		private static int ClearNPCByID(int npcID)
+        {
+            int cleared = 0;
+            for (int i = 0; i < Main.maxNPCs; i++)
+            {
+                if (Main.npc[i].active && Main.npc[i].netID==npcID )
+                {
+                    Main.npc[i].active = false;
+                    Main.npc[i].type = 0;
+                    TSPlayer.All.SendData(PacketTypes.NpcUpdate, "", i);
+                    cleared++;
+                }
+            }
+            return cleared;
         }
 
         // SpawnBoss
@@ -207,12 +253,13 @@ namespace Plugin
 			int amount = 1;
 			if (args.Parameters.Count == 2 && (!int.TryParse(args.Parameters[1], out amount) || amount <= 0))
 			{
-				args.Player.SendErrorMessage("Invalid boss amount!");
+				args.Player.SendErrorMessage("无效的boss名!");
 				return;
 			}
 
 			string message = "{0} 召唤了 {1} {2} 次";
 			string spawnName="";
+			int npcID = 0;
 			NPC npc = new NPC();
 			switch (args.Parameters[0].ToLower())
 			{
@@ -226,81 +273,68 @@ namespace Plugin
 						TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
 					}
 					spawnName = "Boss全明星";
-					break;
+					return;
 
 				case "brain":
 				case "brain of cthulhu":
 				case "boc":
-					npc.SetDefaults(266);
-					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = npc.FullName;
+					npcID = 266;
 					break;
 
 				case "destroyer":
-					npc.SetDefaults(134);
 					TSPlayer.Server.SetTime(false, 0.0);
-					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = npc.FullName;
+					npcID = 134;
 					break;
+
 				case "duke":
 				case "duke fishron":
 				case "fishron":
-					npc.SetDefaults(370);
-					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = npc.FullName;
+					npcID = 370;
 					break;
+
 				case "eater":
 				case "eater of worlds":
 				case "eow":
-					npc.SetDefaults(13);
-					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = npc.FullName;
+					npcID = 13;
 					break;
+
 				case "eye":
 				case "eye of cthulhu":
 				case "eoc":
-					npc.SetDefaults(4);
 					TSPlayer.Server.SetTime(false, 0.0);
-					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = npc.FullName;
+					npcID = 4;
 					break;
+
 				case "golem":
-					npc.SetDefaults(245);
-					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = npc.FullName;
+					npcID = 245;
 					break;
+
 				case "king":
 				case "king slime":
 				case "ks":
-					npc.SetDefaults(50);
-					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = npc.FullName;
+					npcID = 50;
 					break;
+
 				case "plantera":
-					npc.SetDefaults(262);
-					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = npc.FullName;
-					spawnName = NPC.getNewNPCName(262) ;
+					npcID = 262;
 					break;
+
 				case "prime":
 				case "skeletron prime":
-					npc.SetDefaults(127);
 					TSPlayer.Server.SetTime(false, 0.0);
-					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = npc.FullName;
+					npcID = 127;
 					break;
+
 				case "queen bee":
 				case "qb":
-					npc.SetDefaults(222);
-					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = npc.FullName;
+					npcID = 222;
 					break;
+
 				case "skeletron":
-					npc.SetDefaults(35);
 					TSPlayer.Server.SetTime(false, 0.0);
-					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = npc.FullName;
+					npcID = 35;
 					break;
+
 				case "twins":
 					TSPlayer.Server.SetTime(false, 0.0);
 					npc.SetDefaults(125);
@@ -309,132 +343,124 @@ namespace Plugin
 					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
 					spawnName = "双子魔眼";
 					break;
+
 				case "wof":
 				case "wall of flesh":
 					if (Main.wofNPCIndex != -1)
 					{
-						args.Player.SendErrorMessage("There is already a Wall of Flesh!");
+						args.Player.SendErrorMessage("血肉墙已存在!");
 						return;
 					}
 					if (args.Player.Y / 16f < Main.maxTilesY - 205)
 					{
-						args.Player.SendErrorMessage("You must spawn the Wall of Flesh in hell!");
+						args.Player.SendErrorMessage("血肉墙只能在地狱进行召唤!");
 						return;
 					}
 					NPC.SpawnWOF(new Vector2(args.Player.X, args.Player.Y));
 					spawnName = "血肉墙";
 					break;
+
 				case "moon":
 				case "moon lord":
 				case "ml":
-					npc.SetDefaults(398);
-					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = npc.FullName;
+					TSPlayer.Server.SetTime(false, 0.0);
+					npcID = 398;
 					break;
+
 				case "empress":
 				case "empress of light":
 				case "eol":
-					npc.SetDefaults(636);
-					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = npc.FullName;
+					npcID = 636;
 					break;
+
 				case "queen slime":
 				case "qs":
-					npc.SetDefaults(657);
-					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = npc.FullName;
+					npcID = 657;
 					break;
+
 				case "lunatic":
 				case "lunatic cultist":
 				case "cultist":
 				case "lc":
-					npc.SetDefaults(439);
-					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = npc.FullName;
+					npcID = 439;
 					break;
+
 				case "betsy":
-					npc.SetDefaults(551);
-					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = npc.FullName;
+					npcID = 551;
 					break;
+
 				case "flying dutchman":
 				case "flying":
 				case "dutchman":
-					npc.SetDefaults(491);
-					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = npc.FullName;
+					npcID = 491;
 					break;
+
 				case "mourning wood":
-					npc.SetDefaults(325);
-					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = npc.FullName;
+					TSPlayer.Server.SetTime(false, 0.0);
+					npcID = 325;
 					break;
+
 				case "pumpking":
-					npc.SetDefaults(327);
-					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = npc.FullName;
+					TSPlayer.Server.SetTime(false, 0.0);
+					npcID = 327;
 					break;
+
 				case "everscream":
-					npc.SetDefaults(344);
-					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = npc.FullName;
+					TSPlayer.Server.SetTime(false, 0.0);
+					npcID = 344;
 					break;
+
 				case "santa-nk1":
 				case "santa":
-					npc.SetDefaults(346);
-					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = npc.FullName;
+					TSPlayer.Server.SetTime(false, 0.0);
+					npcID = 346;
 					break;
+
 				case "ice queen":
-					npc.SetDefaults(345);
-					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = npc.FullName;
+					TSPlayer.Server.SetTime(false, 0.0);
+					npcID = 345;
 					break;
+
 				case "martian saucer":
-					npc.SetDefaults(395);
-					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = npc.FullName;
+					npcID = 395;
 					break;
+
 				case "solar pillar":
-					npc.SetDefaults(517);
-					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = npc.FullName;
+					npcID = 517;
 					break;
+
 				case "nebula pillar":
-					npc.SetDefaults(507);
-					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = npc.FullName;
+					npcID = 507;
 					break;
+
 				case "vortex pillar":
-					npc.SetDefaults(422);
-					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = npc.FullName;
+					npcID = 422;
 					break;
+
 				case "stardust pillar":
-					npc.SetDefaults(493);
-					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = npc.FullName;
+					npcID = 493;
 					break;
+
 				case "deerclops":
-					npc.SetDefaults(668);
-					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
-					spawnName = npc.FullName;
+					npcID = 668;
 					break;
+
 				default:
 					args.Player.SendErrorMessage("无法识别此boss名!");
 					return;
 			}
 
-			if (args.Silent)
-			{
-				//"You spawned <spawn name> <x> time(s)"
-				args.Player.SendSuccessMessage(message, "You", spawnName, amount);
+			if( npcID!=0 ){
+				npc.SetDefaults(npcID);
+				TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
+
+				// boss的名字
+				if( string.IsNullOrEmpty(spawnName) )
+					spawnName = NPCHelper.GetNameByID(npcID);
 			}
-			else
-			{
-				//"<player> spawned <spawn name> <x> time(s)"
-				TSPlayer.All.SendSuccessMessage(message, args.Player.Name, spawnName, amount);
-			}
+
+			//"<player> spawned <spawn name> <x> time(s)"
+			TSPlayer.All.SendSuccessMessage(message, args.Player.Name, spawnName, amount);
 		}
 
 		public static void FireworkRocket(TSPlayer player)
