@@ -135,7 +135,7 @@ namespace Plugin
                 }
             }
 
-            return $"今日完成渔夫任务情况({finished}/{players.Count}):\n {string.Join("、", players)}";
+            return $"今日完成渔夫任务情况({finished}/{players.Count}):\n {string.Join(", ", players)}";
 		}
 
         public static void ChangeMoonPhaseByID(TSPlayer player, int id, int amount=1)

@@ -3,6 +3,8 @@ using TShockAPI.Localization;
 using Terraria;
 using TShockAPI;
 using Terraria.GameContent.Bestiary;
+using System.Linq;
+using Microsoft.Xna.Framework;
 
 
 namespace Plugin
@@ -64,6 +66,7 @@ namespace Plugin
 
                 case 134: return "毁灭者";
                 case 125: return "双子魔眼";
+                case 126: return "双子魔眼";
                 case 127: return "机械骷髅王";
                 case 262: return "世纪之花";
                 case 245: return "石巨人";
@@ -146,7 +149,7 @@ namespace Plugin
 
                 case "史王": case "史莱姆王": return 50;
                 case "克眼": case "克苏鲁之眼": return 4;
-                case "世吞": case "世界吞噬者": return 13;
+                case "世吞": case "世界吞噬者": case "世界吞噬怪": return 13;
                 case "克脑": case "克苏鲁之脑": return 266;
                 case "骷髅王": return 35;
                 case "巨鹿": case "鹿角怪": return 668;
@@ -169,7 +172,7 @@ namespace Plugin
                 case "冰雪皇后": case "冰雪女王": return 345;
                 case "坦克": case "圣诞坦克": return 346;
 
-                case "火星飞碟": case "外星飞碟": return 395;
+                case "火星飞碟": case "外星飞碟": return 392;
                 case "荷兰飞盗船": case "海盗船": return 491;
                 case "双足翼龙": return 551;
 
@@ -248,13 +251,13 @@ namespace Plugin
 		}
 
 
-        
+
 		// NPC重生
         public static void ReliveNPC(TSPlayer op)
         {
             List<int> found = new List<int>();
 
-            // 向导 
+            // 向导
             found.Add(22);
 
             // 解救状态
@@ -376,10 +379,341 @@ namespace Plugin
                 op.SendInfoMessage("入住过的NPC都活着");
             }
         }
-        
+
 		private static bool DidDiscoverBestiaryEntry(int npcId)
 		{
 			return Main.BestiaryDB.FindEntryByNPCID(npcId).UIInfoProvider.GetEntryUICollectionInfo().UnlockState > BestiaryEntryUnlockState.NotKnownAtAll_0;
+		}
+
+
+
+
+		// 生成NPC
+        public static void SpawnNPC(TSPlayer op, int npcID, int times=0)
+		{
+			string bossType = "";
+			switch (npcID)
+			{
+				case 266: bossType="brain of cthulhu"; break;
+				case 134: bossType="destroyer"; break;
+				case 370: bossType="duke fishron"; break;
+				case 13: bossType="eater of worlds"; break;
+				case 4: bossType="eye of cthulhu"; break;
+				case 245: bossType="golem"; break;
+				case 50: bossType="king slime"; break;
+				case 262: bossType="plantera"; break;
+				case 127: bossType="skeletron prime"; break;
+				case 222: bossType="queen bee"; break;
+				case 35: bossType="skeletron"; break;
+
+				case 125: bossType="twins"; break;
+				case 126: bossType="twins"; break;
+
+				case 113: bossType="wall of flesh"; break;
+				case 396: bossType="moon lord"; break;
+				case 636: bossType="empress of light"; break;
+				case 657: bossType="queen slime"; break;
+				case 439: bossType="lunatic cultist"; break;
+				case 551: bossType="betsy"; break;
+				case 491: bossType="flying dutchman"; break;
+				case 325: bossType="mourning wood"; break;
+				case 327: bossType="pumpking"; break;
+				case 344: bossType="everscream"; break;
+				case 346: bossType="santa-nk1"; break;
+				case 345: bossType="ice queen"; break;
+
+				case 392: bossType="martian saucer"; break;
+				case 393: bossType="martian saucer"; break;
+				case 394: bossType="martian saucer"; break;
+				case 395: bossType="martian saucer"; break;
+
+				case 517: bossType="solar pillar"; break;
+				case 507: bossType="nebula pillar"; break;
+				case 422: bossType="vortex pillar"; break;
+				case 493: bossType="stardust pillar"; break;
+				case 668: bossType="deerclops"; break;
+			}
+
+			if( !string.IsNullOrEmpty(bossType) )
+			{
+				// 召唤boss
+				List<string> args = new List<string>() {bossType};
+				if( times>0 )
+					args.Add( times.ToString() );
+				SpawnBossRaw( new CommandArgs("", op, args ) );
+			} else {
+				// 生成npc
+				NPC npc = new NPC();
+				npc.SetDefaults(npcID);
+
+				bool pass = true;
+				if( npc.townNPC ){
+					if(NPCHelper.CheckNPCActive(npcID.ToString())){
+						pass = false;
+					}
+				}
+
+				if( pass )
+					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, times, op.TileX, op.TileY);
+			}
+        }
+
+		// 清除NPC
+        public static void ClearNPC(TSPlayer op, int npcID, int times=0)
+		{
+			List<NPC> npcs = TShock.Utils.GetNPCByIdOrName(npcID.ToString());
+			if (npcs.Count == 0)
+			{
+				op.SendErrorMessage("找不到对应的 NPC");
+			}
+			else if (npcs.Count > 1)
+			{
+				op.SendMultipleMatchError(npcs.Select(n => $"{n.FullName}({n.type})"));
+			}
+			else
+			{
+				var npc = npcs[0];
+				TSPlayer.All.SendSuccessMessage("{0} 清理了 {1} 个 {2}", op.Name, ClearNPCByID(npc.netID), npc.FullName);
+			}
+		}
+
+		// 通过npcid清理npc
+		private static int ClearNPCByID(int npcID)
+        {
+            int cleared = 0;
+            for (int i = 0; i < Main.maxNPCs; i++)
+            {
+                if (Main.npc[i].active && Main.npc[i].netID==npcID )
+                {
+                    Main.npc[i].active = false;
+                    Main.npc[i].type = 0;
+                    TSPlayer.All.SendData(PacketTypes.NpcUpdate, "", i);
+                    cleared++;
+                }
+            }
+            return cleared;
+        }
+
+        // SpawnBoss
+        private static void SpawnBossRaw(CommandArgs args)
+		{
+			if (args.Parameters.Count < 1 || args.Parameters.Count > 2)
+			{
+				args.Player.SendErrorMessage("Invalid syntax! Proper syntax: {0}spawnboss <boss type> [amount]", Commands.Specifier);
+				return;
+			}
+
+			int amount = 1;
+			if (args.Parameters.Count == 2 && (!int.TryParse(args.Parameters[1], out amount) || amount <= 0))
+			{
+				args.Player.SendErrorMessage("无效的boss名!");
+				return;
+			}
+
+			string message = "{0} 召唤了 {1} {2} 次";
+			string spawnName="";
+			int npcID = 0;
+			NPC npc = new NPC();
+			switch (args.Parameters[0].ToLower())
+			{
+				case "*":
+				case "all":
+					int[] npcIds = { 4, 13, 35, 50, 125, 126, 127, 134, 222, 245, 262, 266, 370, 398, 439, 636, 657 };
+					TSPlayer.Server.SetTime(false, 0.0);
+					foreach (int i in npcIds)
+					{
+						npc.SetDefaults(i);
+						TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
+					}
+					spawnName = "Boss全明星";
+					return;
+
+				case "brain":
+				case "brain of cthulhu":
+				case "boc":
+					npcID = 266;
+					break;
+
+				case "destroyer":
+					TSPlayer.Server.SetTime(false, 0.0);
+					npcID = 134;
+					break;
+
+				case "duke":
+				case "duke fishron":
+				case "fishron":
+					npcID = 370;
+					break;
+
+				case "eater":
+				case "eater of worlds":
+				case "eow":
+					npcID = 13;
+					break;
+
+				case "eye":
+				case "eye of cthulhu":
+				case "eoc":
+					TSPlayer.Server.SetTime(false, 0.0);
+					npcID = 4;
+					break;
+
+				case "golem":
+					npcID = 245;
+					break;
+
+				case "king":
+				case "king slime":
+				case "ks":
+					npcID = 50;
+					break;
+
+				case "plantera":
+					npcID = 262;
+					break;
+
+				case "prime":
+				case "skeletron prime":
+					TSPlayer.Server.SetTime(false, 0.0);
+					npcID = 127;
+					break;
+
+				case "queen bee":
+				case "qb":
+					npcID = 222;
+					break;
+
+				case "skeletron":
+					TSPlayer.Server.SetTime(false, 0.0);
+					npcID = 35;
+					break;
+
+				case "twins":
+					TSPlayer.Server.SetTime(false, 0.0);
+					npc.SetDefaults(125);
+					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
+					npc.SetDefaults(126);
+					TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
+					spawnName = "双子魔眼";
+					break;
+
+				case "wof":
+				case "wall of flesh":
+					if (Main.wofNPCIndex != -1)
+					{
+						args.Player.SendErrorMessage("血肉墙已存在!");
+						return;
+					}
+					if (args.Player.Y / 16f < Main.maxTilesY - 205)
+					{
+						args.Player.SendErrorMessage("血肉墙只能在地狱进行召唤!");
+						return;
+					}
+					NPC.SpawnWOF(new Vector2(args.Player.X, args.Player.Y));
+					spawnName = "血肉墙";
+					break;
+
+				case "moon":
+				case "moon lord":
+				case "ml":
+					TSPlayer.Server.SetTime(false, 0.0);
+					npcID = 398;
+					break;
+
+				case "empress":
+				case "empress of light":
+				case "eol":
+					npcID = 636;
+					break;
+
+				case "queen slime":
+				case "qs":
+					npcID = 657;
+					break;
+
+				case "lunatic":
+				case "lunatic cultist":
+				case "cultist":
+				case "lc":
+					npcID = 439;
+					break;
+
+				case "betsy":
+					npcID = 551;
+					break;
+
+				case "flying dutchman":
+				case "flying":
+				case "dutchman":
+					npcID = 491;
+					break;
+
+				case "mourning wood":
+					TSPlayer.Server.SetTime(false, 0.0);
+					npcID = 325;
+					break;
+
+				case "pumpking":
+					TSPlayer.Server.SetTime(false, 0.0);
+					npcID = 327;
+					break;
+
+				case "everscream":
+					TSPlayer.Server.SetTime(false, 0.0);
+					npcID = 344;
+					break;
+
+				case "santa-nk1":
+				case "santa":
+					TSPlayer.Server.SetTime(false, 0.0);
+					npcID = 346;
+					break;
+
+				case "ice queen":
+					TSPlayer.Server.SetTime(false, 0.0);
+					npcID = 345;
+					break;
+
+				case "martian saucer":
+					npcID = 395;
+					break;
+
+				case "solar pillar":
+					npcID = 517;
+					break;
+
+				case "nebula pillar":
+					npcID = 507;
+					break;
+
+				case "vortex pillar":
+					npcID = 422;
+					break;
+
+				case "stardust pillar":
+					npcID = 493;
+					break;
+
+				case "deerclops":
+					npcID = 668;
+					break;
+
+				default:
+					args.Player.SendErrorMessage("无法识别此boss名!");
+					return;
+			}
+
+			if( npcID!=0 ){
+				npc.SetDefaults(npcID);
+				TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, amount, args.Player.TileX, args.Player.TileY);
+
+				// boss的名字
+				if( string.IsNullOrEmpty(spawnName) )
+					spawnName = NPCHelper.GetNameByID(npcID);
+			}
+
+			//"<player> spawned <spawn name> <x> time(s)"
+			TSPlayer.All.SendSuccessMessage(message, args.Player.Name, spawnName, amount);
 		}
 
 

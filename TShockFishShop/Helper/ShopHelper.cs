@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Terraria;
 
+
 namespace Plugin
 {
     public class ShopItem
@@ -240,6 +241,14 @@ namespace Plugin
             return s;
         }
 
+    }
+    
+
+    public class ShopItem2
+    {
+        public int serial = 0;
+
+        public ShopItem item;
     }
 
     // public class Shelf

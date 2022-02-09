@@ -74,6 +74,9 @@ namespace Plugin
         // 调中午
         public const int TimeToNoon = -164;
 
+        // 调午夜
+        public const int TimeToMidNight = -165;
+
 
         // ------------------------------------------------------------------------------------------
         // 召唤NPC
@@ -83,14 +86,14 @@ namespace Plugin
 
         // ------------------------------------------------------------------------------------------
         // 清除NPC
-        // -5000-[buffID]
-        public const int ClearNPCStart = -5000;
-        public const int ClearNPCEnd = -5999;
+        // -4000-[npcID]
+        public const int ClearNPCStart = -4000;
+        public const int ClearNPCEnd = -4999;
 
 
         private static int GetSpawnID(int id)    {return -(1000+id);}
 
-        private static int GetClearNPCID(int id)    {return -(5000+id);}
+        private static int GetClearNPCID(int id)    {return -(4000+id);}
 
 
         public static string GetNameByID(int id, string prefix="")
@@ -117,6 +120,7 @@ namespace Plugin
                 case TimeToDay: return "调白天";
                 case TimeToNight: return "调晚上";
                 case TimeToNoon: return "调中午";
+                case TimeToMidNight: return "调午夜";
                 case BloodMoonStart: return "召唤血月";
                 case BloodMoonStop: return "跳过血月";
                 case RawCmd: return $"指令{prefix}";
@@ -175,6 +179,7 @@ namespace Plugin
                 case "调白天": return TimeToDay;
                 case "调晚上": return TimeToNight;
                 case "调中午": return TimeToNoon;
+                case "调午夜": return TimeToMidNight;
                 case "召唤血月": return BloodMoonStart;
                 case "跳过血月": return BloodMoonStop;
 

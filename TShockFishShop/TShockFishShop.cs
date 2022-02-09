@@ -87,8 +87,8 @@ namespace Plugin
             switch (args.Parameters[0].ToLowerInvariant())
             {
                 // 帮助
-                case "help":
                 case "h":
+                case "help":
                     ShowHelpText();
                     return;
 
@@ -97,20 +97,20 @@ namespace Plugin
                     break;
 
                 // 浏览
-                case "list":
                 case "l":
+                case "list":
                     ListGoods(args);
                     break;
 
                 // 询价
-                case "ask":
                 case "a":
+                case "ask":
                     AskGoods(args);
                     break;
 
                 // 购买
-                case "buy":
                 case "b":
+                case "buy":
                     BuyGoods(args);
                     break;
 
@@ -122,15 +122,15 @@ namespace Plugin
 
 
                 // 钓鱼信息
-                case "info":
                 case "i":
+                case "info":
                     FishHelper.FishInfo(op);
                     break;
 
 
                 // 修改钓鱼次数
-                case "finish":
                 case "f":
+                case "finish":
                     if ( !op.RealPlayer ){
                         op.SendErrorMessage("此指令需要在游戏内才能执行！");
                         break;
@@ -168,8 +168,8 @@ namespace Plugin
 
 
                 // 指定今天的任务鱼
-                case "changesuper":
                 case "cs":
+                case "changesuper":
                     if( !op.HasPermission(PermissionChangeSuper) ){
                         op.SendErrorMessage("你无权指定今天的任务鱼！");
                     } else {
@@ -212,7 +212,7 @@ namespace Plugin
                     else
                         CmdHelper.TPHereAll(op);
                     break;
-                
+
                 case "sb":
                     if( !op.HasPermission(PermissionSpecial) ){
                         op.SendErrorMessage("你无权执行此指令！");
@@ -224,7 +224,7 @@ namespace Plugin
                     }
                     int npcID = 0;
                     if( int.TryParse(args.Parameters[1].ToLowerInvariant(), out npcID) )
-                        CmdHelper.SpawnNPC(op, npcID);
+                        NPCHelper.SpawnNPC(op, npcID);
                     else
                         op.SendErrorMessage("npcid输入不正确，例如 /fish sb 396");
                     break;
@@ -238,25 +238,13 @@ namespace Plugin
             LoadConfig();
 
             // 商店是否解锁
-            string msg = "";
-            string s = "";
-            foreach( ItemData d in _config.unlock )
-            {
-                if( !UnlockID.CheckUnlock(d, args.Player, out s) )
-                    msg += " " + s;
-            }
-            if( msg!="" ){
-                if( args.Player!=null )
-                    args.Player.SendInfoMessage( $"【{_config.name}】已打烊，因为: {msg}" );
-                else
-                   Log.info( $"【{_config.name}】已打烊，因为: {msg}" );
+            if( !CheckShopUnlock(args.Player) )
                 return;
-            }
 
             // 更新货架
             List<ShopItem> founds = UpdateShelf(args.Player);
 
-            float num = (float)founds.Count/_config.pageSlots;
+            float num = (float)founds.Count / _config.pageSlots;
             int totalPage = (int)Math.Ceiling( num );
 
             int pageNum = 1;
@@ -271,6 +259,7 @@ namespace Plugin
 
 
             // 显示指定页的内容
+            string msg = "";
             int rowCount = 0;
             int pageCount = 0;
             int totalCount = 0;
@@ -311,40 +300,6 @@ namespace Plugin
                 Log.info(msg);
         }
 
-        // 加载配置
-        private void LoadConfig(bool forceLoad=false)
-        {
-            if( !_configIsLoading || forceLoad )
-            {
-                _config = Config.Load(Path.Combine(savedir,"config.json"));
-
-                foreach (ItemData d in _config.unlock )
-                {
-                    d.fixIDByName();
-                }
-
-                foreach (ShopItem item in _config.shop)
-                {
-                    item.filling();
-                    foreach (ItemData d in item.cost )
-                    {
-                        d.fixIDByName();
-                    }
-                    foreach (ItemData d in item.unlock )
-                    {
-                        d.fixIDByName();
-                    }
-                }
-                _configIsLoading = true;
-            }
-        }
-
-        /// 更新货架
-        private List<ShopItem> UpdateShelf(TSPlayer player)
-        {
-            return _config.shop;
-        }
-
 
         // 询价
         private void AskGoods(CommandArgs args)
@@ -356,9 +311,14 @@ namespace Plugin
 
             LoadConfig();
 
+            // 商店是否解锁
+            if( !CheckShopUnlock(args.Player) )
+                return;
+
             String itemNameOrId = args.Parameters[1];
             List<ShopItem> founds = UpdateShelf(args.Player);
-            List<ShopItem> goods = new List<ShopItem>();
+            List<ShopItem2> goods = new List<ShopItem2>();
+            ShopItem2 item2;
 
             int goodsSerial = 0;
             if( int.TryParse(itemNameOrId, out goodsSerial) )
@@ -369,10 +329,12 @@ namespace Plugin
                     args.Player.SendErrorMessage($"最大编号为: {count}，请使用 /fish list 查看货架.");
                     return;
                 }
-
-                goods.Add(founds[goodsSerial-1]);
+                item2 = new ShopItem2();
+                item2.serial = goodsSerial;
+                item2.item = founds[goodsSerial-1];
+                goods.Add( item2 );
             } else {
-                 // 通过名字 匹配编号
+                // 通过名字 匹配编号
                 int customID = IDSet.GetIDByName( itemNameOrId );
                 if( customID!=0 )
                 {
@@ -387,20 +349,20 @@ namespace Plugin
                     Log.info( matchedItems.Count.ToString() );
                     foreach (Item item in matchedItems)
                     {
-                        List<ShopItem> finds = FindGoods(item.netID);
-                        foreach( ShopItem sitem in finds ){
+                        List<ShopItem2> finds = FindGoods(item.netID);
+                        foreach( ShopItem2 sitem in finds ){
                             goods.Add( sitem );
                         }
                     }
                 }
             }
 
-            foreach (ShopItem shopItem in goods)
+            foreach (ShopItem2 shopItem in goods)
             {
-                string shopDesc = shopItem.GetItemDesc();
-                string costDesc = shopItem.GetCostDesc();
-                string unlockDesc = shopItem.GetUnlockDesc();
-                string s = $"{shopDesc} = {costDesc}";
+                string shopDesc = shopItem.item.GetItemDesc();
+                string costDesc = shopItem.item.GetCostDesc();
+                string unlockDesc = shopItem.item.GetUnlockDesc();
+                string s = $"{shopItem.serial}.{shopDesc} <= {costDesc}";
                 if( unlockDesc!="" )
                     s += $" | 需 {unlockDesc}";
                 args.Player.SendInfoMessage( s );
@@ -410,7 +372,7 @@ namespace Plugin
                 args.Player.SendErrorMessage( $"没卖过 {itemNameOrId}!" );
             } else{
                 if( args.Player.RealPlayer )
-                    args.Player.SendInfoMessage($"你的余额: {GetCoinsCountDesc(args.Player)}");
+                    args.Player.SendInfoMessage($"你的余额: {InventoryHelper.GetCoinsCountDesc(args.Player)}");
             }
         }
 
@@ -433,6 +395,11 @@ namespace Plugin
 
             // 更新货架
             LoadConfig();
+
+            // 商店是否解锁
+            if( !CheckShopUnlock(args.Player) )
+                return;
+
             List<ShopItem> goods = UpdateShelf(args.Player);
 
             int goodsSerial = 1;
@@ -517,10 +484,10 @@ namespace Plugin
 
             // 询价
             msg = "";
-            if( CheckCost(args.Player, shopItem, goodsAmount, out msg) )
+            if( InventoryHelper.CheckCost(args.Player, shopItem, goodsAmount, out msg) )
             {
                 // 检查扣除
-                DeductCost(args.Player, shopItem, goodsAmount);
+                InventoryHelper.DeductCost(args.Player, shopItem, goodsAmount);
                 // 提供商品/服务
                 ProvideGoods(args.Player, shopItem, goodsAmount);
 
@@ -532,7 +499,7 @@ namespace Plugin
                     s =$"（你是建筑师，享1折优惠，钱币只收 {s2}）";
                 }
 
-                msg = $"你购买了 {goodsAmount}件 {shopItem.GetItemDesc()} | 花费: {shopItem.GetCostDesc(goodsAmount)}{s} | 余额: {GetCoinsCountDesc(args.Player)}";
+                msg = $"你购买了 {goodsAmount}件 {shopItem.GetItemDesc()} | 花费: {shopItem.GetCostDesc(goodsAmount)}{s} | 余额: {InventoryHelper.GetCoinsCountDesc(args.Player)}";
                 args.Player.SendSuccessMessage( msg  );
                 Log.info( $"{args.Player.Name} 买了 {shopItem.GetItemDesc()}" );
             } else {
@@ -541,269 +508,88 @@ namespace Plugin
 
         }
 
-        // 获取余额
-        private int GetCoinsCount(TSPlayer player)
+
+        private bool CheckShopUnlock(TSPlayer op)
         {
-            bool overFlowing;
-			long num = Terraria.Utils.CoinsCount(out overFlowing, player.TPlayer.inventory, 58, 57, 56, 55, 54);
-			long num2 = Terraria.Utils.CoinsCount(out overFlowing, player.TPlayer.bank.item);
-			long num3 = Terraria.Utils.CoinsCount(out overFlowing, player.TPlayer.bank2.item);
-			long num4 = Terraria.Utils.CoinsCount(out overFlowing, player.TPlayer.bank3.item);
-			long num5 = Terraria.Utils.CoinsCount(out overFlowing, player.TPlayer.bank4.item);
-            int total = ((int)Terraria.Utils.CoinsCombineStacks(out overFlowing, num, num2, num3, num4, num5));
-
-            return total;
-        }
-
-        // 余额描述
-        private string GetCoinsCountDesc(TSPlayer player)
-        {
-            int total = GetCoinsCount(player);
-            return MyUtils.GetMoneyDesc( total );
-        }
-
-        // 检查钱是否足够
-        private bool CheckCost(TSPlayer player, ShopItem shopItem, int amount, out string msg)
-        {
-            // 取出要扣除的物品id
-            List<ItemData> costItems = shopItem.GetCostItem(amount);
-
-            msg = "";
-
-            // 计算金钱
-            int costMoney = shopItem.GetCostMoney(amount);
-
-            // 建筑师购物价格打1折
-            if( player.Group.Name == "builder" || player.Group.Name=="architect" ){
-                float discountMoney = costMoney * 0.1f;
-                costMoney = (int)Math.Ceiling(  discountMoney );
-            }
-
-			if (GetCoinsCount(player) < costMoney)
-			{
-                msg = "钱不够";
-                return false;
-            }
-
-
-            // 检查 对应的物品以及数量
-            Item itemNet;
-            ItemData itemData;
-            for (int i=0; i<NetItem.MaxInventory; i++)
+            string msg = "";
+            string s = "";
+            foreach( ItemData d in _config.unlock )
             {
-                if( i>=NetItem.InventorySlots )
-                    break;
-
-                itemNet = player.TPlayer.inventory[i];
-                if( itemNet.stack<1 )
-                    continue;
-
-                itemData = shopItem.GetOneCostItem(costItems, itemNet.netID);
-                if( itemData.id !=0 )
-                {
-                    if( itemNet.stack>=itemData.stack ){
-                        costItems.Remove(itemData);
-                    } else {
-                        itemData.stack -= itemNet.stack;
-                    }
-                }
-
+                if( !UnlockID.CheckUnlock(d, op, out s) )
+                    msg += " " + s;
             }
-            if( costItems.Count>0 ){
-                msg = "物品不够";
+            if( msg!="" ){
+                if( op!=null )
+                    op.SendInfoMessage( $"【{_config.name}】已打烊，因为: {msg}" );
+                else
+                   Log.info( $"【{_config.name}】已打烊，因为: {msg}" );
                 return false;
             }
-
-            // 任意物品
-            // ……
-
-
             return true;
         }
 
-        // 减扣物品
-        private void DeductCost(TSPlayer player, ShopItem shopItem, int amount=1)
+        // 加载配置
+        private void LoadConfig(bool forceLoad=false)
         {
-            // 取出要扣除的物品
-            List<ItemData> costItems = shopItem.GetCostItem(amount);
-
-            Item itemNet;
-            ItemData itemData;
-            for (int i=0; i<NetItem.MaxInventory; i++)
+            if( !_configIsLoading || forceLoad )
             {
-                if( i>=NetItem.InventorySlots )
-                    break;
+                _config = Config.Load(Path.Combine(savedir,"config.json"));
 
-                itemNet = player.TPlayer.inventory[i];
-                if( itemNet.stack<1 )
-                    continue;
-
-                if(itemNet.IsACoin)
-                    continue;
-
-                itemData = shopItem.GetOneCostItem(costItems, itemNet.netID);
-                if( itemData.id !=0 )
+                foreach (ItemData d in _config.unlock )
                 {
-                    if( itemNet.stack>=itemData.stack ){
-                        itemNet.stack -= itemData.stack;
-                        costItems.Remove(itemData);
-                    } else {
-                        itemNet.stack = 0;
-                        itemData.stack -= itemNet.stack;
-                    }
-                    MyUtils.updatePlayerSlot(player, itemNet, i);
+                    d.fixIDByName();
                 }
 
+                foreach (ShopItem item in _config.shop)
+                {
+                    item.filling();
+                    foreach (ItemData d in item.cost )
+                    {
+                        d.fixIDByName();
+                    }
+                    foreach (ItemData d in item.unlock )
+                    {
+                        d.fixIDByName();
+                    }
+                }
+                _configIsLoading = true;
             }
-            if( costItems.Count>0 ){
-                Log.info($"有 {costItems.Count} 个东西减扣失败！");
-            }
-
-            // 扣钱
-            int costMoney = shopItem.GetCostMoney(amount);
-            // 建筑师购物价格打1折
-            if( player.Group.Name == "builder" || player.Group.Name=="architect" ){
-                float discountMoney = costMoney * 0.1f;
-                costMoney = (int)Math.Ceiling(  discountMoney );
-            }
-
-            bool success = DeductMoney(player, costMoney);
-            if( !success ){
-                Log.info($"金币扣除失败！金额: {costMoney} 铜");
-            }
-
-
-            // NetMessage.SendData(4, -1, -1, NetworkText.FromLiteral(player.Name), player.Index, 0f, 0f, 0f, 0);
-            // NetMessage.SendData(4, player.Index, -1, NetworkText.FromLiteral(player.Name), player.Index, 0f, 0f, 0f, 0);
-            // // RemoveItemOwner
-            // NetMessage.SendData(39, player.Index, -1, NetworkText.Empty, 400);
         }
 
-
-        private bool DeductMoney(TSPlayer player, int price)
+        /// 更新货架
+        private List<ShopItem> UpdateShelf(TSPlayer player)
         {
-            // 找出当前货币的格子索引
-            int b1 = 0;
-            int b2 = 0;
-            int b3 = 0;
-            int b4 = 0;
-            Item item;
-            List <Item> items = new List<Item>();
-            List<int> indexs = new List<int>();
-            for (int i = 0; i < 260; i++)
+            return _config.shop;
+        }
+
+        private List<ShopItem2> FindGoods(int _id, string _prefix="")
+        {
+            List<ShopItem2> items = new List<ShopItem2>();
+            ShopItem2 item;
+            for (int i = 0; i < _config.shop.Count; i++)
             {
-                if (i < 54){
-                    item =player.TPlayer.inventory[i];
-                    if( item.IsACoin )
-                    {
-                        indexs.Add(i);
-                        items.Add(item);
-                    }
-
-                } else if (i >= 99 && i < 139){
-                    item =player.TPlayer.bank.item[b1];
-                    if( item.IsACoin )
-                    {
-                        indexs.Add(i);
-                        items.Add(item);
-                    }
-                    b1++;
-
-                } else if (i >= 139 && i < 179){
-                    item =player.TPlayer.bank2.item[b2];
-                    if( item.IsACoin )
-                    {
-                        indexs.Add(i);
-                        items.Add(item);
-                    }
-                    b2++;
-
-                } else if (i >= 180 && i < 220){
-                    item =player.TPlayer.bank3.item[b3];
-                    if( item.IsACoin )
-                    {
-                        indexs.Add(i);
-                        items.Add(item);
-                    }
-                    b3++;
-
-                } else if (i >= 220 && i < 260){
-                    item =player.TPlayer.bank4.item[b4];
-                    if( item.IsACoin )
-                    {
-                        indexs.Add(i);
-                        items.Add(item);
-                    }
-                    b4++;
-                }
-            }
-
-            // 购买物品
-            bool success = player.TPlayer.BuyItem(price);
-
-            // 找出货币的格子索引（减扣后）
-            b1 = 0;
-            b2 = 0;
-            b3 = 0;
-            b4 = 0;
-            for (int i = 0; i < 260; i++)
-            {
-                if(indexs.Contains(i))
+                ShopItem data = _config.shop[i];
+                if( data.id != _id )
                     continue;
 
-                if (i < 54){
-                    item =player.TPlayer.inventory[i];
-                    if( item.IsACoin )
+                if( _prefix=="" ){
+                    item = new ShopItem2();
+                    item.serial = i+1;
+                    item.item = data;
+                    items.Add(item);
+                } else {
+                    if(data.prefix==_prefix )
                     {
-                        indexs.Add(i);
+                        item = new ShopItem2();
+                        item.serial = i+1;
+                        item.item = data;
                         items.Add(item);
                     }
-
-                } else if (i >= 99 && i < 139){
-                    item =player.TPlayer.bank.item[b1];
-                    if( item.IsACoin )
-                    {
-                        indexs.Add(i);
-                        items.Add(item);
-                    }
-                    b1++;
-
-                } else if (i >= 139 && i < 179){
-                    item =player.TPlayer.bank2.item[b2];
-                    if( item.IsACoin )
-                    {
-                        indexs.Add(i);
-                        items.Add(item);
-                    }
-                    b2++;
-
-                } else if (i >= 180 && i < 220){
-                    item =player.TPlayer.bank3.item[b3];
-                    if( item.IsACoin )
-                    {
-                        indexs.Add(i);
-                        items.Add(item);
-                    }
-                    b3++;
-
-                } else if (i >= 220 && i < 260){
-                    item =player.TPlayer.bank4.item[b4];
-                    if( item.IsACoin )
-                    {
-                        indexs.Add(i);
-                        items.Add(item);
-                    }
-                    b4++;
                 }
             }
-
-            // 刷新背包和储蓄罐
-            for (int i =0; i<indexs.Count; i++)
-            {
-                MyUtils.updatePlayerSlot(player, items[i], indexs[i]);
-            }
-            return success;
+            return items;
         }
+
 
         // 提供商品/服务
         private void ProvideGoods(TSPlayer player, ShopItem shopItem, int amount=1)
@@ -830,10 +616,11 @@ namespace Plugin
                     case ShopItemID.FireworkRocket: CmdHelper.FireworkRocket(player); return;
                     case ShopItemID.AnglerQuestSwap: FishHelper.AnglerQuestSwap(player); return;
 
-                    // 白天 中午 晚上
+                    // 白天 中午 晚上 午夜
                     case ShopItemID.TimeToDay: CmdHelper.SwitchTime(player, "day"); return;
                     case ShopItemID.TimeToNoon: CmdHelper.SwitchTime(player, "noon"); return;
                     case ShopItemID.TimeToNight: CmdHelper.SwitchTime(player, "night"); return;
+                    case ShopItemID.TimeToMidNight: CmdHelper.SwitchTime(player, "midnight"); return;
 
                     // 雨
                     case ShopItemID.RainingStart: CmdHelper.ToggleRaining(player, true); return;
@@ -863,91 +650,24 @@ namespace Plugin
                         break;
                 }
 
+                // 召唤NPC类
                 if( id>ShopItemID.SpawnEnd && id<ShopItemID.SpawnStart )
                 {
-                    // 召唤NPC类
                     int npcID = ShopItemID.SpawnStart-id;
-                    CmdHelper.SpawnNPC(player, npcID, amount);
-                } else if( id>ShopItemID.ClearNPCEnd && id<ShopItemID.ClearNPCStart )
+                    NPCHelper.SpawnNPC(player, npcID, amount);
+                }
+                
+                // 清除NPC类
+                else if( id>ShopItemID.ClearNPCEnd && id<ShopItemID.ClearNPCStart )
                 {
-                    // 清除NPC类
                     int npcID = ShopItemID.ClearNPCStart-id;
-                    CmdHelper.ClearNPC(player, npcID, amount);
+                    NPCHelper.ClearNPC(player, npcID, amount);
                 }
 
             } else {
                 // 下发物品
                 player.GiveItem( shopItem.id, shopItem.stack*amount, shopItem.GetPrefixInt() );
             }
-        }
-
-        // 查询
-        private void SearchGoods(CommandArgs args)
-        {
-            if( args.Parameters.Count<2 ){
-                args.Player.SendErrorMessage("需要输入 物品名/物品id，例如: /fish search 2374");
-                return;
-            }
-
-            LoadConfig();
-
-            String itemNameOrId = args.Parameters[1];
-            List<ShopItem> shopItems = new List<ShopItem>();
-
-            int customID = IDSet.GetIDByName( itemNameOrId );
-            if( customID!=0 )
-            {
-                shopItems = FindGoods(customID);
-            } else {
-                List<Item> matchedItems = TShock.Utils.GetItemByIdOrName(itemNameOrId);
-                if (matchedItems.Count == 0)
-                {
-                    args.Player.SendErrorMessage($"物品名/物品id: {itemNameOrId} 不正确");
-                    return;
-                }
-                Log.info( matchedItems.Count.ToString() );
-                foreach (Item item in matchedItems)
-                {
-                    List<ShopItem> finds = FindGoods(item.netID);
-                    foreach( ShopItem sitem in finds ){
-                        shopItems.Add( sitem );
-                    }
-                }
-            }
-
-            foreach (ShopItem shopItem in shopItems)
-            {
-                string shopDesc = shopItem.GetItemDesc();
-                string costDesc = shopItem.GetCostDesc();
-                string unlockDesc = shopItem.GetUnlockDesc();
-                string s = $"{shopDesc} = {costDesc}";
-                if( unlockDesc!="" )
-                    s += $" | 需 {unlockDesc})";
-                args.Player.SendInfoMessage( s );
-
-                // args.Player.SendInfoMessage( $"{shopItem.GetItemDesc()} = {shopItem.GetCostDesc()} ({shopItem.GetUnlockDesc()})" );
-            }
-
-            if( shopItems.Count==0 )
-                args.Player.SendErrorMessage( $"没卖过 {itemNameOrId}!" );
-        }
-
-        private List<ShopItem> FindGoods(int _id, string _prefix="")
-        {
-            List<ShopItem> shopItems = new List<ShopItem>();
-            foreach (ShopItem data in _config.shop)
-            {
-                if( data.id != _id )
-                    continue;
-
-                if( _prefix=="" ){
-                    shopItems.Add(data);
-                } else {
-                    if(data.prefix==_prefix )
-                        shopItems.Add(data);
-                }
-            }
-            return shopItems;
         }
 
 

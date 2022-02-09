@@ -69,6 +69,7 @@
     <Compile Include="Helper\NPCHelper.cs" />
     <Compile Include="Helper\CmdHelper.cs" />
     <Compile Include="Helper\FishHelper.cs" />
+    <Compile Include="Helper\InventoryHelper.cs" />
     
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -15,12 +15,11 @@ namespace Plugin
         public const int HpUnder400 = -106;
 
 
-                // ------------------------------------------------------------------------------------------
+        // ------------------------------------------------------------------------------------------
         // 需要 击败指定boss
         // -2000-[npcID]
         //  击败任意 机械boss = -2901
         public const int DownedStart = -2000;
-        // 召唤 世纪之花
         public const int DownedEnd = -2999;
 
 
@@ -33,17 +32,28 @@ namespace Plugin
 
         // ------------------------------------------------------------------------------------------
         // 获得buff
-        // 获得buff = -4000-[buffID]
-        // public const int BuffStart = -4000;
-        // public const int BuffEnd = -4999;
+        // 获得buff = -5000-[buffID]
+        // public const int BuffStart = -5000;
+        // public const int BuffEnd = -5999;
 
 
         // ------------------------------------------------------------------------------------------
         // 已知的需要 击败指定boss
+        // 一王后
         public const int downedAnyMech = -2901;
+        // 四柱后
         public const int downedAllMech = -2902;
+        // 一柱后
         public const int downedAnyTower = -2903;
+        // 四柱后
         public const int downedAllTower = -2904;
+        // 哥布林入侵
+        public const int downedGoblins = -2905;
+        // 海盗入侵
+        public const int downedPirates = -2906;
+        // 霜月
+        public const int downedFrost = -2907;
+
 
         public const int downedSlimeKing = -2050;
         public const int downedBoss1 = -2004;
@@ -51,10 +61,12 @@ namespace Plugin
 
         // 世界吞噬者 13  克苏鲁之脑 266
         public const int downedBoss2 = -2013;
+        // 蜂王
         public const int downedQueenBee = -2222;
         // 骷髅王
         public const int downedBoss3 = -2035;
 
+        // 血肉墙
         public const int downedWallofFlesh = -2113;
         // 毁灭者
         public const int downedMechBoss1 = -2134;
@@ -62,14 +74,23 @@ namespace Plugin
         public const int downedMechBoss2 = -2125;
         // 机械骷髅王
         public const int downedMechBoss3 = -2127;
+        // 世纪之花
         public const int downedPlantBoss = -2262;
+        // 石巨人
         public const int downedGolemBoss = -2245;
+        // 史莱姆皇后
         public const int downedQueenSlime = -2657;
+        // 光之女皇
         public const int downedEmpressOfLight = -2636;
+        // 猪龙鱼公爵
         public const int downedFishron = -2370;
+        // 拜月教邪教徒
         public const int downedAncientCultist = -2439;
+        // 月亮领主
         public const int downedMoonlord = -2396;
+        // 哀木
         public const int downedHalloweenTree = -2325;
+        // 南瓜王
         public const int downedHalloweenKing = -2327;
         // 常绿尖叫怪
         public const int downedChristmasTree = -2344;
@@ -77,6 +98,11 @@ namespace Plugin
         public const int downedChristmasIceQueen = -2345;
         // 圣诞坦克
         public const int downedChristmasSantank = -2346;
+
+        // 火星飞碟
+        public const int downedMartians = -2392;
+        // 小丑
+        public const int downedClown = -2109;
 
         // 日耀柱
         public const int downedTowerSolar = -2517;
@@ -107,6 +133,7 @@ namespace Plugin
                 case downedAllMech: return "三王后";
                 case downedAnyTower: return "一柱后";
                 case downedAllTower: return "四柱后";
+                case downedBoss3: return "骷髅王后";
             }
 
             int npcID = 0;
@@ -140,13 +167,12 @@ namespace Plugin
                 case "雨": case "雨天": case "下雨": return Raining;
                 case "生命<400": case "血量<400": case "hp<400": return HpUnder400;
 
-
-                case "骷髅王后": return downedBoss3;
                 case "一王后": return downedAnyMech;
                 case "三王后": return downedAllMech;
                 case "一柱后": return downedAnyTower;
                 case "四柱后": return downedAllTower;
 
+                case "骷髅王后": return downedBoss3;
                 case "肉后": case "困难模式": return downedWallofFlesh;
                 case "花后": return downedPlantBoss;
                 case "石后": return downedGolemBoss;
@@ -288,6 +314,31 @@ namespace Plugin
                 case downedChristmasSantank:
                     if( !NPC.downedChristmasSantank )
                         s = "未击败 圣诞坦克";
+                    break;
+
+                case downedMartians:
+                    if( !NPC.downedMartians )
+                        s = "未击败 火星飞碟";
+                    break;
+
+                case downedGoblins:
+                    if( !NPC.downedGoblins )
+                        s = "未击败 哥布林入侵";
+                    break;
+
+                case downedPirates:
+                    if( !NPC.downedPirates )
+                        s = "未击败 海盗入侵";
+                    break;
+
+                case downedFrost:
+                    if( !NPC.downedFrost )
+                        s = "未击败 霜月";
+                    break;
+
+                case downedClown:
+                    if( !NPC.downedClown )
+                        s = "未击败 小丑";
                     break;
 
                 case downedTowerSolar:
