@@ -44,6 +44,9 @@ namespace Plugin
         // 雨停
         public const int RainingStop = -144;
 
+        // 好运来
+        public const int GoodLucky = -145;
+
 
         // 跳过入侵
         public const int InvasionStop = -146;
@@ -81,22 +84,34 @@ namespace Plugin
         // ------------------------------------------------------------------------------------------
         // 召唤NPC
         // -1000-[npcID]
-        public const int SpawnStart = -1000;
-        public const int SpawnEnd = -1999;
+        private const int SpawnStart = -1000;
+        private const int SpawnEnd = -1999;
 
         // ------------------------------------------------------------------------------------------
         // 清除NPC
         // -4000-[npcID]
-        public const int ClearNPCStart = -4000;
-        public const int ClearNPCEnd = -4999;
+        private const int ClearNPCStart = -4000;
+        private const int ClearNPCEnd = -4999;
+
+        // ------------------------------------------------------------------------------------------
+        // 获得buff
+        // -5000-[buffID]
+        private const int SetBuffStart = -5000;
+        private const int SetBuffEnd = -5999;
 
 
         private static int GetSpawnID(int id)    {return -(1000+id);}
+        public static int GetRealSpawnID(int id)    {return id>SpawnEnd && id<SpawnStart ? SpawnStart-id : 0;}
 
         private static int GetClearNPCID(int id)    {return -(4000+id);}
+        public static int GetRealClearNPCID(int id)    {return id>ClearNPCEnd && id<ClearNPCStart ? ClearNPCStart-id : 0;}
+
+        private static int GetSetBuffID(int id)    {return -(5000+id);}
+        public static int GetRealBuffID(int id)    {return id>SetBuffEnd && id<SetBuffStart ? SetBuffStart-id : 0;}
 
 
-        public static string GetNameByID(int id, string prefix="")
+
+        public static string GetNameByID(int id, string prefix="", int stack=1)
         {
             switch( id )
             {
@@ -127,6 +142,7 @@ namespace Plugin
                 case ReliveNPC: return "复活NPC";
                 case TPHereAll: return "集合打团";
                 case CelebrateAll: return "集体庆祝";
+                case GoodLucky: return "好运来";
             }
 
             int npcID = 0;
@@ -146,6 +162,15 @@ namespace Plugin
                 npcName = NPCHelper.GetNameByID(npcID);
                 if( !string.IsNullOrEmpty(npcName) )
                     return $"清除{npcName}";
+            }
+
+            // 获得buff
+            if( id>=SetBuffEnd && id<= SetBuffStart ){
+                int buffID = SetBuffStart-id;
+                string buffName = TShock.Utils.GetBuffName(buffID);
+                if( !string.IsNullOrEmpty(buffName) ){
+                    return $"{buffName}{BuffHelper.GetTimeDesc(stack)}";
+                }
             }
 
             return "";
@@ -180,6 +205,7 @@ namespace Plugin
                 case "调晚上": return TimeToNight;
                 case "调中午": return TimeToNoon;
                 case "调午夜": return TimeToMidNight;
+                case "好运来": return GoodLucky;
                 case "召唤血月": return BloodMoonStart;
                 case "跳过血月": return BloodMoonStop;
 
@@ -246,6 +272,11 @@ namespace Plugin
             if( id!=0 )
                 return id;
 
+            // 使用buff名匹配
+            id = GetBuffIDByName(name);
+            if( id!=0 )
+                return id;
+
             return 0;
         }
 
@@ -254,6 +285,15 @@ namespace Plugin
             List<Item> items = TShock.Utils.GetItemByName(name);
             if( items.Count>0 )
                 return items[0].netID;
+
+            return 0;
+        }
+
+        private static int GetBuffIDByName(string name)
+        {
+            List<int> ids = TShock.Utils.GetBuffByName(name);
+            if( ids.Count>0 )
+                return ids[0];
 
             return 0;
         }
@@ -285,10 +325,11 @@ namespace Plugin
                 case ReliveNPC:
                 case TPHereAll:
                 case CelebrateAll:
+                case GoodLucky:
                     return false;
             }
 
-            if( id>=ClearNPCEnd && id<=ClearNPCStart )
+            if( GetRealClearNPCID(id) != 0 )
                 return false;
 
             return true;

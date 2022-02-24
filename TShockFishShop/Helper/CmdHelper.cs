@@ -36,6 +36,12 @@ namespace Plugin
 			}
 		}
 
+		// 好运来
+		public static void GoodLucky(TSPlayer op)
+		{
+			BuffHelper.SetPlayerBuff(op, BuffID.Lucky, 52*60);
+		}
+
 		// 调雨
 		public static void ToggleRaining(TSPlayer player, bool on)
 		{

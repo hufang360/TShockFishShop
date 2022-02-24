@@ -109,6 +109,16 @@ namespace Plugin
             goods = new ShopItem("集体庆祝");
             goods.AddCost("银币", 0, 10);
             shop.Add(goods);
+
+            // 好运来
+            goods = new ShopItem("好运来");
+            goods.AddCost("铜币", 0, 1);
+            shop.Add(goods);
+
+            // 1分钟 黑曜石皮 buff
+            goods = new ShopItem("",-5001, 60);
+            goods.AddCost("金币", 0, 5);
+            shop.Add(goods);
         }
     }
 

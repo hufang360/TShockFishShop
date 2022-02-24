@@ -19,15 +19,15 @@ namespace Plugin
         // 需要 击败指定boss
         // -2000-[npcID]
         //  击败任意 机械boss = -2901
-        public const int DownedStart = -2000;
-        public const int DownedEnd = -2999;
+        private const int DownedStart = -2000;
+        private const int DownedEnd = -2999;
 
 
         // ------------------------------------------------------------------------------------------
         // 需要 NPC在场
         // NPC活着 = -3000-[npcID]
-        public const int PresentStart = -3000;
-        public const int PresentEnd = -3999;
+        private const int PresentStart = -3000;
+        private const int PresentEnd = -3999;
 
 
         // ------------------------------------------------------------------------------------------
@@ -116,8 +116,10 @@ namespace Plugin
 
         
         private static int GetDownedID(int id)   {return -(2000+id);}
-        private static int GetPresentID(int id)  {return -(3000+id);}
+        public static int GetRealDownedID(int id)    {return id>DownedEnd && id<DownedStart ? DownedStart-id : 0;}
 
+        private static int GetPresentID(int id)  {return -(3000+id);}
+        public static int GetRealPresentID(int id)    {return id>PresentEnd && id<PresentStart ? PresentStart-id : 0;}
 
         public static string GetNameByID(int id)
         {
@@ -138,14 +140,16 @@ namespace Plugin
 
             int npcID = 0;
             string npcName = "";
-            if( id>DownedEnd && id<DownedStart ){
-                npcID = DownedStart-id;
+            npcID = GetRealDownedID(id);
+            if( npcID!=0 ){
                 npcName = NPCHelper.GetNameByID(npcID);
                 if( !string.IsNullOrEmpty(npcName) )
                     return $"击败 {npcName}";
 
-            } else if( id>PresentEnd && id<PresentStart ){
-                npcID = PresentStart-id;
+            } 
+            
+            npcID = GetRealPresentID(id);
+            if( npcID!=0 ){
                 npcName = NPCHelper.GetNameByID(npcID);
                 if( !string.IsNullOrEmpty(npcName) )
                     return $"{npcName} 活着";
@@ -459,9 +463,9 @@ namespace Plugin
             }
 
             // 指定npc是否活着
-            if( data.id>=PresentEnd && data.id<=PresentStart )
+            int npcID = GetRealPresentID(data.id);
+            if( npcID!=0 )
             {
-                int npcID = PresentStart-data.id;
                 passed = NPCHelper.CheckNPCActive(npcID.ToString());
                 if( !passed ){
                     if(npcID < Main.maxNPCTypes)

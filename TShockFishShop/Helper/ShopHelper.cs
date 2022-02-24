@@ -48,6 +48,8 @@ namespace Plugin
 
         public string GetItemDesc()
         {
+            if( id==0 )
+                filling();
             return MyUtils.GetItemDesc( name, id, stack, prefix );
         }
 

@@ -2,7 +2,7 @@ namespace Plugin
 {
     public class IDSet
     {
-        public static string GetNameByID( int id, string prefix="")
+        public static string GetNameByID( int id, string prefix="", int stack=1)
         {
             string s = "";
 
@@ -12,7 +12,7 @@ namespace Plugin
                 return s;
 
             // 商品名称
-            s = ShopItemID.GetNameByID(id, prefix);
+            s = ShopItemID.GetNameByID(id, prefix, stack);
             if( !string.IsNullOrEmpty(s) )
                 return s;
 

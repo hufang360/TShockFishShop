@@ -24,6 +24,7 @@ namespace Plugin
         public static readonly string PermissionFinish = "fishshop.finish";
         public static readonly string PermissionChange = "fishshop.change";
         public static readonly string PermissionChangeSuper = "fishshop.changesuper";
+        public static readonly string PermissionReload = "fishshop.reload";
         public static readonly string PermissionSpecial= "fishshop.special";
 
         public static readonly string savedir = Path.Combine(TShock.SavePath, "FishShop");
@@ -49,8 +50,8 @@ namespace Plugin
         }
         private void OnReload(ReloadEventArgs args)
         {
-            args.Player.SendSuccessMessage("[fishshop]鱼店配置已重载");
-            LoadConfig(true);
+            args.Player.SendInfoMessage("欲重载鱼店配置，请使用 /fish reload");
+            // LoadConfig(true);
         }
 
         private void FishShop(CommandArgs args)
@@ -69,12 +70,11 @@ namespace Plugin
                     op.SendInfoMessage("/fish change，更换今天的任务鱼");
                 if( op.HasPermission(PermissionChangeSuper) )
                     op.SendInfoMessage("/fish changesuper <物品id|物品名>，指定今天的任务鱼");
+                if( op.HasPermission(PermissionReload) )
+                    op.SendInfoMessage("/fish reload，重载配置");
 
                 if( op.HasPermission(PermissionSpecial) ){
-                    op.SendInfoMessage("/fish relive，复活NPC");
-                    op.SendInfoMessage("/fish tpall，集合");
-                    op.SendInfoMessage("/fish jump，集体庆祝");
-                    op.SendInfoMessage("/fish firework，烟花");
+                    op.SendInfoMessage("/fish special, 查看特别指令");
                 }
             }
 
@@ -93,7 +93,8 @@ namespace Plugin
                     return;
 
                 default:
-                    op.SendErrorMessage("请输入 /fish help 查询用法");
+                    ListGoods(args);
+                    op.SendInfoMessage("请输入 /fish help 查询用法");
                     break;
 
                 // 浏览
@@ -113,12 +114,6 @@ namespace Plugin
                 case "buy":
                     BuyGoods(args);
                     break;
-
-                // // 查询
-                // case "search":
-                // case "s":
-                //     SearchGoods(args);
-                //     break;
 
 
                 // 钓鱼信息
@@ -180,9 +175,40 @@ namespace Plugin
                         FishHelper.FishQuestSwap( op, args.Parameters[1]  );
                     }
                     break;
+                
+                case "reload":
+                case "r":
+                    if( !op.HasPermission(PermissionReload) ){
+                        op.SendErrorMessage("你无权执行重载操作！");
+                    } else {
+                        args.Player.SendSuccessMessage("[fishshop]鱼店配置已重载");
+                        LoadConfig(true);
+                    }
+                    break;
 
 
                 // 供测试用的指令
+                case "special":
+                case "spe":
+                    if( !op.HasPermission(PermissionSpecial) ){
+                        op.SendErrorMessage("你无权执行此指令！");
+                    } else {
+                        op.SendInfoMessage("/fish docs，生成参考文档");
+                        op.SendInfoMessage("/fish relive，复活NPC");
+                        op.SendInfoMessage("/fish tpall，集合");
+                        op.SendInfoMessage("/fish jump，集体庆祝");
+                        op.SendInfoMessage("/fish firework，烟花");
+                    }
+                    break;
+                // 生成参考文档
+                case "docs":
+                    if( !op.HasPermission(PermissionSpecial) ){
+                        op.SendErrorMessage("你无权执行此指令！");
+                    } else {
+                        DocsHelper.GenDocs(op, savedir);
+                    }
+                    break;
+                    
                 case "jump":
                     if( !op.HasPermission(PermissionSpecial) ){
                         op.SendErrorMessage("你无权执行此指令！");
@@ -362,7 +388,7 @@ namespace Plugin
                 string shopDesc = shopItem.item.GetItemDesc();
                 string costDesc = shopItem.item.GetCostDesc();
                 string unlockDesc = shopItem.item.GetUnlockDesc();
-                string s = $"{shopItem.serial}.{shopDesc} <= {costDesc}";
+                string s = $"{shopItem.serial}.{shopDesc} = {costDesc}";
                 if( unlockDesc!="" )
                     s += $" | 需 {unlockDesc}";
                 args.Player.SendInfoMessage( s );
@@ -621,6 +647,9 @@ namespace Plugin
                     case ShopItemID.TimeToNoon: CmdHelper.SwitchTime(player, "noon"); return;
                     case ShopItemID.TimeToNight: CmdHelper.SwitchTime(player, "night"); return;
                     case ShopItemID.TimeToMidNight: CmdHelper.SwitchTime(player, "midnight"); return;
+                    
+                    // 好运来
+                    case ShopItemID.GoodLucky: CmdHelper.GoodLucky(player); return;
 
                     // 雨
                     case ShopItemID.RainingStart: CmdHelper.ToggleRaining(player, true); return;
@@ -651,17 +680,27 @@ namespace Plugin
                 }
 
                 // 召唤NPC类
-                if( id>ShopItemID.SpawnEnd && id<ShopItemID.SpawnStart )
+                int id2 = ShopItemID.GetRealSpawnID(id);
+                if( id2!=0 )
                 {
-                    int npcID = ShopItemID.SpawnStart-id;
-                    NPCHelper.SpawnNPC(player, npcID, amount);
+                    NPCHelper.SpawnNPC(player, id2, amount);
+                    return;
                 }
                 
                 // 清除NPC类
-                else if( id>ShopItemID.ClearNPCEnd && id<ShopItemID.ClearNPCStart )
+                id2 = ShopItemID.GetRealClearNPCID(id);
+                if( id2!=0 )
                 {
-                    int npcID = ShopItemID.ClearNPCStart-id;
-                    NPCHelper.ClearNPC(player, npcID, amount);
+                    NPCHelper.ClearNPC(player, id2, amount);
+                    return;
+                }
+
+                // 获得buff类
+                id2 = ShopItemID.GetRealBuffID(id);
+                if( id2!=0 )
+                {
+                    BuffHelper.SetPlayerBuff(player, id2, shopItem.stack*amount);
+                    return;
                 }
 
             } else {

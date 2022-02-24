@@ -20,6 +20,8 @@ namespace Plugin
         }
 
         public string GetItemDesc(){
+            if( id==0 )
+                fixIDByName();
             return MyUtils.GetItemDesc( "", id, stack );
         }
 
