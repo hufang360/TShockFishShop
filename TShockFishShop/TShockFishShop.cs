@@ -490,6 +490,13 @@ namespace Plugin
                 return;
             }
 
+            // 部分物品死亡时不支持购买
+            if( args.Player.Dead && !shopItem.DeadCanBuyItem() )
+            {
+                args.Player.SendInfoMessage( $"你已死亡，请待复活后再购买！" );
+                return;
+            }
+
             // 部分物品单次至多买一件
             if( !shopItem.CanBuyManyItem() )
                 goodsAmount = 1;

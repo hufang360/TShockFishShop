@@ -353,7 +353,30 @@ namespace Plugin
                     return false;
             }
 
+            // 清除npc类
             if( GetRealClearNPCID(id) != 0 )
+                return false;
+
+            return true;
+        }
+
+        public static bool DeadCanBuyItem(int id)
+        {
+            switch (id)
+            {
+                case BuffGoodLucky:
+                case BuffWhipPlayer:
+                case BuffFaster:
+                case BuffMining:
+                case BuffFishing:
+                case BuffIncitant:
+                case FireworkRocket:
+                case Firework:
+                    return false;
+            }
+
+            // buff 类
+            if( GetRealBuffID (id) != 0 )
                 return false;
 
             return true;

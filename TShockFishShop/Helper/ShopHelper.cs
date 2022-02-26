@@ -58,6 +58,11 @@ namespace Plugin
             return ShopItemID.CanBuyManyItem(id);
         }
 
+        public bool DeadCanBuyItem()
+        {
+            return ShopItemID.DeadCanBuyItem(id);
+        }
+
         // 汇总要减扣的物品
         // 货币不计算在内
         // 任意类的物品不计算在内
