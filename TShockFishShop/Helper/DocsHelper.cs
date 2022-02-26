@@ -15,6 +15,7 @@ namespace Plugin
     {
         public static void GenDocs(TSPlayer op, string path)
         {
+            // https://terraria.fandom.com/zh/wiki/Category:Data_IDs
             // https://terraria.fandom.com/zh/wiki/Item_IDs
             // https://terraria.fandom.com/zh/wiki/NPC_IDs
             // https://terraria.fandom.com/zh/wiki/Buff_IDs

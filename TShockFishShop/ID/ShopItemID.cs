@@ -45,7 +45,7 @@ namespace Plugin
         public const int RainingStop = -144;
 
         // 好运来
-        public const int GoodLucky = -145;
+        public const int BuffGoodLucky = -145;
 
 
         // 跳过入侵
@@ -79,6 +79,21 @@ namespace Plugin
 
         // 调午夜
         public const int TimeToMidNight = -165;
+
+        // ------------------------------------------------------------------------------------------
+        // buff
+        //  打神鞭
+        public const int BuffWhipPlayer = -166;
+
+        //  逮虾户
+        public const int BuffFaster = -167;
+
+        //  黄金矿工
+        public const int BuffMining = -168;
+        // 钓鱼佬
+        public const int BuffFishing = -169;
+        // 兴奋剂
+        public const int BuffIncitant = -170;
 
 
         // ------------------------------------------------------------------------------------------
@@ -142,7 +157,12 @@ namespace Plugin
                 case ReliveNPC: return "复活NPC";
                 case TPHereAll: return "集合打团";
                 case CelebrateAll: return "集体庆祝";
-                case GoodLucky: return "好运来";
+                case BuffGoodLucky: return "好运来";
+                case BuffWhipPlayer: return "打神鞭";
+                case BuffFaster: return "逮虾户";
+                case BuffMining: return "黄金矿工";
+                case BuffFishing: return "钓鱼佬";
+                case BuffIncitant: return "兴奋剂";
             }
 
             int npcID = 0;
@@ -205,7 +225,12 @@ namespace Plugin
                 case "调晚上": return TimeToNight;
                 case "调中午": return TimeToNoon;
                 case "调午夜": return TimeToMidNight;
-                case "好运来": return GoodLucky;
+                case "好运来": return BuffGoodLucky;
+                case "打神鞭": return BuffWhipPlayer;
+                case "逮虾户": return BuffFaster;
+                case "黄金矿工": return BuffMining;
+                case "钓鱼佬": return BuffFishing;
+                case "兴奋剂": return BuffIncitant;
                 case "召唤血月": return BloodMoonStart;
                 case "跳过血月": return BloodMoonStop;
 
@@ -325,7 +350,6 @@ namespace Plugin
                 case ReliveNPC:
                 case TPHereAll:
                 case CelebrateAll:
-                case GoodLucky:
                     return false;
             }
 

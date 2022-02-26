@@ -647,9 +647,22 @@ namespace Plugin
                     case ShopItemID.TimeToNoon: CmdHelper.SwitchTime(player, "noon"); return;
                     case ShopItemID.TimeToNight: CmdHelper.SwitchTime(player, "night"); return;
                     case ShopItemID.TimeToMidNight: CmdHelper.SwitchTime(player, "midnight"); return;
-                    
+
+                    //  =====
+                    // buff 类
+                    // ====
                     // 好运来
-                    case ShopItemID.GoodLucky: CmdHelper.GoodLucky(player); return;
+                    // 打神鞭
+                    // 逮虾户
+                    // 黄金矿工
+                    // 钓鱼佬
+                    // 兴奋剂
+                    case ShopItemID.BuffGoodLucky: CmdHelper.BuffGoodLucky(player, amount); return;
+                    case ShopItemID.BuffWhipPlayer: CmdHelper.BuffWhipPlayer(player, amount); return;
+                    case ShopItemID.BuffFaster: CmdHelper.BuffFaster(player, amount); return;
+                    case ShopItemID.BuffMining: CmdHelper.BuffMining(player, amount); return;
+                    case ShopItemID.BuffFishing: CmdHelper.BuffFishing(player, amount); return;
+                    case ShopItemID.BuffIncitant: CmdHelper.BuffIncitant(player, amount); return;
 
                     // 雨
                     case ShopItemID.RainingStart: CmdHelper.ToggleRaining(player, true); return;
