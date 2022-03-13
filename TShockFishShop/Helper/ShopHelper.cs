@@ -63,6 +63,10 @@ namespace Plugin
             return ShopItemID.DeadCanBuyItem(id);
         }
 
+        public string GetComment(){
+            return ShopItemID.GetComment(id);
+        }
+
         // 汇总要减扣的物品
         // 货币不计算在内
         // 任意类的物品不计算在内

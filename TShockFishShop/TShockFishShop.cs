@@ -41,18 +41,18 @@ namespace Plugin
         public override void Initialize()
         {
             Commands.ChatCommands.Add(new Command(new List<string>() {}, FishShop, "fishshop", "fish", "fs") { HelpText = "鱼店"});
-            GeneralHooks.ReloadEvent += OnReload;
+            // GeneralHooks.ReloadEvent += OnReload;
 
             if( !Directory.Exists(savedir) )
                 Directory.CreateDirectory(savedir);
 
             MyUtils.init();
         }
-        private void OnReload(ReloadEventArgs args)
-        {
-            args.Player.SendInfoMessage("欲重载鱼店配置，请使用 /fish reload");
-            // LoadConfig(true);
-        }
+        // private void OnReload(ReloadEventArgs args)
+        // {
+        //     // args.Player.SendInfoMessage("欲重载鱼店配置，请使用 /fish reload");
+        //     // LoadConfig(true);
+        // }
 
         private void FishShop(CommandArgs args)
         {
@@ -78,11 +78,19 @@ namespace Plugin
                 }
             }
 
-            if (args.Parameters.Count<string>() == 0)
+            if( op.Group.Name == TShock.Config.Settings.DefaultGuestGroupName )
             {
-                op.SendErrorMessage("语法错误，使用 /fish help 查询用法");
+                op.SendErrorMessage("游客无法访问鱼店");
                 return;
             }
+
+
+            if (args.Parameters.Count<string>() == 0)
+            {
+                op.SendErrorMessage("语法错误，输入 /fish help 查询用法");
+                return;
+            }
+
 
             switch (args.Parameters[0].ToLowerInvariant())
             {
@@ -352,7 +360,7 @@ namespace Plugin
                 // 编号有效性
                 int count = founds.Count;
                 if( goodsSerial<=0 || goodsSerial>count ){
-                    args.Player.SendErrorMessage($"最大编号为: {count}，请使用 /fish list 查看货架.");
+                    args.Player.SendErrorMessage($"最大编号为: {count}，请输入 /fish list 查看货架.");
                     return;
                 }
                 item2 = new ShopItem2();
@@ -388,9 +396,12 @@ namespace Plugin
                 string shopDesc = shopItem.item.GetItemDesc();
                 string costDesc = shopItem.item.GetCostDesc();
                 string unlockDesc = shopItem.item.GetUnlockDesc();
+                string comment = shopItem.item.GetComment();
                 string s = $"{shopItem.serial}.{shopDesc} = {costDesc}";
                 if( unlockDesc!="" )
-                    s += $" | 需 {unlockDesc}";
+                    s += $"\n解锁条件：需 {unlockDesc}";
+                if( comment!="" )
+                    s += $"\n商品备注：{comment}";
                 args.Player.SendInfoMessage( s );
             }
 
@@ -406,16 +417,17 @@ namespace Plugin
         // 购买
         private void BuyGoods(CommandArgs args)
         {
-            if ( !args.Player.RealPlayer ){
-                args.Player.SendErrorMessage("此指令需要在游戏内执行！");
+            TSPlayer op = args.Player;
+            if ( !op.RealPlayer ){
+                op.SendErrorMessage("此指令需要在游戏内执行！");
                 return;
             }
-            if( !args.Player.InventorySlotAvailable ){
-                args.Player.SendErrorMessage("背包已满，不能购买！");
+            if( !op.InventorySlotAvailable ){
+                op.SendErrorMessage("背包已满，不能购买！");
                 return;
             }
             if( args.Parameters.Count<2 ){
-                args.Player.SendErrorMessage("需输入 物品名 / 商品编号，例如: /fish buy 1，/fish buy 生命水晶");
+                op.SendErrorMessage("需输入 物品名 / 商品编号，例如: /fish buy 1，/fish buy 生命水晶");
                 return;
             }
 
@@ -423,10 +435,10 @@ namespace Plugin
             LoadConfig();
 
             // 商店是否解锁
-            if( !CheckShopUnlock(args.Player) )
+            if( !CheckShopUnlock(op) )
                 return;
 
-            List<ShopItem> goods = UpdateShelf(args.Player);
+            List<ShopItem> goods = UpdateShelf(op);
 
             int goodsSerial = 1;
             if( int.TryParse(args.Parameters[1], out goodsSerial) )
@@ -434,7 +446,7 @@ namespace Plugin
                 // 编号有效性
                 int count = goods.Count;
                 if( goodsSerial<=0 || goodsSerial>count ){
-                    args.Player.SendErrorMessage($"最大编号为: {count}，请输入 /fish list 查看货架");
+                    op.SendErrorMessage($"最大编号为: {count}，请输入 /fish list 查看货架");
                     return;
                 }
             } else {
@@ -453,7 +465,7 @@ namespace Plugin
                 }
 
                 if( goodsSerial==0 ){
-                    args.Player.SendErrorMessage($"没有名为 {args.Parameters[1]} 的 物品");
+                    op.SendErrorMessage($"没有名为 {args.Parameters[1]} 的 物品");
                     return;
                 }
             }
@@ -470,7 +482,7 @@ namespace Plugin
             ShopItem shopItem = goods[goodsSerial-1];
 
             // [日志记录]
-            Log.info( String.Format("{0} 要买{1}个 {2}", args.Player.Name, goodsAmount, shopItem.GetItemDesc()) );
+            Log.info( String.Format("{0} 要买{1}个 {2}", op.Name, goodsAmount, shopItem.GetItemDesc()) );
             Log.info( $"item: {shopItem.name} {shopItem.id} {shopItem.stack} {shopItem.prefix}" );
             foreach (ItemData _d in shopItem.unlock)
                 Log.info( $"unlock: {_d.name} {_d.id} {_d.stack}" );
@@ -478,26 +490,34 @@ namespace Plugin
                 Log.info( $"cost: {_d.name} {_d.id} {_d.stack}" );
 
 
+            // 检查解锁条件
             string msg = "";
             string s = "";
             foreach( ItemData d in shopItem.unlock )
             {
-                if( !UnlockID.CheckUnlock(d, args.Player, out s) )
+                if( !UnlockID.CheckUnlock(d, op, out s) )
                     msg += " " + s;
             }
             if( msg!="" ){
-                args.Player.SendInfoMessage( $"暂时不能购买，因为: {msg}" );
+                op.SendInfoMessage( $"暂时不能购买，因为: {msg}" );
                 return;
             }
 
-            // 部分物品死亡时不支持购买
-            if( args.Player.Dead && !shopItem.DeadCanBuyItem() )
+            // buff类死亡时不能买
+            if( op.Dead && !shopItem.DeadCanBuyItem() )
             {
-                args.Player.SendInfoMessage( $"你已死亡，请待复活后再购买！" );
+                op.SendInfoMessage( $"你已死亡，请待复活后再购买此物品！" );
                 return;
             }
 
-            // 部分物品单次至多买一件
+            // 坠落之星白天卖会消失
+            if( shopItem.id == 75 && Main.dayTime ){
+                op.SendInfoMessage( $"坠落之星 只能在晚上购买！" );
+                return;
+            }
+
+
+            // 单次至多买一件的物品
             if( !shopItem.CanBuyManyItem() )
                 goodsAmount = 1;
 
@@ -509,7 +529,7 @@ namespace Plugin
                     float num = itemnet.maxStack / shopItem.stack;
                     goodsAmount = (int)Math.Floor(num);
                     if( goodsAmount==0 ){
-                        args.Player.SendErrorMessage($"[鱼店]此商品的堆叠数量配置错误,name={shopItem.name},id={shopItem.id},stack={shopItem.stack}");
+                        op.SendErrorMessage($"[鱼店]此商品的堆叠数量配置错误,name={shopItem.name},id={shopItem.id},stack={shopItem.stack}");
                         return;
                     }
                 }
@@ -517,26 +537,26 @@ namespace Plugin
 
             // 询价
             msg = "";
-            if( InventoryHelper.CheckCost(args.Player, shopItem, goodsAmount, out msg) )
+            if( InventoryHelper.CheckCost(op, shopItem, goodsAmount, out msg) )
             {
                 // 检查扣除
-                InventoryHelper.DeductCost(args.Player, shopItem, goodsAmount);
+                InventoryHelper.DeductCost(op, shopItem, goodsAmount);
                 // 提供商品/服务
-                ProvideGoods(args.Player, shopItem, goodsAmount);
+                ProvideGoods(op, shopItem, goodsAmount);
 
                 s = "";
-                if( args.Player.Group.Name=="builder" || args.Player.Group.Name=="architect" ){
+                if( op.Group.Name=="builder" || op.Group.Name=="architect" ){
                     float discountMoney = shopItem.GetCostMoney(goodsAmount) * 0.1f;
                     int discountMoneyInt = (int)Math.Ceiling( discountMoney );
                     string s2 = MyUtils.GetMoneyDesc(discountMoneyInt);
                     s =$"（你是建筑师，享1折优惠，钱币只收 {s2}）";
                 }
 
-                msg = $"你购买了 {goodsAmount}件 {shopItem.GetItemDesc()} | 花费: {shopItem.GetCostDesc(goodsAmount)}{s} | 余额: {InventoryHelper.GetCoinsCountDesc(args.Player)}";
-                args.Player.SendSuccessMessage( msg  );
-                Log.info( $"{args.Player.Name} 买了 {shopItem.GetItemDesc()}" );
+                msg = $"你购买了 {goodsAmount}件 {shopItem.GetItemDesc()} | 花费: {shopItem.GetCostDesc(goodsAmount)}{s} | 余额: {InventoryHelper.GetCoinsCountDesc(op)}";
+                op.SendSuccessMessage( msg  );
+                Log.info( $"{op.Name} 买了 {shopItem.GetItemDesc()}" );
             } else {
-                args.Player.SendInfoMessage($"没买成功，因为: {msg}，请输入 /fish ask {goodsSerial} 查询购买条件");
+                op.SendInfoMessage($"没买成功，因为: {msg}，请输入 /fish ask {goodsSerial} 查询购买条件");
             }
 
         }
@@ -734,7 +754,7 @@ namespace Plugin
 		{
 			if (disposing)
 			{
-                GeneralHooks.ReloadEvent -= OnReload;
+                // GeneralHooks.ReloadEvent -= OnReload;
 			}
 			base.Dispose(disposing);
 		}

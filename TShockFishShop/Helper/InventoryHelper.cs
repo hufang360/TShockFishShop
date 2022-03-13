@@ -1,6 +1,7 @@
 using System;
 using Terraria;
 using TShockAPI;
+using System.Linq;
 using System.Collections.Generic;
 
 
@@ -208,31 +209,38 @@ namespace Plugin
 
             // 购买物品
             bool success = player.TPlayer.BuyItem(price);
+            // player.SendInfoMessage( $"前：{String.Join(" ",indexs)}" );
 
             // 找出货币的格子索引（减扣后）
             b1 = 0;
             b2 = 0;
             b3 = 0;
             b4 = 0;
+            List <Item> items2 = new List<Item>();
+            List<int> indexs2 = new List<int>();
             for (int i = 0; i < 260; i++)
             {
                 if(indexs.Contains(i))
-                    continue;
+                {
+                    var newIndex = indexs.IndexOf(i);
+                    indexs.RemoveAt(newIndex);
+                    items.RemoveAt(newIndex);
+                }
 
                 if (i < 54){
                     item =player.TPlayer.inventory[i];
                     if( item.IsACoin )
                     {
-                        indexs.Add(i);
-                        items.Add(item);
+                        indexs2.Add(i);
+                        items2.Add(item);
                     }
 
                 } else if (i >= 99 && i < 139){
                     item =player.TPlayer.bank.item[b1];
                     if( item.IsACoin )
                     {
-                        indexs.Add(i);
-                        items.Add(item);
+                        indexs2.Add(i);
+                        items2.Add(item);
                     }
                     b1++;
 
@@ -240,8 +248,8 @@ namespace Plugin
                     item =player.TPlayer.bank2.item[b2];
                     if( item.IsACoin )
                     {
-                        indexs.Add(i);
-                        items.Add(item);
+                        indexs2.Add(i);
+                        items2.Add(item);
                     }
                     b2++;
 
@@ -249,8 +257,8 @@ namespace Plugin
                     item =player.TPlayer.bank3.item[b3];
                     if( item.IsACoin )
                     {
-                        indexs.Add(i);
-                        items.Add(item);
+                        indexs2.Add(i);
+                        items2.Add(item);
                     }
                     b3++;
 
@@ -258,12 +266,17 @@ namespace Plugin
                     item =player.TPlayer.bank4.item[b4];
                     if( item.IsACoin )
                     {
-                        indexs.Add(i);
-                        items.Add(item);
+                        indexs2.Add(i);
+                        items2.Add(item);
                     }
                     b4++;
                 }
             }
+            // player.SendInfoMessage( $"后：{String.Join(" ",indexs2)}" );
+
+            indexs.AddRange( indexs2 );
+            items.AddRange( items2 );
+            // player.SendInfoMessage( $"合并：{String.Join(" ",indexs)}" );
 
             // 刷新背包和储蓄罐
             for (int i =0; i<indexs.Count; i++)

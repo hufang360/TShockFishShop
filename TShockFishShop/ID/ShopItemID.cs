@@ -225,12 +225,14 @@ namespace Plugin
                 case "调晚上": return TimeToNight;
                 case "调中午": return TimeToNoon;
                 case "调午夜": return TimeToMidNight;
+
                 case "好运来": return BuffGoodLucky;
                 case "打神鞭": return BuffWhipPlayer;
                 case "逮虾户": return BuffFaster;
                 case "黄金矿工": return BuffMining;
                 case "钓鱼佬": return BuffFishing;
                 case "兴奋剂": return BuffIncitant;
+                
                 case "召唤血月": return BloodMoonStart;
                 case "跳过血月": return BloodMoonStop;
 
@@ -380,6 +382,25 @@ namespace Plugin
                 return false;
 
             return true;
+        }
+
+        // 商品说明
+        public static string GetComment(int id)
+        {
+            switch (id)
+            {
+                case BuffGoodLucky: return "获得10分钟 好运气 buff";
+                case BuffWhipPlayer: return "获得10分钟 丛林之怒、迪朗达尔的祝福、收割时刻 buff（近战攻速+105%）";
+                case BuffFaster: return "获得10分钟 快乐、敏捷、酒足饭饱、糖果冲刺、恐慌 buff";
+                case BuffMining: return "获得10分钟 挖矿、建筑工、光芒、夜猫子、酒足饭饱、洞穴探险、危险感知、猎人、糖果冲刺 buff";
+                case BuffFishing: return "获得10分钟 钓鱼、声呐、宝匣、夜猫子";
+                case BuffIncitant: return "获得10分钟 酒足饭饱、再生药水、敏捷、铁皮、怒气、生命力、暴怒、耐力";
+
+                case TPHereAll: return "将所有玩家传到你身边";
+                case AnglerQuestSwap: return "更换今天的任务鱼，并重置任务完成情况";
+                
+                default: return "";
+            }
         }
     }
 }

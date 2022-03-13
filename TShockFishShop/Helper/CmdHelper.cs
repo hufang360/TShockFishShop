@@ -50,12 +50,12 @@ namespace Plugin
 			var time = 10*60 * amount;
 
 			// 311  荆鞭	丛林之怒
-			// 312  冷鞭	一种不错的增益
+			// -312  冷鞭	一种不错的增益
 			// 308  迪朗达尔	迪朗达尔的祝福
 			// 314  暗黑收割	收割时刻
 			List<int> buff = new List<int>() {
 				BuffID.ScytheWhipPlayerBuff, 
-				BuffID.CoolWhipPlayerBuff, 
+				// BuffID.CoolWhipPlayerBuff, 
 				BuffID.SwordWhipPlayerBuff, 
 				BuffID.ThornWhipPlayerBuff, 
 			};
