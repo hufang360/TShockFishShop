@@ -7,7 +7,7 @@ using System.Linq;
 using TShockAPI;
 
 
-namespace Plugin
+namespace FishShop
 {
     public class FishHelper
     {
@@ -78,18 +78,22 @@ namespace Plugin
 
         public static void FishInfo(TSPlayer player)
         {
-            int itemID = Main.anglerQuestItemNetIDs[ Main.anglerQuest ];
-
-            string questText = Language.GetTextValue("AnglerQuestText.Quest_" + ItemID.Search.GetName(itemID));
-            string[] splits = questText.Split("\n\n".ToCharArray());
-            if( splits.Count()>1 ){
-                questText = splits[splits.Count()-1];
-                questText = questText.Replace("（抓捕位置：", "");
-                questText = questText.Replace("）", "");
+            if( NPCHelper.CheckNPCActive("369") )
+            {
+                int itemID = Main.anglerQuestItemNetIDs[ Main.anglerQuest ];
+                string questText = Language.GetTextValue("AnglerQuestText.Quest_" + ItemID.Search.GetName(itemID));
+                string[] splits = questText.Split("\n\n".ToCharArray());
+                if( splits.Count()>1 ){
+                    questText = splits[splits.Count()-1];
+                    questText = questText.Replace("（抓捕位置：", "");
+                    questText = questText.Replace("）", "");
+                }
+                string itemName = MyUtils.GetItemDesc("", itemID);
+                player.SendInfoMessage($"任务鱼: {itemName}（{questText}）");
+            } else {
+                player.SendInfoMessage($"任务鱼: 渔夫不在场");
             }
 
-            string itemName = MyUtils.GetItemDesc("", itemID);
-            player.SendInfoMessage($"任务鱼: {itemName}（{questText}）");
             player.SendInfoMessage($"月相: {MyUtils.moonPhases[Main.moonPhase]}");
 
             // 时间

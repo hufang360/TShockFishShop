@@ -3,7 +3,7 @@ using System;
 using System.Reflection;
 
 
-namespace Plugin
+namespace FishShop
 {
     class Compatible
     {

@@ -1,4 +1,4 @@
-namespace Plugin
+namespace FishShop
 {
     public class ItemData
     {

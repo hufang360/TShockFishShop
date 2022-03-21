@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 
 
-namespace Plugin
+namespace FishShop
 {
     public class Config
     {

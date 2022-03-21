@@ -7,7 +7,7 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 
 
-namespace Plugin
+namespace FishShop
 {
     public class NPCHelper
     {
@@ -353,7 +353,7 @@ namespace Plugin
             {
 				NPC npc = new NPC();
 				npc.SetDefaults(npcID);
-				TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, 1, op.TileX, op.TileY);
+				TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, 1, op.TileX, op.TileY, 5, 2);
 
                 if( names.Count!=0 && names.Count%10==0 ){
                     names.Add("\n"+npc.FullName);

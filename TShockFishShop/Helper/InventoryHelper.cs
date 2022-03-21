@@ -5,7 +5,7 @@ using System.Linq;
 using System.Collections.Generic;
 
 
-namespace Plugin
+namespace FishShop
 {
     public class InventoryHelper
     {

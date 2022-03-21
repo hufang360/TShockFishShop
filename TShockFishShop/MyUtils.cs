@@ -5,7 +5,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.Localization;
 
-namespace Plugin
+namespace FishShop
 {
     public class MyUtils
     {

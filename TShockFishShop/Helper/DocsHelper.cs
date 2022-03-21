@@ -9,7 +9,7 @@ using Terraria.Localization;
 using TShockAPI;
 
 
-namespace Plugin
+namespace FishShop
 {
     public class DocsHelper
     {

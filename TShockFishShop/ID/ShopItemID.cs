@@ -3,7 +3,7 @@ using TShockAPI;
 using Terraria;
 
 
-namespace Plugin
+namespace FishShop
 {
     public class ShopItemID
     {
@@ -389,7 +389,7 @@ namespace Plugin
         {
             switch (id)
             {
-                case BuffGoodLucky: return "获得10分钟 好运气 buff";
+                case BuffGoodLucky: return "获得10分钟 幸运 buff";
                 case BuffWhipPlayer: return "获得10分钟 丛林之怒、迪朗达尔的祝福、收割时刻 buff（近战攻速+105%）";
                 case BuffFaster: return "获得10分钟 快乐、敏捷、酒足饭饱、糖果冲刺、恐慌 buff";
                 case BuffMining: return "获得10分钟 挖矿、建筑工、光芒、夜猫子、酒足饭饱、洞穴探险、危险感知、猎人、糖果冲刺 buff";

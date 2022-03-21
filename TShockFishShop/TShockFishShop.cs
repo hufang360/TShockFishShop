@@ -4,13 +4,13 @@ using System.Linq;
 using System.Reflection;
 using System.IO;
 using Terraria;
-using TShockAPI.Hooks;
+using Terraria.Localization;
 using TerrariaApi.Server;
 using TShockAPI;
-using Terraria.Localization;
+using TShockAPI.Hooks;
 
 
-namespace Plugin
+namespace FishShop
 {
     [ApiVersion(2, 1)]
     public class Plugin : TerrariaPlugin
@@ -108,12 +108,14 @@ namespace Plugin
                 // 浏览
                 case "l":
                 case "list":
+                    SoundHelper.PlayChat(op);
                     ListGoods(args);
                     break;
 
                 // 询价
                 case "a":
                 case "ask":
+                    SoundHelper.PlayChat(op);
                     AskGoods(args);
                     break;
 
@@ -555,6 +557,7 @@ namespace Plugin
                 msg = $"你购买了 {goodsAmount}件 {shopItem.GetItemDesc()} | 花费: {shopItem.GetCostDesc(goodsAmount)}{s} | 余额: {InventoryHelper.GetCoinsCountDesc(op)}";
                 op.SendSuccessMessage( msg  );
                 Log.info( $"{op.Name} 买了 {shopItem.GetItemDesc()}" );
+                SoundHelper.PlayCoins(op);
             } else {
                 op.SendInfoMessage($"没买成功，因为: {msg}，请输入 /fish ask {goodsSerial} 查询购买条件");
             }
@@ -684,12 +687,12 @@ namespace Plugin
                     // 黄金矿工
                     // 钓鱼佬
                     // 兴奋剂
-                    case ShopItemID.BuffGoodLucky: CmdHelper.BuffGoodLucky(player, amount); return;
-                    case ShopItemID.BuffWhipPlayer: CmdHelper.BuffWhipPlayer(player, amount); return;
-                    case ShopItemID.BuffFaster: CmdHelper.BuffFaster(player, amount); return;
-                    case ShopItemID.BuffMining: CmdHelper.BuffMining(player, amount); return;
-                    case ShopItemID.BuffFishing: CmdHelper.BuffFishing(player, amount); return;
-                    case ShopItemID.BuffIncitant: CmdHelper.BuffIncitant(player, amount); return;
+                    case ShopItemID.BuffGoodLucky: BuffHelper.BuffGoodLucky(player, amount); return;
+                    case ShopItemID.BuffWhipPlayer: BuffHelper.BuffWhipPlayer(player, amount); return;
+                    case ShopItemID.BuffFaster: BuffHelper.BuffFaster(player, amount); return;
+                    case ShopItemID.BuffMining: BuffHelper.BuffMining(player, amount); return;
+                    case ShopItemID.BuffFishing: BuffHelper.BuffFishing(player, amount); return;
+                    case ShopItemID.BuffIncitant: BuffHelper.BuffIncitant(player, amount); return;
 
                     // 雨
                     case ShopItemID.RainingStart: CmdHelper.ToggleRaining(player, true); return;

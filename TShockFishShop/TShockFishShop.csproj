@@ -44,13 +44,13 @@
       <HintPath>deps\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="OTAPI">
-      <HintPath>deps\1.4.3.2\OTAPI.dll</HintPath>
+      <HintPath>deps\1.4.3.6\OTAPI.dll</HintPath>
     </Reference>
     <Reference Include="TerrariaServer">
-      <HintPath>deps\1.4.3.2\TerrariaServer.exe</HintPath>
+      <HintPath>deps\1.4.3.6\TerrariaServer.exe</HintPath>
     </Reference>
     <Reference Include="TShockAPI">
-      <HintPath>deps\1.4.3.2\TShockAPI.dll</HintPath>
+      <HintPath>deps\1.4.3.6\TShockAPI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -72,6 +72,7 @@
     <Compile Include="Helper\BuffHelper.cs" />
     <Compile Include="Helper\InventoryHelper.cs" />
     <Compile Include="Helper\DocsHelper.cs" />
+    <Compile Include="Helper\SoundHelper.cs" />
     
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

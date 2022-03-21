@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Terraria;
 
 
-namespace Plugin
+namespace FishShop
 {
     public class ShopItem
     {

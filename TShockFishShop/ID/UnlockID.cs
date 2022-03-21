@@ -2,7 +2,7 @@ using Terraria;
 using TShockAPI;
 
 
-namespace Plugin
+namespace FishShop
 {
     public class UnlockID
     {
