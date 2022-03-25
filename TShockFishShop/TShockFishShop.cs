@@ -108,14 +108,12 @@ namespace FishShop
                 // 浏览
                 case "l":
                 case "list":
-                    SoundHelper.PlayChat(op);
                     ListGoods(args);
                     break;
 
                 // 询价
                 case "a":
                 case "ask":
-                    SoundHelper.PlayChat(op);
                     AskGoods(args);
                     break;
 
@@ -557,7 +555,6 @@ namespace FishShop
                 msg = $"你购买了 {goodsAmount}件 {shopItem.GetItemDesc()} | 花费: {shopItem.GetCostDesc(goodsAmount)}{s} | 余额: {InventoryHelper.GetCoinsCountDesc(op)}";
                 op.SendSuccessMessage( msg  );
                 Log.info( $"{op.Name} 买了 {shopItem.GetItemDesc()}" );
-                SoundHelper.PlayCoins(op);
             } else {
                 op.SendInfoMessage($"没买成功，因为: {msg}，请输入 /fish ask {goodsSerial} 查询购买条件");
             }

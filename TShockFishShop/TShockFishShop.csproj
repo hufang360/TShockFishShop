@@ -72,7 +72,6 @@
     <Compile Include="Helper\BuffHelper.cs" />
     <Compile Include="Helper\InventoryHelper.cs" />
     <Compile Include="Helper\DocsHelper.cs" />
-    <Compile Include="Helper\SoundHelper.cs" />
     
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
