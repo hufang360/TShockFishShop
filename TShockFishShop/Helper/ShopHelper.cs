@@ -1,3 +1,5 @@
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using Terraria;
 
@@ -6,65 +8,100 @@ namespace FishShop
 {
     public class ShopItem
     {
-        public string name = "";
-        public int id = 0;
-        public int stack = 1;
-        public string prefix = "";
-        public List<ItemData> unlock = new List<ItemData>();
-        public List<ItemData> cost = new List<ItemData>();
-        
-        public ShopItem(string _name="", int _id = 0, int _stack=1, string _prefixOrName="")
+        public string name = "";    // 物品名
+        public int id = 0;          // 物品id
+        public int stack = 1;       // 堆叠
+        public string prefix = "";  // 词缀
+
+        public int limit = 0;       // 玩家限量
+        public int serverLimit = 0;      // 全服限量
+
+        public string comment = "";      // 商品备注
+
+        public List<string> allowGroup = new List<string>();    // 允许某个组可购买
+
+        public List<ItemData> unlock = new List<ItemData>();  // 解锁条件
+        public List<ItemData> cost = new List<ItemData>();    // 支付条件
+
+
+        [JsonIgnore]
+        private SetShopData _settings = new SetShopData();   // 预设置
+
+
+        public ShopItem(string _name = "", int _id = 0, int _stack = 1, string _prefixOrName = "")
         {
             name = _name;
             id = _id;
             stack = _stack;
             prefix = _prefixOrName;
+            FillingSettings();
         }
 
 
-        public void filling(){
-            if( id==0 )
-                id = IDSet.GetIDByName(name);
+        public void Filling()
+        {
+            if (id == 0) id = IDSet.GetIDByName(name);
 
-            // // 执行指令
-            // if( id==ShopItemID.RawCmd ){
-            //     name = string.Format( $"指令{prefix}");
-            // } else {
-            //     prefix = MyUtils.AffixNameToPrefix(prefix).ToString();
-            // }
-            if( id!=ShopItemID.RawCmd )
-                prefix = MyUtils.AffixNameToPrefix(prefix).ToString();
+            if (stack == 0) stack = 1;
+
+            FillingSettings();
+
+            if (id == ShopItemID.RawCmd)
+            {
+                name = string.Format($"指令{prefix}");
+            }
+
+            // 执行指令
+            if (id != ShopItemID.RawCmd)
+                prefix = utils.AffixNameToPrefix(prefix).ToString();
         }
 
-        public void AddUnlock(string _name="", int _id = 0, int _stack=1 )
+        private void FillingSettings()
+        {
+            if (Settings.datas.ContainsKey(id))
+                _settings = Settings.datas[id];
+        }
+
+        public void AddUnlock(string _name = "", int _id = 0, int _stack = 1)
         {
             unlock.Add(new ItemData(_name, _id, _stack));
         }
 
-        public void AddCost(string _name="", int _id = 0, int _stack=1 )
+        public void AddCost(string _name = "", int _id = 0, int _stack = 1)
         {
             cost.Add(new ItemData(_name, _id, _stack));
         }
 
         public string GetItemDesc()
         {
-            if( id==0 )
-                filling();
-            return MyUtils.GetItemDesc( name, id, stack, prefix );
+            if (id == 0) Filling();
+            return utils.GetItemDesc(name, id, stack, prefix);
         }
 
         public bool CanBuyManyItem()
         {
-            return ShopItemID.CanBuyManyItem(id);
+            if (ShopItemID.GetRealClearNPCID(id) != 0) return false;
+            return _settings.buyMax == 0;
         }
 
         public bool DeadCanBuyItem()
         {
-            return ShopItemID.DeadCanBuyItem(id);
+            if (ShopItemID.GetRealBuffID(id) != 0) return false;
+            return !_settings.needAlive;
         }
 
-        public string GetComment(){
-            return ShopItemID.GetComment(id);
+        // 商品说明
+        public string GetComment()
+        {
+            if (!string.IsNullOrEmpty(_settings.comment))
+            {
+                if (!string.IsNullOrEmpty(comment))
+                    return $"{_settings.comment}, {comment}";
+                else
+                    return _settings.comment;
+            }
+            else
+                return comment;
         }
 
         // 汇总要减扣的物品
@@ -78,21 +115,23 @@ namespace FishShop
             {
                 int _stack = d.stack * amount;
                 int _id = d.id;
-                if( _id == 0 || _id>Main.maxItemTypes){
+                if (_id == 0 || _id > Main.maxItemTypes)
+                {
                     Log.info($"[CheckCost]物品id{_id}无效");
                     continue;
                 }
 
                 // 跳过 铜、银、金、铂金
-                if( _id == 71 ||  _id==72 || _id==73 || _id==74  )
+                if (_id == 71 || _id == 72 || _id == 73 || _id == 74)
                     continue;
 
                 // 任务鱼
-                if( _id==UnlockID.ItemIDQuestFish ){
+                if (_id == UnlockID.ItemIDQuestFish)
+                {
                     _id = Main.anglerQuestItemNetIDs[Main.anglerQuest];
                 }
 
-                _items.Add( new ItemData("", _id, _stack) );
+                _items.Add(new ItemData("", _id, _stack));
             }
             return _items;
         }
@@ -104,13 +143,14 @@ namespace FishShop
             string msg = "";
             foreach (ItemData data in cost)
             {
-                if( data.id == 0 ){
+                if (data.id == 0)
+                {
                     switch (data.name)
                     {
                         // 任务鱼可以确定一个id
                         // 其它物品可能得到多个id
                         case "任务鱼":
-                            _costItems.Add( new ItemData("", Main.anglerQuestItemNetIDs[Main.anglerQuest], 1) );
+                            _costItems.Add(new ItemData("", Main.anglerQuestItemNetIDs[Main.anglerQuest], 1));
                             break;
 
                         case "宝匣":
@@ -137,7 +177,7 @@ namespace FishShop
         {
             for (int i = 0; i < _data.Count; i++)
             {
-                if(_data[i].id == _id)
+                if (_data[i].id == _id)
                     return _data[i];
             }
             return new ItemData();
@@ -149,7 +189,7 @@ namespace FishShop
             int amount = 0;
             foreach (ItemData data in cost)
             {
-                if( data.id==0 )
+                if (data.id == 0)
                 {
                     switch (data.name)
                     {
@@ -177,46 +217,38 @@ namespace FishShop
                 }
                 switch (data.id)
                 {
-                    case 71:
-                        amount += data.stack;
-                        break;
-                    case 72:
-                        amount += data.stack*100;
-                        break;
-                    case 73:
-                        amount += data.stack*10000;
-                        break;
-                    case 74:
-                        amount += data.stack*1000000;
-                        break;
+                    case 71: amount += data.stack; break;
+                    case 72: amount += data.stack * 100; break;
+                    case 73: amount += data.stack * 10000; break;
+                    case 74: amount += data.stack * 1000000; break;
                 }
             }
-            return amount*goodsAmount;
+            return amount * goodsAmount;
         }
 
         public int GetPrefixInt()
         {
-            int num = 0;
-            if ( int.TryParse( prefix, out num ) )
+            if (int.TryParse(prefix, out int num))
                 return num;
             else
-                return MyUtils.AffixNameToPrefix(prefix);
+                return utils.AffixNameToPrefix(prefix);
         }
 
 
-        public string GetCostDesc(int amount=1)
+        public string GetCostDesc(int amount = 1)
         {
             // 钱
-            string msg = MyUtils.GetMoneyDesc(GetCostMoney(amount));
+            string msg = utils.GetMoneyDesc(GetCostMoney(amount));
 
             // 物品
             List<ItemData> costItems = GetCostItem(amount);
             List<string> msgs = new List<string>();
-            if( !string.IsNullOrEmpty(msg) )
+            if (!string.IsNullOrEmpty(msg))
                 msgs.Add(msg);
 
-            foreach (ItemData _d in costItems){
-                msgs.Add( _d.GetItemDesc() );
+            foreach (ItemData _d in costItems)
+            {
+                msgs.Add(_d.GetItemDesc());
             }
             msg = string.Join("", msgs);
 
@@ -232,28 +264,83 @@ namespace FishShop
         {
             string msg = "";
             string s = "";
-            foreach (ItemData d in unlock){
-                if( msg!="" )
+            foreach (ItemData d in unlock)
+            {
+                if (msg != "")
                     s = "、";
                 msg += $"{s}{ GetOneUnlockDesc(d) }";
             }
+
             return msg;
         }
+
+        public string GetAllowGroupDesc()
+        {
+            if (allowGroup.Count > 0)
+                return $"仅 {string.Join("、", allowGroup)} 用户组";
+            else
+                return "";
+        }
+
 
         // 显示解锁条件
         private string GetOneUnlockDesc(ItemData re)
         {
-            string s = IDSet.GetNameByID( re.id );
+            string s = IDSet.GetNameByID(re.id);
 
             // 完成钓鱼任务
-            if( re.id==UnlockID.FishQuestCompleted )
-                s = string.Format( s, re.stack );
+            if (re.id == UnlockID.FishQuestCompleted)
+                s = string.Format(s, re.stack);
 
             return s;
         }
 
+
+        // 获得限购信息
+        public string GetLimitDesc(string playerName)
+        {
+            if (string.IsNullOrEmpty(playerName))
+                return "";
+
+            int count1 = Math.Max(0, LimitHelper.GetPlayerRecord(playerName, id));
+            int count2 = Math.Max(0, LimitHelper.GetServerRecord(id));
+            List<string> msgs = new List<string>();
+            if (limit > 0)
+                msgs.Add($"个人 {count1}/{limit}");
+            if (serverLimit > 0)
+                msgs.Add($"全服 {count2}/{serverLimit}");
+
+            return string.Join(", ", msgs);
+        }
+
+        // 限购检查
+        public bool CheckLimitCanBuy(string playerName)
+        {
+            if (string.IsNullOrEmpty(playerName))
+                return true;
+
+            int count1 = LimitHelper.GetPlayerRecord(playerName, id);
+            if (limit > 0)
+            {
+                if (limit - count1 > 0)
+                    return true;
+                else
+                    return false;
+            }
+
+            int count2 = LimitHelper.GetServerRecord(id);
+            if (serverLimit > 0)
+            {
+                if (serverLimit - count2 > 0)
+                    return true;
+                else
+                    return false;
+            }
+
+            return true;
+        }
     }
-    
+
 
     public class ShopItem2
     {
@@ -261,51 +348,5 @@ namespace FishShop
 
         public ShopItem item;
     }
-
-    // public class Shelf
-    // {
-    //     private List<ShelfData> _datas = new List<ShelfData>();
-
-    //     //获得指定玩家的货架
-    //     public ShelfData GetOne( int index)
-    //     {
-    //         foreach( ShelfData d in _datas){
-    //             if(d.playerIndex == index)
-    //                 return d;
-    //         }
-    //         return new ShelfData();
-    //     }
-
-    //     //添加一个玩家的货架
-    //     // 控制台执行时，传过来的 playerindex 是 -1
-    //     public void AddOne( int playerIndex, ShelfData playerData)
-    //     {
-    //         int index = -1;
-    //         for( int i=0; i<_datas.Count; i++)
-    //         {
-    //             if(_datas[i].playerIndex == playerIndex){
-    //                 index = i;
-    //                 break;
-    //             }
-    //         }
-    //         if(index==-1)
-    //             _datas.Add( playerData );
-    //         else
-    //             _datas[index] = playerData;
-    //     }
-
-    // }
-
-    // public class ShelfData
-    // {
-    //     public int playerIndex=-1;
-    //     public string playerName = "";
-    //     public List<ShopItem> goods = new List<ShopItem>();
-
-    //     public ShelfData(int _index=-1, string _name=""){
-    //         playerIndex = _index;
-    //         playerName = _name;
-    //     }
-    // }
 
 }

@@ -1,0 +1,41 @@
+{
+  "name": "鱼店",
+  "pageSlots": 40,
+  "rowSlots": 10,
+  "unlock": [{"name": "渔夫任务"}],
+  "shop": [
+
+
+{"name": "蠕虫罐头", "id":4345 , "stack": 10, "unlock": [{"name": "渔夫在场"}],"cost": [{"name": "金币", "stack": 10}] },
+{"name": "生命水晶", "id": 29, "comment": "有人下地淘金，有人在家淘气", "cost": [{"name": "煤", "id":1922}] },
+{"name": "墓石碑", "id": 1173, "cost": [{"name": "海草", "id":2338}] },
+{"name": "无趣弓", "id": 3853, "unlock": [{"name": "石后"}], "cost": [{"name": "双足翼龙圣物", "id": 4948}] },
+{"name": "第一分形", "id": 4722, "unlock": [{"name": "石后"}], "cost": [{"name": "铂金币", "stack": 30}] },
+{"name": "吸血鬼刀", "id": 1569 , "prefix": "传奇", "allowGroup":["战士","vip"], "limit":1, "serverLimit":3, "unlock": [{"name": "花后"}], "cost": [{"name": "铂金币", "stack": 30}] },
+{"name": "下个月相", "unlock": [{"name": "渔夫任务", "stack": 10}], "cost": [{"name": "金币", "stack": 10}] },
+{"name": "更换任务鱼", "unlock": [{"name": "渔夫任务", "stack": 10}], "cost": [{"name": "金币", "stack": 10}] },
+{"name": "烟花起飞", "cost": [{"name": "金币"}] },
+{"name": "雨来", "cost": [{"name": "金币"}] },
+{"name": "雨停", "cost": [{"name": "金币"}] },
+{"name": "调白天", "cost": [{"name": "金币"}] },
+{"name": "调晚上", "cost": [{"name": "金币", "stack": 3}] },
+{"name": "跳过入侵", "cost": [{"name": "金币", "stack": 3}] },
+{"name": "召唤哥布林军队", "cost": [ {"name": "哥布林战旗", "id": 361}, {"name": "金币", "stack":10} ] },
+{"name": "召唤史莱姆王", "cost": [{"name": "史莱姆王冠"}] },
+{"name": "召唤世纪之花", "unlock": [ {"name": "三王后"}, {"name": "渔夫任务", "stack": 20} ], "cost": [{"name": "铂金币"}] },
+{"name": "指令", "stack":"/tpnpc Angler", "comment":"传到渔夫身边", "cost": [{"name": "金币"}] },
+{"name": "复活npc", "cost": [{"name": "金币", "stack": 5}] },
+{"name": "集合打团", "cost": [{"name": "金币", "stack": 5}] },
+{"name": "集体庆祝", "cost": [{"name": "银币", "stack": 10}] },
+{"name": "好运来", "cost": [{"name": "铜币"}] },
+{"name": "逮虾户", "cost": [{"name": "金", "id": 0, "stack": 5}] },
+{"name": "钓鱼佬", "cost": [{"name": "金", "id": 0, "stack": 10}] },
+{"name": "黄金矿工", "cost": [{"name": "金", "id": 0, "stack": 20}] },
+{"name": "兴奋剂", "cost": [{"name": "金", "id": 0, "stack": 10}] },
+{"name": "打神鞭", "cost": [{"name": "金", "id": 0, "stack": 50}] },
+
+{"name": "黑曜石皮buff", "id": -5001, "stack": 60, "cost": [{"name": "金币", "stack":5}] }
+
+
+]
+}

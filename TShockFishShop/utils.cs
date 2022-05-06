@@ -4,10 +4,13 @@ using TShockAPI;
 using Terraria;
 using Terraria.ID;
 using Terraria.Localization;
+using System.Reflection;
+using System.IO;
+
 
 namespace FishShop
 {
-    public class MyUtils
+    public class utils
     {
         public static List<string> moonPhases = new List<string>() {"满月","亏凸月","下弦月","残月","新月","娥眉月","上弦月","盈凸月"};
 
@@ -66,7 +69,7 @@ namespace FishShop
                 return AffixNameToPrefix(prefix);
         }
         
-        public static string GetMoneyDesc(int price){
+        public static string GetMoneyDesc(int price, bool tagStyle=true){
             string msg = "";
 
             // 铂金币
@@ -74,7 +77,7 @@ namespace FishShop
             int stack = (int)Math.Floor( num );
             if( stack>0 ){
                 price -= stack*1000000;
-                msg = $"[i/s{stack}:74]";
+                msg = tagStyle ? $"[i/s{stack}:74]" : $"{stack}铂";
             }
 
             // 金币
@@ -82,7 +85,7 @@ namespace FishShop
             stack = (int)Math.Floor( num );
             if( stack>0 ){
                 price -= stack*10000;
-                msg += $"[i/s{stack}:73]";
+                msg += tagStyle ? $"[i/s{stack}:73]" : $" {stack}金";
             }
 
             // 银币
@@ -90,12 +93,12 @@ namespace FishShop
             stack = (int)Math.Floor( num );
             if( stack>0 ){
                 price -= stack*100;
-                msg += $"[i/s{stack}:72]";
+                msg += tagStyle ? $"[i/s{stack}:72]" : $" {stack}银";
             }
 
             // 铜币
             if( price>0 ){
-                msg += $"[i/s{price}:71]";
+                msg += tagStyle ? $"[i/s{price}:71]" : $" {stack}铜币";
             }
 
             return msg;
@@ -217,6 +220,26 @@ namespace FishShop
             NetMessage.SendData((int)PacketTypes.PlayerSlot, player.Index, -1, NetworkText.FromLiteral(item.Name), player.Index, slotIndex, (float)item.prefix);
         }
 
+        public static int GetUnixTimestamp
+        {
+            get { return (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds; }
+        }
+
+
+        public static int InvalidItemID { get { return -24; } }
+
+
+        /// <summary>
+        /// 获取内嵌文件
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string FromEmbeddedPath(string path)
+        {
+            Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(path);
+            StreamReader streamReader = new StreamReader(stream);
+            return streamReader.ReadToEnd();
+        }
 
     }
 

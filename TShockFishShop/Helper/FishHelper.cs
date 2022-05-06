@@ -15,8 +15,9 @@ namespace FishShop
         {
             Main.AnglerQuestSwap();
             int itemID = Main.anglerQuestItemNetIDs[ Main.anglerQuest ];
-            string itemName = MyUtils.GetItemDesc("", itemID);
+            string itemName = utils.GetItemDesc("", itemID);
             TSPlayer.All.SendSuccessMessage($"{player.Name} 购买了 更换任务鱼，今天的任务鱼已随机成 {itemName}");
+            if (!player.RealPlayer) player.SendInfoMessage($"今天的任务鱼换成 {itemName}");
         }
 
         // 指定今天的任务鱼（物品id或物品名）
@@ -32,7 +33,7 @@ namespace FishShop
             if( int.TryParse( itemNameOrId, out itemID) ){
                 // 鱼的物品id
                 if( !Main.anglerQuestItemNetIDs.Contains( itemID ) ){
-                    itemName = MyUtils.GetItemDesc( "", itemID);
+                    itemName = utils.GetItemDesc( "", itemID);
                     // Lang.GetItemNameValue(4444);
                     player.SendErrorMessage($"{itemID} = {itemName}，并不是有效的任务鱼！");
                     return;
@@ -41,7 +42,8 @@ namespace FishShop
 
                 // 鱼的名字
                 List<Item> found = TShock.Utils.GetItemByName(itemNameOrId);
-                if( found.Count==0 ){
+                if( found.Count==0 )
+                {
 
                     // 追加判断，加入一些容易叫错的物品名
                     itemID = ShopItemID.GetIDByName(itemNameOrId);
@@ -72,7 +74,7 @@ namespace FishShop
 			// NetMessage.SendData(76, player.Index, -1, NetworkText.Empty, player.Index);
 			// NetMessage.SendData(76, -1, -1, NetworkText.Empty, player.Index);
 
-            itemName = MyUtils.GetItemDesc("", itemID);
+            itemName = utils.GetItemDesc("", itemID);
             player.SendSuccessMessage($"今日份的任务鱼已指定成 {itemName}");
 		}
 
@@ -88,13 +90,13 @@ namespace FishShop
                     questText = questText.Replace("（抓捕位置：", "");
                     questText = questText.Replace("）", "");
                 }
-                string itemName = MyUtils.GetItemDesc("", itemID);
+                string itemName = utils.GetItemDesc("", itemID);
                 player.SendInfoMessage($"任务鱼: {itemName}（{questText}）");
             } else {
                 player.SendInfoMessage($"任务鱼: 渔夫不在场");
             }
 
-            player.SendInfoMessage($"月相: {MyUtils.moonPhases[Main.moonPhase]}");
+            player.SendInfoMessage($"月相: {utils.moonPhases[Main.moonPhase]}");
 
             // 时间
             double time = Main.time / 3600.0;
@@ -141,6 +143,19 @@ namespace FishShop
 
             return $"今日完成渔夫任务情况({finished}/{players.Count}):\n {string.Join(", ", players)}";
 		}
+        
+        public static bool NeedBuyChangeMoonPhase(TSPlayer player, int id, int amount = 1)
+        {
+            int index = ShopItemID.MoonphaseStart - id;
+            if (index == 8)
+                index = (Main.moonPhase + amount) % 8;
+            if( index==Main.moonPhase )
+            {
+                player.SendInfoMessage("要切换的月相相同，无需购买");
+                return false;
+            }
+            return true;
+        }
 
         public static void ChangeMoonPhaseByID(TSPlayer player, int id, int amount=1)
         {
@@ -154,7 +169,7 @@ namespace FishShop
         {
             if( index<0 || index>7 )
                 return;
-            string name = MyUtils.moonPhases[index];
+            string name = utils.moonPhases[index];
             Main.dayTime = false;
             Main.moonPhase = index;
             Main.time = 0.0;

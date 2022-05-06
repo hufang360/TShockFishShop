@@ -55,7 +55,7 @@ namespace FishShop
 		public static void BuffGoodLucky(TSPlayer op, int amount=1)
 		{
 			var time = 10*60 * amount;
-			BuffHelper.SetPlayerBuff(op, BuffID.Lucky, time);
+			SetPlayerBuff(op, BuffID.Lucky, time);
 		}
 
 		// 打神鞭
@@ -76,7 +76,7 @@ namespace FishShop
 
 			foreach (int id in buff)
 			{
-				BuffHelper.SetPlayerBuff(op, id, time);
+				SetPlayerBuff(op, id, time);
 			}
 
 		}
@@ -104,7 +104,7 @@ namespace FishShop
 
 			foreach (int id in buff)
 			{
-				BuffHelper.SetPlayerBuff(op, id, time);
+				SetPlayerBuff(op, id, time);
 			}
 		}
 
@@ -136,7 +136,7 @@ namespace FishShop
 
 			foreach (int id in buff)
 			{
-				BuffHelper.SetPlayerBuff(op, id, time);
+				SetPlayerBuff(op, id, time);
 			}
 		}
 
@@ -159,7 +159,7 @@ namespace FishShop
 
 			foreach (int id in buff)
 			{
-				BuffHelper.SetPlayerBuff(op, id, time);
+				SetPlayerBuff(op, id, time);
 			}
 		}
 
@@ -189,7 +189,7 @@ namespace FishShop
 
 			foreach (int id in buff)
 			{
-				BuffHelper.SetPlayerBuff(op, id, time);
+				SetPlayerBuff(op, id, time);
 			}
 		}
 
