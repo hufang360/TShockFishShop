@@ -9,8 +9,6 @@ namespace FishShop
 {
     public class InventoryHelper
     {
-        
-
         // 获取余额
         public static int GetCoinsCount(TSPlayer player)
         {
@@ -26,13 +24,13 @@ namespace FishShop
         }
 
         // 余额描述
-        public static string GetCoinsCountDesc(TSPlayer player)
+        public static string GetCoinsCountDesc(TSPlayer player, bool tagStyle=true)
         {
             int total = GetCoinsCount(player);
-            return MyUtils.GetMoneyDesc( total );
+            return utils.GetMoneyDesc( total, tagStyle);
         }
 
-        // 检查钱是否足够
+        #region 检查钱是否足够
         public static bool CheckCost(TSPlayer player, ShopItem shopItem, int amount, out string msg)
         {
             // 取出要扣除的物品id
@@ -90,7 +88,9 @@ namespace FishShop
 
             return true;
         }
+        #endregion
 
+        #region 减扣物品
         // 减扣物品
         public static void DeductCost(TSPlayer player, ShopItem shopItem, int amount=1)
         {
@@ -121,7 +121,7 @@ namespace FishShop
                         itemNet.stack = 0;
                         itemData.stack -= itemNet.stack;
                     }
-                    MyUtils.updatePlayerSlot(player, itemNet, i);
+                    utils.updatePlayerSlot(player, itemNet, i);
                 }
 
             }
@@ -147,143 +147,116 @@ namespace FishShop
             // // RemoveItemOwner
             // NetMessage.SendData(39, player.Index, -1, NetworkText.Empty, 400);
         }
+        #endregion
 
-
+        #region 减扣金币
         private static bool DeductMoney(TSPlayer player, int price)
         {
-            // 找出当前货币的格子索引
+            
             int b1 = 0;
             int b2 = 0;
             int b3 = 0;
             int b4 = 0;
-            Item item;
             List <Item> items = new List<Item>();
             List<int> indexs = new List<int>();
+
+            // 找出当前货币的格子索引
+            void record(Item _item, int _index)
+            {
+                if (_item.IsACoin)
+                {
+                    indexs.Add(_index);
+                    items.Add(_item);
+                }
+            }
             for (int i = 0; i < 260; i++)
             {
                 if (i < 54){
-                    item =player.TPlayer.inventory[i];
-                    if( item.IsACoin )
-                    {
-                        indexs.Add(i);
-                        items.Add(item);
-                    }
+                    record(player.TPlayer.inventory[i], i);
 
                 } else if (i >= 99 && i < 139){
-                    item =player.TPlayer.bank.item[b1];
-                    if( item.IsACoin )
-                    {
-                        indexs.Add(i);
-                        items.Add(item);
-                    }
+                    record(player.TPlayer.bank.item[b1], i);
                     b1++;
 
-                } else if (i >= 139 && i < 179){
-                    item =player.TPlayer.bank2.item[b2];
-                    if( item.IsACoin )
-                    {
-                        indexs.Add(i);
-                        items.Add(item);
-                    }
+                } else if (i >= 139 && i < 179)
+                {
+                    record(player.TPlayer.bank2.item[b2], i);
                     b2++;
 
                 } else if (i >= 180 && i < 220){
-                    item =player.TPlayer.bank3.item[b3];
-                    if( item.IsACoin )
-                    {
-                        indexs.Add(i);
-                        items.Add(item);
-                    }
+                    record(player.TPlayer.bank3.item[b3], i);
                     b3++;
 
                 } else if (i >= 220 && i < 260){
-                    item =player.TPlayer.bank4.item[b4];
-                    if( item.IsACoin )
-                    {
-                        indexs.Add(i);
-                        items.Add(item);
-                    }
+                    record(player.TPlayer.bank4.item[b4], i);
                     b4++;
                 }
             }
 
+
             // 购买物品
             bool success = player.TPlayer.BuyItem(price);
-            // player.SendInfoMessage( $"前：{String.Join(" ",indexs)}" );
+
 
             // 找出货币的格子索引（减扣后）
             b1 = 0;
             b2 = 0;
             b3 = 0;
             b4 = 0;
-            List <Item> items2 = new List<Item>();
+            List<Item> items2 = new List<Item>();
             List<int> indexs2 = new List<int>();
+
+            void record2(Item _item, int _index)
+            {
+                if (_item.IsACoin)
+                {
+                    indexs2.Add(_index);
+                    items2.Add(_item);
+                    if (indexs.Contains(_index))
+                    {
+                        var newIndex = indexs.IndexOf(_index);
+                        indexs.RemoveAt(newIndex);
+                        items.RemoveAt(newIndex);
+                    }
+                }
+            }
+
             for (int i = 0; i < 260; i++)
             {
-                if(indexs.Contains(i))
-                {
-                    var newIndex = indexs.IndexOf(i);
-                    indexs.RemoveAt(newIndex);
-                    items.RemoveAt(newIndex);
-                }
-
                 if (i < 54){
-                    item =player.TPlayer.inventory[i];
-                    if( item.IsACoin )
-                    {
-                        indexs2.Add(i);
-                        items2.Add(item);
-                    }
+                    record2(player.TPlayer.inventory[i], i);
 
                 } else if (i >= 99 && i < 139){
-                    item =player.TPlayer.bank.item[b1];
-                    if( item.IsACoin )
-                    {
-                        indexs2.Add(i);
-                        items2.Add(item);
-                    }
+                    record2(player.TPlayer.bank.item[b1], i);
                     b1++;
 
                 } else if (i >= 139 && i < 179){
-                    item =player.TPlayer.bank2.item[b2];
-                    if( item.IsACoin )
-                    {
-                        indexs2.Add(i);
-                        items2.Add(item);
-                    }
+                    record2(player.TPlayer.bank2.item[b2], i);
                     b2++;
 
                 } else if (i >= 180 && i < 220){
-                    item =player.TPlayer.bank3.item[b3];
-                    if( item.IsACoin )
-                    {
-                        indexs2.Add(i);
-                        items2.Add(item);
-                    }
+                    record2(player.TPlayer.bank3.item[b3], i);
                     b3++;
 
                 } else if (i >= 220 && i < 260){
-                    item =player.TPlayer.bank4.item[b4];
-                    if( item.IsACoin )
-                    {
-                        indexs2.Add(i);
-                        items2.Add(item);
-                    }
+                    record2(player.TPlayer.bank4.item[b4], i);
                     b4++;
                 }
             }
-            // player.SendInfoMessage( $"后：{String.Join(" ",indexs2)}" );
 
+            //player.SendInfoMessage( $"购买前：{string.Join(" ",indexs)}" );
+            //player.SendInfoMessage( $"购买后：{string.Join(" ",indexs2)}" );
             indexs.AddRange( indexs2 );
             items.AddRange( items2 );
-            // player.SendInfoMessage( $"合并：{String.Join(" ",indexs)}" );
+            //player.SendInfoMessage( $"合并：{string.Join(" ",indexs)}" );
 
             // 刷新背包和储蓄罐
             for (int i =0; i<indexs.Count; i++)
             {
-                MyUtils.updatePlayerSlot(player, items[i], indexs[i]);
+                utils.updatePlayerSlot(player, items[i], indexs[i]);
             }
             return success;
         }
+        #endregion
     }
 }

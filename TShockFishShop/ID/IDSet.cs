@@ -25,8 +25,6 @@ namespace FishShop
             if( string.IsNullOrEmpty(name) )
                 return 0;
             
-            name = name.ToLowerInvariant();
-
             // 解锁条件
             int id = 0;
             id = UnlockID.GetIDByName(name);

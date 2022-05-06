@@ -152,7 +152,7 @@ namespace FishShop
             if( npcID!=0 ){
                 npcName = NPCHelper.GetNameByID(npcID);
                 if( !string.IsNullOrEmpty(npcName) )
-                    return $"{npcName} 活着";
+                    return $"{npcName} 在场";
             }
 
             return "";
@@ -194,6 +194,7 @@ namespace FishShop
                     return GetDownedID(npcID);
 
             } else if( name.Contains("活着") || name.Contains("在场") ){
+                Log.info("hell"+name);
                 // npc 活着
                 s = name.Replace(" ", "").Replace("活着","").Replace("在场", "").ToLowerInvariant();
                 npcID = NPCHelper.GetIDByName(s);
@@ -476,7 +477,7 @@ namespace FishShop
             }
 
             msg = s;
-            passed = s=="" ? true:false;
+            passed = s=="";
             return passed;
         }
 

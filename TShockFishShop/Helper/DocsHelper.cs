@@ -234,7 +234,7 @@ namespace FishShop
 			{
 				NPC npc = new NPC();
 				npc.SetDefaults(i);
-				if (!String.IsNullOrEmpty(npc.FullName))
+				if (!string.IsNullOrEmpty(npc.FullName))
 				{
 					buffer.AppendLine( $"{i},{npc.FullName}");
 				}
@@ -250,7 +250,7 @@ namespace FishShop
 
 			for (int i = 0; i < Main.maxBuffTypes; i++)
 			{
-				if (!String.IsNullOrEmpty(Lang.GetBuffName(i)))
+				if (!string.IsNullOrEmpty(Lang.GetBuffName(i)))
 				{
 					buffer.AppendLine( $"{i},{Lang.GetBuffName(i)},{Lang.GetBuffDescription(i)}" );
 				}
@@ -268,7 +268,7 @@ namespace FishShop
 			{
 				string prefix = Lang.prefix[i].ToString();
 
-				if (!String.IsNullOrEmpty(prefix))
+				if (!string.IsNullOrEmpty(prefix))
 				{
 					buffer.AppendLine( $"{i},{prefix}");
 				}
@@ -286,7 +286,7 @@ namespace FishShop
 			{
 				Projectile projectile = new Projectile();
 				projectile.SetDefaults(i);
-				if (!String.IsNullOrEmpty(projectile.Name))
+				if (!string.IsNullOrEmpty(projectile.Name))
 				{
 					buffer.AppendLine( $"{i},{projectile.Name}");
 				}
