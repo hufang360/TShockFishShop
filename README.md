@@ -14,7 +14,7 @@
 /fish info, 查询钓鱼信息;
 
 /fish reload, 重载配置;
-/fish reload, 重置限量记录（1.4）;
+/fish reset, 重置限量记录（1.4）;
 
 /fish = /fishshop = /fs
 ```
