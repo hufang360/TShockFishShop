@@ -14,6 +14,7 @@
 /fish info, 查询钓鱼信息;
 
 /fish reload, 重载配置;
+/fish reload, 重置限量记录（1.4）;
 
 /fish = /fishshop = /fs
 ```
@@ -27,10 +28,13 @@
 | fishshop.change | 切换钓鱼任务 |
 | fishshop.changesuper | 指定钓鱼任务 |
 | fishshop.finish  | 修改钓鱼完成次数 |
-| fishshop.reload  | 重载鱼店配置 |
+| fishshop.reload  | 重载鱼店配置 和 重置限量记录 |
 | fishshop.special  | 服主和开发者专用 |
 
 授权示意（服主默认拥有全部权限）：
 ```shell
 /group addperm default fishshop.change
 ```
+
+
+商品配置说明：[https://gitee.com/hufang360/TShockFishShop/wikis/商品配置](https://gitee.com/hufang360/TShockFishShop/wikis/%E5%95%86%E5%93%81%E9%85%8D%E7%BD%AE)
