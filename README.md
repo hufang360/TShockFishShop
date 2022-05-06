@@ -36,9 +36,14 @@
 /group addperm default fishshop.change
 ```
 
+<br>
 
-商品配置说明：[./wikis/config.json/商品配置](https://gitee.com/hufang360/TShockFishShop/wikis/config.json/%E5%95%86%E5%93%81%E9%85%8D%E7%BD%AE)
+商品配置说明：
 
+[./wikis/config.json/商品配置](https://gitee.com/hufang360/TShockFishShop/wikis/config.json/%E5%95%86%E5%93%81%E9%85%8D%E7%BD%AE)
+
+<br>
 
 支持
-![输入图片说明](res/afdian-hufang360.jpg =300)
+
+<img src="https://gitee.com/hufang360/TShockFishShop/raw/master/res/afdian-hufang360.jpg" height="360px"/>
