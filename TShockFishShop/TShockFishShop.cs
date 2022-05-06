@@ -564,9 +564,8 @@ namespace FishShop
             }
 
             // 检查用户组
-            bool groupPass = op.HasPermission(PermissionGroupIgnore);
-            if (!groupPass && shopItem.allowGroup.Count > 0)
-                groupPass = shopItem.allowGroup.Contains(op.Group.Name);
+            bool groupPass = op.HasPermission(PermissionGroupIgnore) || shopItem.allowGroup.Count == 0;
+            if (!groupPass) groupPass = shopItem.allowGroup.Contains(op.Group.Name);
             if (!groupPass)
             {
                 msg += $" 你不是 {string.Join("、", shopItem.allowGroup)} 用户组的玩家";
