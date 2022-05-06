@@ -37,4 +37,4 @@
 ```
 
 
-商品配置说明：[https://gitee.com/hufang360/TShockFishShop/wikis/商品配置](https://gitee.com/hufang360/TShockFishShop/wikis/%E5%95%86%E5%93%81%E9%85%8D%E7%BD%AE)
+商品配置说明：[./wikis/config.json/商品配置](https://gitee.com/hufang360/TShockFishShop/wikis/config.json/%E5%95%86%E5%93%81%E9%85%8D%E7%BD%AE)
