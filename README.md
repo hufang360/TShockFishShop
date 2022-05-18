@@ -40,7 +40,7 @@
 
 商品配置说明：
 
-[https://www.yuque.com/hufang/bv/tshock-fish-shop](https://www.yuque.com/hufang/bv/tshock-fish-shop)（由于gitee审核太严，经常发不出东西，以后插件说明会在语雀上更新说明）
+[https://www.yuque.com/hufang/bv/tshock-fish-shop](https://www.yuque.com/hufang/bv/tshock-fish-shop)（由于gitee审核太严，经常发不出东西，以后插件说明会在语雀上更新）
 
 <br>
 
