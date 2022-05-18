@@ -40,7 +40,7 @@
 
 商品配置说明：
 
-[./wikis/config.json/商品配置](https://gitee.com/hufang360/TShockFishShop/wikis/config.json/%E5%95%86%E5%93%81%E9%85%8D%E7%BD%AE)
+[https://www.yuque.com/hufang/bv/tshock-fish-shop](https://www.yuque.com/hufang/bv/tshock-fish-shop)（由于gitee审核太严，经常发不出东西，以后插件说明会在语雀上更新说明）
 
 <br>
 
