@@ -44,6 +44,5 @@
 
 <br>
 
-支持
-
-<img src="https://gitee.com/hufang360/TShockFishShop/raw/master/res/afdian-hufang360.jpg" height="360px"/>
+爱发电支持：
+[https://afdian.net/@hufang360](https://afdian.net/@hufang360)
