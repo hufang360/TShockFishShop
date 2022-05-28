@@ -1,41 +1,172 @@
+// json不允许添加注释，不过为了配置方便，本插件做了处理，注释并不会对插件功能造成影响。
+
+// 参考和支持
+// 鱼店速查：https://shimo.im/sheets/gO3oxEZL0zuyDyqD/y0PPl
+// 插件说明：https://www.yuque.com/hufang/bv/tshock-fish-shop
+// 联系方式：https://space.bilibili.com/4328524
+
+// 配置文件说明
+// ├─ name，店铺名字
+// ├─ pageSlots，单页展示商品总数
+// ├─ rowSlots，单行展示商品数
+// ├─ unlock，店铺解锁条件，可以配置多条，itemData类型
+// └─ shop，商品列表
+//      ├─ name，商品名，有id的情况下可不写
+//      ├─ id，商品id/物品id，可不写，不写时根据name匹配id
+//      ├─ stack，堆叠数，不写、写0、写1 都表示数量1
+//      ├─ prefix, 词缀，可写成 "prefix":"幸运" 也可写成 "prefix":"68"，字符串类型，写数字时记得用引号括起来
+//      ├─ cmds，指令清单，仅当 id=-160时才启用（1.4.1新增）
+//      ├─ buffs ，buff清单，当id=-159时才会启用（1.4.1新增）
+//      ├─ seconds ，各buff持续时间，不写或长度和buffs对不上，默认为60s（1.4.1新增）
+//      ├─ limit，玩家限量
+//      ├─ serverLimit，全服限量
+//      ├─ comment，商品备注，会出现在 /fish ask 结果中
+//      ├─ allowGroup，用户组限制，哪些用户组可购买，可填写多条，不写表示允许所有。目前未考虑用户组的继承关系。
+//      ├─ unlock，解锁条件，可以配置多条，itemData类型
+//      └─ cost，支付条件，可以配置多条，itemData类型
+
+// itemData
+// ├─ name，物品名/解锁条件名
+// ├─ id，物品id/商品id/解锁条件id
+// ├─ stack，数量，不写、写0、写1 都表示数量1
+// └─ cmd，指令，仅做支付条件时才启用，用于执行代币扣除指令（1.4.1新增）
+
 {
-  "name": "鱼店",
-  "pageSlots": 40,
-  "rowSlots": 10,
-  "unlock": [{"name": "渔夫任务"}],
-  "shop": [
+  "name":"鱼店",
+  "pageSlots":40,
+  "rowSlots":10,
+  "unlock":[{"name":"渔夫任务"}],
+  "shop":[
+
+{"name":"蠕虫罐头", "id":4345 , "stack":10, "unlock":[{"name":"渔夫在场"}],"cost":[{"name":"金", "stack":10}]},
+{"name":"生命水晶", "id":29, "unlock":[{"name":"肉后"}, {"name":"生命<400"}], "cost":[{"name":"金", "stack":2}]},
+{"name":"生命水晶", "id":29, "unlock":[{"name":"渔夫任务", "stack":5}],"comment":"有人下地淘金，有人在家淘气", "cost":[{"name":"煤", "id":1922}]},
+{"name":"生命果", "id":1291, "unlock":[{"name":"花后"}, {"name":"渔夫任务", "stack":5}],"cost":[{"name":"金", "stack":3}]},
+{"name":"墓石碑", "id":1173, "cost":[{"name":"海草", "id":2338}]},
+{"name":"金币", "id":73, "stack":5, "cost":[{"name":"鲈鱼", "id":2290, "stack":30}]},
+{"name":"草药袋", "id":3093, "stack":5, "cost":[{"name":"金", "stack":5}]},
+{"name":"水瓶", "id":126, "stack":100, "cost":[{"name":"金"}]},
+
+{"name":"钱币槽", "id":3213, "unlock":[{"name":"渔夫任务", "stack":20}], "cost":[{"name":"铂"}]},
+{"name":"眼骨", "id":5098, "unlock":[{"name":"渔夫任务", "stack":20}], "cost":[{"name":"金", "stack":50}]},
+{"name":"无底水桶", "id":3031, "unlock":[{"name":"渔夫任务", "stack":10}], "cost":[{"name":"金", "stack":20}]},
+{"name":"超级吸水棉", "id":3032, "unlock":[{"name":"渔夫任务", "stack":10}], "cost":[{"name":"金", "stack":10}]},
+{"name":"熔岩吸收棉", "id":4872, "unlock":[{"name":"渔夫任务", "stack":10}], "cost":[{"name":"金", "stack":40}]},
+{"name":"冤大头钓竿", "id":2296, "unlock":[{"name":"击败骷髅王"}], "cost":[{"name":"铂", "stack":10}]},
+{"name":"每秒伤害计数器", "id":3119, "unlock":[{"name":"击败骷髅王"}], "cost":[{"name":"铂"}]},
+{"name":"生命体分析机", "id":3118, "unlock":[{"name":"击败骷髅王"}], "cost":[{"name":"铂"}]},
+{"name":"秒表", "id":3099, "unlock":[{"name":"击败骷髅王"}], "cost":[{"name":"铂"}]},
+{"name":"雷达", "id":3084, "unlock":[{"name":"渔夫任务", "stack":20}], "cost":[{"name":"铂", "stack":5}, {"name":"任务鱼"}]},
+{"name":"渔民袖珍宝典", "id":3120, "unlock":[{"name":"渔夫任务", "stack":20}], "cost":[{"name":"铂"}, {"name":"任务鱼"}]},
+{"name":"天气收音机", "id":3037, "unlock":[{"name":"渔夫任务", "stack":20}], "cost":[{"name":"铂"}, {"name":"任务鱼"}]},
+{"name":"六分仪", "id":3096, "unlock":[{"name":"渔夫任务", "stack":20}], "cost":[{"name":"铂"}, {"name":"任务鱼"}]},
+{"name":"优质钓鱼线", "id":2373, "unlock":[{"name":"渔夫任务", "stack":10}], "cost":[{"name":"铂"}, {"name":"任务鱼"}]},
+{"name":"渔夫耳环", "id":2374, "unlock":[{"name":"渔夫任务", "stack":10}], "cost":[{"name":"铂"}, {"name":"任务鱼"}]},
+{"name":"钓具箱", "id":2375, "unlock":[{"name":"渔夫任务", "stack":10}], "cost":[{"name":"铂"}, {"name":"任务鱼"}]},
 
 
-{"name": "蠕虫罐头", "id":4345 , "stack": 10, "unlock": [{"name": "渔夫在场"}],"cost": [{"name": "金币", "stack": 10}] },
-{"name": "生命水晶", "id": 29, "comment": "有人下地淘金，有人在家淘气", "cost": [{"name": "煤", "id":1922}] },
-{"name": "墓石碑", "id": 1173, "cost": [{"name": "海草", "id":2338}] },
-{"name": "无趣弓", "id": 3853, "unlock": [{"name": "石后"}], "cost": [{"name": "双足翼龙圣物", "id": 4948}] },
-{"name": "第一分形", "id": 4722, "unlock": [{"name": "石后"}], "cost": [{"name": "铂金币", "stack": 30}] },
-{"name": "吸血鬼刀", "id": 1569 , "prefix": "传奇", "allowGroup":["战士","vip"], "limit":1, "serverLimit":3, "unlock": [{"name": "花后"}], "cost": [{"name": "铂金币", "stack": 30}] },
-{"name": "下个月相", "unlock": [{"name": "渔夫任务", "stack": 10}], "cost": [{"name": "金币", "stack": 10}] },
-{"name": "更换任务鱼", "unlock": [{"name": "渔夫任务", "stack": 10}], "cost": [{"name": "金币", "stack": 10}] },
-{"name": "烟花起飞", "cost": [{"name": "金币"}] },
-{"name": "雨来", "cost": [{"name": "金币"}] },
-{"name": "雨停", "cost": [{"name": "金币"}] },
-{"name": "调白天", "cost": [{"name": "金币"}] },
-{"name": "调晚上", "cost": [{"name": "金币", "stack": 3}] },
-{"name": "跳过入侵", "cost": [{"name": "金币", "stack": 3}] },
-{"name": "召唤哥布林军队", "cost": [ {"name": "哥布林战旗", "id": 361}, {"name": "金币", "stack":10} ] },
-{"name": "召唤史莱姆王", "cost": [{"name": "史莱姆王冠"}] },
-{"name": "召唤世纪之花", "unlock": [ {"name": "三王后"}, {"name": "渔夫任务", "stack": 20} ], "cost": [{"name": "铂金币"}] },
-{"name": "指令", "stack":"/tpnpc Angler", "comment":"传到渔夫身边", "cost": [{"name": "金币"}] },
-{"name": "复活npc", "cost": [{"name": "金币", "stack": 5}] },
-{"name": "集合打团", "cost": [{"name": "金币", "stack": 5}] },
-{"name": "集体庆祝", "cost": [{"name": "银币", "stack": 10}] },
-{"name": "好运来", "cost": [{"name": "铜币"}] },
-{"name": "逮虾户", "cost": [{"name": "金", "id": 0, "stack": 5}] },
-{"name": "钓鱼佬", "cost": [{"name": "金", "id": 0, "stack": 10}] },
-{"name": "黄金矿工", "cost": [{"name": "金", "id": 0, "stack": 20}] },
-{"name": "兴奋剂", "cost": [{"name": "金", "id": 0, "stack": 10}] },
-{"name": "打神鞭", "cost": [{"name": "金", "id": 0, "stack": 50}] },
+{"name":"魔力花", "id":555, "unlock":[{"name":"渔夫任务", "stack":10}], "cost":[{"name":"铂"}]},
+{"name":"天界磁石", "id":2219, "unlock":[{"name":"渔夫任务", "stack":20}], "cost":[{"name":"铂", "stack":2}]},
+{"name":"蛙腿", "id":2423, "unlock":[{"name":"渔夫任务", "stack":20}], "cost":[{"name":"金", "stack":150}]},
+{"name":"猛爪手套", "id":211, "unlock":[{"name":"渔夫任务", "stack":20}], "cost":[{"name":"荆棘匣", "id":3987, "stack":3}]},
+{"name":"闪亮红气球", "id":159, "unlock":[{"name":"渔夫任务", "stack":20}], "cost":[{"name":"天蓝匣", "id":3985, "stack":3}]},
+{"name":"罐中臭屁", "id":1724, "unlock":[{"name":"渔夫任务", "stack":20}], "cost":[{"name":"钛金匣", "id":3981, "stack":3}]},
+{"name":"攀爬爪", "id":953, "unlock":[{"name":"渔夫任务", "stack":20}], "cost":[{"name":"金", "stack":80}]},
+{"name":"鞋钉", "id":975, "unlock":[{"name":"渔夫任务", "stack":20}], "cost":[{"name":"金", "stack":80}]},
+{"name":"雨歌", "id":4057, "unlock":[{"name":"雨天"}, {"name":"肉后"}], "cost":[ {"name":"金", "stack":10}]},
+{"name":"金金鱼", "id":4274, "unlock":[{"name":"渔夫任务", "stack":20}], "cost":[{"name":"金", "stack":20}]},
+{"name":"混沌传送杖", "id":1326, "unlock":[{"name":"渔夫任务", "stack":20}], "cost":[{"name":"混沌精旗帜","id":1629,"stack":20}]},
+{"name":"钛金匣", "id":3981, "unlock":[{"name":"肉后"}, {"name":"渔夫任务", "stack":20}], "cost":[{"name":"金", "stack":80}]},
+{"name":"木匣", "id":2334, "stack":99, "unlock":[{"name":"花后"}, {"name":"渔夫任务", "stack":30}], "cost":[{"name":"金", "stack":99}]},
+{"name":"金匣", "id":2336, "stack":99, "unlock":[{"name":"花后"}, {"name":"渔夫任务", "stack":30}], "cost":[{"name":"铂", "stack":99}]},
 
-{"name": "黑曜石皮buff", "id": -5001, "stack": 60, "cost": [{"name": "金币", "stack":5}] }
+{"name":"镜面鱼", "id":2309, "stack":30, "unlock":[{"name":"渔夫任务", "stack":5}], "cost":[{"name":"金", "stack":50}]},
+{"name":"装甲洞穴鱼", "id":2303, "stack":30, "unlock":[{"name":"渔夫任务", "stack":5}], "cost":[{"name":"金", "stack":50}]},
+{"name":"黑檀锦鲤", "id":2318, "stack":30, "unlock":[{"name":"渔夫任务", "stack":5}], "cost":[{"name":"金", "stack":50}]},
+{"name":"七彩矿鱼", "id":2310, "stack":30, "unlock":[{"name":"渔夫任务", "stack":5}], "cost":[{"name":"金", "stack":50}]},
+{"name":"血腥食人鱼", "id":2319, "stack":30, "unlock":[{"name":"渔夫任务", "stack":5}], "cost":[{"name":"金", "stack":50}]},
+{"name":"斑驳油鱼", "id":2311, "stack":30, "unlock":[{"name":"渔夫任务", "stack":5}], "cost":[{"name":"金", "stack":50}]},
 
+{"name":"掠夺鲨", "id":2341, "unlock":[{"name":"渔夫任务", "stack":10}], "cost":[{"name":"金", "stack":50}]},
+{"name":"锯齿鲨", "id":2342, "unlock":[{"name":"渔夫任务", "stack":10}], "cost":[{"name":"金", "stack":50}]},
+{"name":"剑鱼", "id":2332, "unlock":[{"name":"渔夫任务", "stack":10}], "cost":[{"name":"金", "stack":5}]},
+{"name":"寒霜飞鱼", "id":3197, "stack":99, "unlock":[{"name":"渔夫任务"}], "cost":[{"name":"金", "stack":3}]},
+{"name":"毒弹枪", "id":3210, "unlock":[{"name":"肉后"}, {"name":"渔夫任务", "stack":20}], "cost":[ {"name":"金", "stack":50}]},
+{"name":"舌锋剑", "id":3211, "unlock":[{"name":"肉后"}, {"name":"渔夫任务", "stack":20}], "cost":[ {"name":"金", "stack":50}]},
+{"name":"水晶蛇", "id":3209, "unlock":[{"name":"肉后"}, {"name":"渔夫任务", "stack":20}], "cost":[{"name":"铂"}]},
+{"name":"带磷松露", "id":2429, "unlock":[{"name":"肉后"}, {"name":"渔夫任务", "stack":20}], "cost":[{"name":"铂"}]},
+{"name":"黑曜石剑鱼", "id":2331, "unlock":[{"name":"肉后"}, {"name":"渔夫任务", "stack":20}], "cost":[ {"name":"金", "stack":50}]},
+{"name":"先进战斗技术", "id":4382, "unlock":[{"name":"渔夫任务", "stack":20}, {"name":"血月"}], "cost":[ {"name":"金", "stack":50}]},
+
+{"name":"再生法杖", "id":213, "cost":[{"name":"丛林匣", "id":3208, "stack":1}]},
+{"name":"手枪", "id":164, "unlock":[{"name":"击败骷髅王"}], "cost":[{"name":"地牢匣", "id":3205, "stack":3}]},
+{"name":"村正", "id":155, "unlock":[{"name":"击败骷髅王"}], "cost":[{"name":"地牢匣", "id":3205, "stack":3}]},
+{"name":"钴护盾", "id":156, "unlock":[{"name":"击败骷髅王"}], "cost":[{"name":"地牢匣", "id":3205, "stack":3}]},
+{"name":"暗影钥匙", "id":329, "unlock":[{"name":"击败骷髅王"}], "cost":[{"name":"地牢匣", "id":3205, "stack":3}]},
+{"name":"魔法飞弹", "id":113, "unlock":[{"name":"击败骷髅王"}], "cost":[{"name":"地牢匣", "id":3205, "stack":3}]},
+
+{"name":"食人鱼枪", "id":1156, "unlock":[{"name":"花后"}], "limit":1, "cost":[{"name":"丛林钥匙", "id":1533}, {"name":"铂"}]},
+{"name":"腐化者之戟", "id":1571, "unlock":[{"name":"花后"}], "limit":1, "cost":[{"name":"腐化钥匙", "id":1534}, {"name":"铂"}]},
+{"name":"吸血鬼刀", "id":1569, "unlock":[{"name":"花后"}], "limit":1, "cost":[{"name":"猩红钥匙", "id":1535}, {"name":"铂"}]},
+{"name":"彩虹枪", "id":1260, "unlock":[{"name":"花后"}], "limit":1, "cost":[{"name":"神圣钥匙", "id":1536}, {"name":"铂"}]},
+{"name":"寒霜九头蛇法杖", "id":1572, "unlock":[{"name":"花后"}], "limit":1, "cost":[{"name":"冰冻钥匙", "id":1537}, {"name":"铂"}]},
+{"name":"沙漠虎杖", "id":4607, "unlock":[{"name":"花后"}], "limit":1, "cost":[{"name":"沙漠钥匙", "id":4714}, {"name":"铂"}]},
+
+{"name":"猪鲨翅膀", "id":2609, "cost":[{"name":"猪鲨宝藏袋", "id":3330, "stack":3}]},
+{"name":"光女翅膀", "id":4823, "cost":[{"name":"光女宝藏袋", "id":4782, "stack":3}]},
+
+{"name":"无趣弓", "id":3853, "unlock":[{"name":"石后"}], "cost":[{"name":"双足翼龙圣物", "id":4948}]},
+{"name":"第一分形", "id":4722, "unlock":[{"name":"石后"}], "cost":[{"name":"铂", "stack":30}]},
+{"name":"吸血鬼刀", "id":1569 , "prefix":"传奇", "allowGroup":["战士","vip"], "limit":1, "serverLimit":3, "unlock":[{"name":"花后"}], "cost":[{"name":"铂", "stack":30}]},
+
+{"name":"满月", "unlock":[{"name":"渔夫任务", "stack":10}], "cost":[{"name":"金", "stack":10}]},
+{"name":"下个月相", "unlock":[{"name":"渔夫任务", "stack":10}], "cost":[{"name":"金", "stack":10}]},
+{"name":"烟花", "cost":[{"name":"金"}]},
+{"name":"烟花起飞", "cost":[{"name":"金", "stack":5}]},
+{"name":"更换任务鱼", "unlock":[{"name":"渔夫任务", "stack":10}], "cost":[{"name":"金", "stack":10}]},
+
+{"name":"雨", "cost":[{"name":"金"}]},
+{"name":"血月", "cost":[{"name":"金"}]},
+{"name":"史莱姆雨", "cost":[{"name":"金"}]},
+{"name":"沙尘暴", "cost":[{"name":"金"}]},
+{"name":"大风天", "cost":[{"name":"金"}]},
+{"name":"暴风雨", "cost":[{"name":"金"}]},
+{"name":"日食", "cost":[{"name":"金"}]},
+{"name":"派对", "cost":[{"name":"金"}]},
+{"name":"陨石", "cost":[{"name":"金"}]},
+{"name":"流星雨", "cost":[{"name":"金"}]},
+{"name":"灯笼夜", "cost":[{"name":"金"}]},
+{"name":"风和日丽", "cost":[{"name":"金"}]},
+
+{"name":"调白天", "cost":[{"name":"金"}]},
+{"name":"调晚上", "cost":[{"name":"金", "stack":5}]},
+{"name":"复活npc", "cost":[{"name":"金", "stack":5}]},
+{"name":"集合打团", "cost":[{"name":"金", "stack":5}]},
+{"name":"集体庆祝", "cost":[{"name":"银", "stack":10}]},
+
+{"name":"跳过入侵", "cost":[{"name":"金", "stack":3}]},
+{"name":"召唤哥布林军队", "cost":[ {"name":"哥布林战旗", "id":361}, {"name":"金", "stack":10}]},
+
+{"name":"召唤史莱姆王", "unlock":[{"name":"击败骷髅王"}, {"name":"渔夫任务", "stack":10}],"cost":[{"name":"金", "stack":3}, {"name":"史莱姆王冠", "id":560}]},
+{"name":"召唤双子魔眼", "unlock":[{"name":"肉后"}, {"name":"渔夫任务", "stack":10}],"cost":[{"name":"铂"}]},
+{"name":"召唤世纪之花", "unlock":[{"name":"三王后"}, {"name":"渔夫任务", "stack":20}], "cost":[{"name":"铂","stack":2}]},
+{"name":"召唤火星飞碟", "unlock":[{"name":"石后"}, {"name":"渔夫任务", "stack":20}], "cost":[{"name":"铂", "stack":2}]},
+
+{"name":"好运来", "unlock":[{"name":"渔夫任务", "stack":5}], "cost":[{"name":"铜币"}]},
+{"name":"逮虾户", "unlock":[{"name":"渔夫任务", "stack":5}], "cost":[{"name":"金", "stack":5}]},
+{"name":"钓鱼佬", "unlock":[{"name":"渔夫任务", "stack":5}], "cost":[{"name":"金", "stack":10}]},
+{"name":"黄金矿工", "unlock":[{"name":"渔夫任务", "stack":5}], "cost":[{"name":"金", "stack":20}]},
+{"name":"兴奋剂", "unlock":[{"name":"渔夫任务", "stack":10}], "cost":[{"name":"金", "stack":10}]},
+{"name":"打神鞭", "unlock":[{"name":"渔夫任务", "stack":20}], "cost":[{"name":"金", "stack":50}]},
+
+{"name":"黑曜石皮", "id":-5001, "stack":60, "unlock":[{"name":"渔夫任务", "stack":5}], "cost":[{"name":"金", "stack":5}]},
+
+{"name":"金钟罩", "id":-159, "buffs":[25, 14, 117, 113, 115, 114], "seconds":[600, 600, 600, 600, 600, 600], "comment":"获得10分钟 踉跄、荆棘、生命力、耐力、暴怒、怒气 buff", "cost":[{"name":"金", "stack":10}]},
+{"name":"挑战白光", "id":-160, "cmds":["/time day", "/sb eol"], "comment":"泰拉棱镜，我来啦！", "unlock":[{"name":"击败光之女皇"}],"cost":[{"name":"金", "stack":50}]},
+
+{"id":-601, "unlock":[{"name":"击败光之女皇"}],"cost":[{"name":"金", "stack":50}]},
+{"id":-600, "cost":[{"name":"金"}]},
+{"id":-602, "cost":[{"name":"金", "stack":15}]}
 
 ]
 }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Terraria;
 using TShockAPI;
 
@@ -11,113 +12,74 @@ namespace FishShop
         // 月相、烟花起飞、更换任务鱼等
         // 召唤boss、召唤npc、召唤敌怪
         // ------------------------------------------------------------------------------------------
-        // 月相
-        public const int MoonphaseStart = -131;
-        // 满月
-        public const int Moonphase1 = -131;
-        // 亏凸月
-        public const int Moonphase2 = -132;
-        //下弦月
-        public const int Moonphase3 = -133;
-        // 残月
-        public const int Moonphase4 = -134;
-        // 新月
-        public const int Moonphase5 = -135;
-        // 娥眉月
-        public const int Moonphase6 = -136;
-        // 上弦月
-        public const int Moonphase7 = -137;
-        // 盈凸月
-        public const int Moonphase8 = -138;
-        // 下个月相
-        public const int MoonphaseNext = -139;
+        public const int MoonphaseStart = -131;     // 月相
+        public const int MoonphaseNext = -139;      // 下个月相
+        public const int Moonphase1 = -131;         // 满月
+        public const int Moonphase2 = -132;         // 亏凸月
+        public const int Moonphase3 = -133;         // 下弦月
+        public const int Moonphase4 = -134;         // 残月
+        public const int Moonphase5 = -135;         // 新月
+        public const int Moonphase6 = -136;         // 娥眉月
+        public const int Moonphase7 = -137;         // 上弦月
+        public const int Moonphase8 = -138;         // 盈凸月
 
-        // 烟花起飞
-        public const int Firework = -140;
-        public const int FireworkRocket = -141;
-        // 更换任务鱼
-        public const int AnglerQuestSwap = -142;
+        public const int Firework = -140;           // 烟花
+        public const int FireworkRocket = -141;     // 烟花起飞
+        public const int AnglerQuestSwap = -142;    // 更换任务鱼
+        public const int RainingStart = -143;       // 雨来
+        public const int RainingStop = -144;        // 雨停
+        public const int BuffGoodLucky = -145;      // 好运来
+        public const int InvasionStop = -146;       // 跳过入侵
+        public const int TimeToDay = -147;          // 调白天
+        public const int TimeToNight = -148;        // 调晚上
+        public const int BloodMoonStart = -149;     // 召唤血月
+        public const int BloodMoonStop = -150;      // 跳过血月
 
-
-        // 雨来
-        public const int RainingStart = -143;
-        // 雨停
-        public const int RainingStop = -144;
-
-        // 好运来
-        public const int BuffGoodLucky = -145;
-
-
-        // 跳过入侵
-        public const int InvasionStop = -146;
-
-        // 调白天
-        public const int TimeToDay = -147;
-
-        // 调晚上
-        public const int TimeToNight = -148;
-
-        // 召唤血月
-        public const int BloodMoonStart = -149;
-        // 跳过血月
-        public const int BloodMoonStop = -150;
-
-        // 执行指令
-        public const int RawCmd = -160;
-
-        // 复活NPC
-        public const int ReliveNPC = -161;
-
-        // 集合打团
-        public const int TPHereAll = -162;
-
-        // 集体庆祝
-        public const int CelebrateAll = -163;
-
-        // 调中午
-        public const int TimeToNoon = -164;
-
-        // 调午夜
-        public const int TimeToMidNight = -165;
+        public const int Buff = -159;               // buff
+        public const int RawCmd = -160;             // 执行指令
+        
+        public const int ReliveNPC = -161;          // 复活NPC
+        public const int TPHereAll = -162;          // 集合打团
+        public const int CelebrateAll = -163;       // 集体庆祝
+        public const int TimeToNoon = -164;         // 调中午
+        public const int TimeToMidNight = -165;     // 调午夜
 
         // ------------------------------------------------------------------------------------------
         // buff
-        // 打神鞭
-        public const int BuffWhipPlayer = -166;
-
-        // 逮虾户
-        public const int BuffFaster = -167;
-
-        // 黄金矿工
-        public const int BuffMining = -168;
-        // 钓鱼佬
-        public const int BuffFishing = -169;
-        // 兴奋剂
-        public const int BuffIncitant = -170;
-
+        public const int BuffWhipPlayer = -166;     // 打神鞭
+        public const int BuffFaster = -167;         // 逮虾户
+        public const int BuffMining = -168;         // 黄金矿工
+        public const int BuffFishing = -169;        // 钓鱼佬
+        public const int BuffIncitant = -170;       // 兴奋剂
 
         // ------------------------------------------------------------------------------------------
         // 召唤入侵
-        // 召唤 哥布林军队
-        public const int InvasionGoblins = -171;
 
-        // 召唤 雪人军团
-        public const int InvasionSnowmen = -172;
+        public const int InvasionGoblins = -171;        // 召唤 哥布林军队
+        public const int InvasionSnowmen = -172;        // 召唤 雪人军团
+        public const int InvasionPirates = -173;        // 召唤 海盗入侵
+        public const int InvasionPumpkinmoon = -174;    // 召唤 南瓜月
+        public const int InvasionFrostmoon = -175;      // 召唤 霜月
+        public const int InvasionMartians = -176;       // 召唤 火星暴乱
 
-        // 召唤 海盗入侵
-        public const int InvasionPirates = -173;
 
-        // 召唤 南瓜月
-        public const int InvasionPumpkinmoon = -174;
+        // ------------------------------------------------------------------------------------------
+        // 事件
+        public const int ToggleRain = -177;             // 雨
+        public const int ToggleSlimeRain = -178;        // 史莱姆雨
+        public const int ToggleSandStorm = -179;        // 沙尘暴
+        public const int ToggleWindyDay = -180;         // 大风天
+        public const int ToggleStorming = -181;         // 暴风雨
 
-        // 召唤 霜月
-        public const int InvasionFrostmoon = -175;
+        public const int ToggleBloodMoon = -182;        // 血月
+        public const int ToggleEclipse = -183;          // 日食
 
-        // 召唤 火星暴乱
-        public const int InvasionMartians = -176;
+        public const int ToggleParty = -184;            // 派对
+        public const int TriggerDropMeteor = -185;      // 陨石
+        public const int StarfallStart = -186;          // 流星雨
+        public const int LanternsNightStart = -187;     // 灯笼夜
 
-        // 召唤 沙尘暴、史莱姆雨、派对、日食、陨石、大风天、撒旦军队、月亮事件、派对
-
+        public const int OverworldDayStart = -188;      // 风和日丽
 
 
         // ------------------------------------------------------------------------------------------
@@ -152,7 +114,10 @@ namespace FishShop
 
         public static string GetNameByID(int id, string prefix = "", int stack = 1)
         {
-            if (id == RawCmd) return $"指令{prefix}";
+            //if (id == RawCmd)
+            //{
+            //    if (!string.IsNullOrEmpty(prefix)) return $"指令{prefix}";
+            //}
 
             string text = Settings.GetShopItemNameByID(id);
             if (!string.IsNullOrEmpty(text)) return text;
@@ -179,11 +144,10 @@ namespace FishShop
             if (id >= SetBuffEnd && id <= SetBuffStart)
             {
                 int buffID = SetBuffStart - id;
-                string buffName = TShock.Utils.GetBuffName(buffID);
+
+                string buffName = BuffHelper.GetBuffNameByID(buffID);
                 if (!string.IsNullOrEmpty(buffName))
-                {
                     return $"{buffName}{BuffHelper.GetTimeDesc(stack)}";
-                }
             }
 
             return "";
@@ -194,9 +158,13 @@ namespace FishShop
         {
             if (string.IsNullOrEmpty(name)) return 0;
 
+            int id = Settings.GetShopItemIDByName(name);
+            if (id != 0) return id;
+
             switch (name)
             {
                 case "指令": return RawCmd;
+                case "增益": return Buff;
 
                 // 原生物品
                 case "铜": case "铜币": return 71;
@@ -208,7 +176,7 @@ namespace FishShop
                 case "无趣弓": return 3853;
             }
 
-            if (name.StartsWith("指令")) return RawCmd;
+            //if (name.StartsWith("指令")) return RawCmd;
 
             // public static int[] anglerQuestItemNetIDs = new int[41]
             // {
@@ -219,7 +187,7 @@ namespace FishShop
             //     4394
             // };
             // 自定义物品 以及 物品id mapping
-            int id = Settings.GetItemIDByName(name);
+            id = Settings.GetItemIDByName(name);
             if (id != 0) return id;
 
 
@@ -244,7 +212,7 @@ namespace FishShop
             if (id != 0) return id;
 
             // 使用buff名匹配
-            id = GetBuffIDByName(name);
+            id = BuffHelper.GetBuffIDByName(name);
             if (id != 0) return id;
 
             return 0;
@@ -258,12 +226,179 @@ namespace FishShop
             return 0;
         }
 
-        private static int GetBuffIDByName(string name)
+        // 检查是否需要购买
+        public static bool CanBuy(TSPlayer op, ShopItem shopItem, int amount = 1)
         {
-            List<int> ids = TShock.Utils.GetBuffByName(name);
-            if (ids.Count > 0) return ids[0];
+            int id = shopItem.id;
+            if (id >= -24) return true;
+            switch (id)
+            {
+                case Moonphase1:
+                case Moonphase2:
+                case Moonphase3:
+                case Moonphase4:
+                case Moonphase5:
+                case Moonphase6:
+                case Moonphase7:
+                case Moonphase8:
+                case MoonphaseNext: return FishHelper.NeedBuyChangeMoonPhase(op, id, amount);
 
-            return 0;
+
+                case InvasionGoblins:
+                case InvasionSnowmen:
+                case InvasionPirates:
+                case InvasionPumpkinmoon:
+                case InvasionFrostmoon:
+                case InvasionMartians: return CmdHelper.NeedBuyStartInvasion(op);
+
+                case InvasionStop: return CmdHelper.NeedBuyStopInvasion(op);
+                case ReliveNPC: return NPCHelper.NeedBuyReliveNPC(op);
+
+                case BloodMoonStart: if (Main.bloodMoon) { op.SendInfoMessage("正处在血月，无需购买"); return false; } break;
+                case BloodMoonStop: if (!Main.bloodMoon) { op.SendInfoMessage("没发生血月，无需购买"); return false; } break;
+
+                case RainingStart: if (Main.raining) { op.SendInfoMessage("正在下雨，无需购买"); return false; }; break;
+                case RainingStop: if (!Main.raining) { op.SendInfoMessage("没在下雨，无需购买"); return false; }; break;
+            }
+
+            return true;
+        }
+
+
+        public static void ProvideGoods(TSPlayer player, ShopItem shopItem, int amount = 1)
+        {
+            int id = shopItem.id;
+            // 自定义物品
+            switch (id)
+            {
+                // 月相
+                case Moonphase1:
+                case Moonphase2:
+                case Moonphase3:
+                case Moonphase4:
+                case Moonphase5:
+                case Moonphase6:
+                case Moonphase7:
+                case Moonphase8:
+                case MoonphaseNext: FishHelper.ChangeMoonPhaseByID(player, id, amount); return;
+
+                case Firework: CmdHelper.Firework(player); return;
+                case FireworkRocket: CmdHelper.FireworkRocket(player); return;
+                case AnglerQuestSwap: FishHelper.AnglerQuestSwap(player); return;
+
+                // 白天 中午 晚上 午夜
+                case TimeToDay: CmdHelper.SwitchTime(player, "day"); return;
+                case TimeToNoon: CmdHelper.SwitchTime(player, "noon"); return;
+                case TimeToNight: CmdHelper.SwitchTime(player, "night"); return;
+                case TimeToMidNight: CmdHelper.SwitchTime(player, "midnight"); return;
+
+                // =====
+                // buff 类
+                // ====
+                // 好运来、打神鞭、逮虾户、黄金矿工、钓鱼佬、兴奋剂
+                case BuffGoodLucky:
+                case BuffWhipPlayer:
+                case BuffFaster:
+                case BuffMining:
+                case BuffFishing:
+                case BuffIncitant:
+                case Buff:
+                    BuffHelper.BuffCommon(player, shopItem.GetBuff(), shopItem.GetBuffSecond(), amount);
+                    return;
+
+
+                // 雨来、雨停
+                case RainingStart: CmdHelper.ToggleRaining(player, true); return;
+                case RainingStop: CmdHelper.ToggleRaining(player, false); return;
+
+                // 血月
+                case BloodMoonStart: CmdHelper.ToggleBloodMoon(player, true); return;
+                case BloodMoonStop: CmdHelper.ToggleBloodMoon(player, false); return;
+
+
+                // 雨、史莱姆雨、 沙尘暴、大风天、雷雨、血月、日食、派对、陨石、流星雨、灯笼夜
+                case ToggleRain: CmdHelper.ToggleRaining(player, true, true); return;
+                case ToggleSlimeRain: CmdHelper.ToggleSlimeRain(player, true, true); return;
+                case ToggleSandStorm: CmdHelper.ToggleSandstorm(player, true, true); return;
+                case ToggleWindyDay: CmdHelper.ToggleWindyDay(player, true, true); return;
+                case ToggleStorming: CmdHelper.ToggleStorming(player, true, true); return;
+
+
+                case ToggleBloodMoon: CmdHelper.ToggleBloodMoon(player, true, true); return;
+                case ToggleEclipse: CmdHelper.ToggleEclipse(player, true, true); return;
+
+
+                case ToggleParty: CmdHelper.ToggleParty(player, true, true); return;
+                case TriggerDropMeteor: CmdHelper.DropMeteor(player); return;
+                case StarfallStart: CmdHelper.Starfall(player); return;
+                case LanternsNightStart: CmdHelper.LanternsNightStart(player); return;
+
+                case OverworldDayStart: CmdHelper.OverworldDay(player); return;
+
+
+                // 入侵
+                case InvasionStop: CmdHelper.StopInvasion(player); return;
+                case InvasionGoblins:
+                case InvasionSnowmen:
+                case InvasionPirates:
+                case InvasionPumpkinmoon:
+                case InvasionFrostmoon:
+                case InvasionMartians: CmdHelper.StartInvasion(player, id); return;
+
+                // 执行指令
+                case RawCmd:
+                    if (shopItem.cmds.Count > 0)
+                    {
+                        foreach (string cmd in shopItem.cmds)
+                        {
+                            CmdHelper.ExecuteRawCmd(player, cmd);
+                        }
+                    }
+                    else if (!string.IsNullOrEmpty(shopItem.prefix)) CmdHelper.ExecuteRawCmd(player, shopItem.prefix);
+                    return;
+
+                case ReliveNPC: NPCHelper.ReliveNPC(player); return;                    // 复活NPC
+                case TPHereAll: CmdHelper.TPHereAll(player); return;                    // 集合打团
+                case CelebrateAll: CmdHelper.CelebrateAll(player); return;              // 集体庆祝
+
+                default: break;
+            }
+
+            // 召唤NPC类
+            int id2 = GetRealSpawnID(id);
+            if (id2 != 0)
+            {
+                NPCHelper.SpawnNPC(player, id2, amount);
+                return;
+            }
+
+            // 清除NPC类
+            id2 = GetRealClearNPCID(id);
+            if (id2 != 0)
+            {
+                NPCHelper.ClearNPC(player, id2, amount);
+                return;
+            }
+
+            // 获得buff类
+            id2 = GetRealBuffID(id);
+            if (id2 != 0)
+            {
+                BuffHelper.SetPlayerBuff(player, id2, shopItem.stack * amount);
+                return;
+            }
+
+            // 玩家自定义商品
+            // 指令清单 和 buff 清单
+            if (id <= -600 && id >= -999)
+            {
+                foreach (string s in shopItem.GetCMD().Where(s => !string.IsNullOrEmpty(s)))
+                {
+                    CmdHelper.ExecuteRawCmd(player, s);
+                }
+
+                BuffHelper.BuffCommon(player, shopItem.GetBuff(), shopItem.GetBuffSecond(), amount);
+            }
         }
 
     }

@@ -15,7 +15,7 @@ namespace FishShop
         {
             Main.AnglerQuestSwap();
             int itemID = Main.anglerQuestItemNetIDs[ Main.anglerQuest ];
-            string itemName = utils.GetItemDesc("", itemID);
+            string itemName = utils.GetItemDesc(itemID);
             TSPlayer.All.SendSuccessMessage($"{player.Name} 购买了 更换任务鱼，今天的任务鱼已随机成 {itemName}");
             if (!player.RealPlayer) player.SendInfoMessage($"今天的任务鱼换成 {itemName}");
         }
@@ -33,7 +33,7 @@ namespace FishShop
             if( int.TryParse( itemNameOrId, out itemID) ){
                 // 鱼的物品id
                 if( !Main.anglerQuestItemNetIDs.Contains( itemID ) ){
-                    itemName = utils.GetItemDesc( "", itemID);
+                    itemName = utils.GetItemDesc(itemID);
                     // Lang.GetItemNameValue(4444);
                     player.SendErrorMessage($"{itemID} = {itemName}，并不是有效的任务鱼！");
                     return;
@@ -74,7 +74,7 @@ namespace FishShop
 			// NetMessage.SendData(76, player.Index, -1, NetworkText.Empty, player.Index);
 			// NetMessage.SendData(76, -1, -1, NetworkText.Empty, player.Index);
 
-            itemName = utils.GetItemDesc("", itemID);
+            itemName = utils.GetItemDesc(itemID);
             player.SendSuccessMessage($"今日份的任务鱼已指定成 {itemName}");
 		}
 
@@ -90,7 +90,7 @@ namespace FishShop
                     questText = questText.Replace("（抓捕位置：", "");
                     questText = questText.Replace("）", "");
                 }
-                string itemName = utils.GetItemDesc("", itemID);
+                string itemName = utils.GetItemDesc(itemID);
                 player.SendInfoMessage($"任务鱼: {itemName}（{questText}）");
             } else {
                 player.SendInfoMessage($"任务鱼: 渔夫不在场");

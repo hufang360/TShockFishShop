@@ -18,24 +18,28 @@ namespace FishShop
 
         public string comment = "";      // 商品备注
 
-        public List<string> allowGroup = new List<string>();    // 允许某个组可购买
+        public List<string> allowGroup = new List<string>();   // 允许某个组可购买
 
         public List<ItemData> unlock = new List<ItemData>();  // 解锁条件
         public List<ItemData> cost = new List<ItemData>();    // 支付条件
+
+        public List<string> cmds = new List<string>();        // 指令清单
+        public List<int> buffs = new List<int>();             // buff 清单
+        public List<int> seconds = new List<int>();           // buff 持续时间
 
 
         [JsonIgnore]
         private SetShopData _settings = new SetShopData();   // 预设置
 
 
-        public ShopItem(string _name = "", int _id = 0, int _stack = 1, string _prefixOrName = "")
-        {
-            name = _name;
-            id = _id;
-            stack = _stack;
-            prefix = _prefixOrName;
-            FillingSettings();
-        }
+        //public ShopItem(string _name = "", int _id = 0, int _stack = 1, string _prefixOrName = "")
+        //{
+        //    name = _name;
+        //    id = _id;
+        //    stack = _stack;
+        //    prefix = _prefixOrName;
+        //    FillingSettings();
+        //}
 
 
         public void Filling()
@@ -48,7 +52,18 @@ namespace FishShop
 
             if (id == ShopItemID.RawCmd)
             {
-                name = string.Format($"指令{prefix}");
+                if (cmds.Count > 0)
+                {
+                    if (string.IsNullOrEmpty(name))
+                        name = "指令";
+                }
+                else if (!string.IsNullOrEmpty(prefix))
+                    name = string.Format($"{_settings.name}{prefix}");
+            }
+            else if (id == ShopItemID.Buff)
+            {
+                if (string.IsNullOrEmpty(name))
+                    name = "增益";
             }
 
             // 执行指令
@@ -58,36 +73,83 @@ namespace FishShop
 
         private void FillingSettings()
         {
-            if (Settings.datas.ContainsKey(id))
-                _settings = Settings.datas[id];
+            if (Settings.shopItem.ContainsKey(id))
+                _settings = Settings.shopItem[id];
         }
 
-        public void AddUnlock(string _name = "", int _id = 0, int _stack = 1)
-        {
-            unlock.Add(new ItemData(_name, _id, _stack));
-        }
+        //public void AddUnlock(string _name = "", int _id = 0, int _stack = 1)
+        //{
+        //    unlock.Add(new ItemData(_name, _id, _stack));
+        //}
 
-        public void AddCost(string _name = "", int _id = 0, int _stack = 1)
-        {
-            cost.Add(new ItemData(_name, _id, _stack));
-        }
+        //public void AddCost(string _name = "", int _id = 0, int _stack = 1)
+        //{
+        //    cost.Add(new ItemData(_name, _id, _stack));
+        //}
 
         public string GetItemDesc()
         {
             if (id == 0) Filling();
-            return utils.GetItemDesc(name, id, stack, prefix);
+            if (id == ShopItemID.RawCmd)
+            {
+                if (cmds.Count > 0)
+                {
+                    // 如果名字是空的才取第一条指令做名字
+                    if (string.IsNullOrEmpty(name))
+                        return "指令";
+                    else
+                        return name;
+                }
+                else if (!string.IsNullOrEmpty(prefix))
+                    return string.Format($"{_settings.name}{prefix}");
+            } 
+            else if (id == ShopItemID.Buff)
+            {
+                if (string.IsNullOrEmpty(name))
+                    return "增益";
+                else
+                    return name;
+            }
+            return utils.GetItemDesc(id, stack, prefix, this);
         }
 
-        public bool CanBuyManyItem()
+        public string GetIcon()
         {
-            if (ShopItemID.GetRealClearNPCID(id) != 0) return false;
-            return _settings.buyMax == 0;
+            return _settings.icon == 0 ? "" : $"[i:{_settings.icon}]";
+        }
+
+        public int BuyMax()
+        {
+            if (ShopItemID.GetRealClearNPCID(id) != 0) return 1;
+            return _settings.buyMax;
         }
 
         public bool DeadCanBuyItem()
         {
             if (ShopItemID.GetRealBuffID(id) != 0) return false;
             return !_settings.needAlive;
+        }
+
+        public bool DayCanBuyItem()
+        {
+            return !_settings.needNight;
+        }
+
+        public bool NightCanBuyItem()
+        {
+            return !_settings.needDay;
+        }
+
+        public List<int> GetBuff()
+        {
+            if (id == ShopItemID.Buff) return buffs;
+            return _settings.buffs;
+        }
+
+        public List<int> GetBuffSecond()
+        {
+            if (id == ShopItemID.Buff) return seconds;
+            return _settings.seconds;
         }
 
         // 商品说明
@@ -102,6 +164,13 @@ namespace FishShop
             }
             else
                 return comment;
+        }
+
+        // 指令商品的 指令内容
+        public List<string> GetCMD()
+        {
+            if (id == ShopItemID.RawCmd) return cmds;
+            return _settings.cmds;
         }
 
         // 汇总要减扣的物品
@@ -226,6 +295,20 @@ namespace FishShop
             return amount * goodsAmount;
         }
 
+        public List<string> GetCostCMD()
+        {
+            // 列出要执行的指令
+            List<string> cmds = new List<string>();
+            foreach (ItemData d in cost)
+            {
+                if (d.id == ShopItemID.RawCmd && !string.IsNullOrEmpty(d.cmd))
+                {
+                    cmds.Add(d.cmd);
+                }
+            }
+            return cmds;
+        }
+
         public int GetPrefixInt()
         {
             if (int.TryParse(prefix, out int num))
@@ -252,6 +335,11 @@ namespace FishShop
             }
             msg = string.Join("", msgs);
 
+            // 执行指令
+            List<string> cmds = GetCostCMD();
+            if (cmds.Count > 0)
+                msg += " 执行" + string.Join(",", GetCostCMD());
+
             // 任意类型的物品
             // string s = GetAnyItemDesc();
             // if( s!="" )
@@ -268,7 +356,7 @@ namespace FishShop
             {
                 if (msg != "")
                     s = "、";
-                msg += $"{s}{ GetOneUnlockDesc(d) }";
+                msg += $"{s}{GetOneUnlockDesc(d)}";
             }
 
             return msg;

@@ -23,12 +23,11 @@ namespace FishShop
         public static readonly string PermissionChange = "fishshop.change";
         public static readonly string PermissionChangeSuper = "fishshop.changesuper";
         public static readonly string PermissionReload = "fishshop.reload";
-        public static readonly string PermissionSplit = "fishshop.split";
         public static readonly string PermissionSpecial = "fishshop.special";
         public static readonly string PermissionGroupIgnore = "fishshop.ignore.allowgroup";
 
         public static readonly string savedir = Path.Combine(TShock.SavePath, "FishShop");
-        public static readonly string settingsFile = Path.Combine(savedir, "settings.json");
+        public static readonly string settingsFile = Path.Combine(savedir, "settings_v1.4.1.json");
         public static readonly string configFile = Path.Combine(savedir, "config.json");
         public static readonly string recordFile = Path.Combine(savedir, "record.json");
 
@@ -130,12 +129,6 @@ namespace FishShop
                     BuyGoods(args);
                     break;
 
-                // 拆分物品
-                case "s":
-                case "split":
-                    //SplitItem(args);
-                    break;
-
 
                 // 钓鱼信息
                 case "i":
@@ -162,8 +155,7 @@ namespace FishShop
                         op.SendErrorMessage("需要输入完成次数，例如: /fish finish 10");
                         break;
                     }
-                    int finished = 0;
-                    if (int.TryParse(args.Parameters[1], out finished))
+                    if (int.TryParse(args.Parameters[1], out int finished))
                     {
                         op.TPlayer.anglerQuestsFinished = finished;
                         NetMessage.SendData(76, op.Index, -1, NetworkText.Empty, op.Index);
@@ -216,9 +208,12 @@ namespace FishShop
                     }
                     else
                     {
+                        double t1 = DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds;
                         Settings.Load(settingsFile);
                         LoadConfig(true);
                         args.Player.SendSuccessMessage("[fishshop]鱼店配置已重载");
+                        double t2 = DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds;
+                        op.SendInfoMessage($"耗时：{t2 - t1} 毫秒");
                     }
                     break;
 
@@ -342,7 +337,7 @@ namespace FishShop
                 pageCount++;
 
                 ShopItem item = founds[i];
-                msg += $"{i + 1}.{item.GetItemDesc()}  ";
+                msg += $"{i + 1}.{item.GetIcon()}{item.GetItemDesc()}  ";
 
                 totalCount = i + 1;
                 if (i >= (totalSlots - 1))
@@ -358,12 +353,12 @@ namespace FishShop
             }
 
             if (founds.Count > (totalCount))
-                msg += $"\n输入 /fish list {pageNum + 1} 查看更多.";
+                msg += $"\n[c/96FF0A:输入 /fish list {pageNum + 1} 查看更多.]";
 
             if (msg == "")
                 msg = "今天卖萌，不卖货！ɜː";
             else
-                msg = $"欢迎光临【{_config.name}】,货架 ({pageNum}/{totalPage}): \n" + msg;
+                msg = $"[c/96FF0A:欢迎光临【{_config.name}】,货架 ({pageNum}/{totalPage}): ]\n" + msg;
             if (args.Player != null)
                 args.Player.SendInfoMessage(msg);
             else
@@ -437,13 +432,14 @@ namespace FishShop
 
             foreach (ShopItem2 shopItem in goods)
             {
+                string iconDesc = shopItem.item.GetIcon();
                 string shopDesc = shopItem.item.GetItemDesc();
                 string costDesc = shopItem.item.GetCostDesc();
                 string unlockDesc = shopItem.item.GetUnlockDesc();
                 string allowGroupDesc = shopItem.item.GetAllowGroupDesc();
                 string comment = shopItem.item.GetComment();
                 string limitDesc = shopItem.item.GetLimitDesc(op.Name);
-                string s = $"{shopItem.serial}.{shopDesc} = {costDesc}";
+                string s = $"{shopItem.serial}.{iconDesc}{shopDesc} = {costDesc}";
                 if (unlockDesc != "")
                     s += $"\n解锁条件：需 {unlockDesc}";
                 if (comment != "")
@@ -546,7 +542,7 @@ namespace FishShop
 
             // [日志记录]
             Log.info(string.Format("{0} 要买{1}个 {2}", op.Name, goodsAmount, shopItem.GetItemDesc()));
-            Log.info($"item: {shopItem.name} {shopItem.id} {shopItem.stack} {shopItem.prefix}");
+            Log.info($"item: {shopItem.name} {shopItem.id} {shopItem.stack} {shopItem.prefix} {shopItem.cmds}");
             foreach (ItemData _d in shopItem.unlock)
                 Log.info($"unlock: {_d.name} {_d.id} {_d.stack}");
             foreach (ItemData _d in shopItem.cost)
@@ -591,14 +587,29 @@ namespace FishShop
                 return;
             }
 
+            // 仅晚上可以购买的商品
+            if (!shopItem.DayCanBuyItem() && Main.dayTime)
+            {
+                op.SendInfoMessage($"只能在晚上购买！");
+                return;
+            }
+
+            // 仅白天可以购买的商品
+            if (!shopItem.NightCanBuyItem() && !Main.dayTime)
+            {
+                op.SendInfoMessage($"只能在白天购买！");
+                return;
+            }
 
             // 检查是否需要购买
-            if (!CanBuy(op, shopItem, goodsAmount))
+            if (!ShopItemID.CanBuy(op, shopItem, goodsAmount))
                 return;
 
             // 单次至多买一件的物品
-            if (!shopItem.CanBuyManyItem())
-                goodsAmount = 1;
+            goodsAmount = Math.Min(goodsAmount, shopItem.BuyMax());
+            if (goodsAmount < 1) goodsAmount = 1;
+
+
 
             if (shopItem.id > 0)
             {
@@ -653,24 +664,6 @@ namespace FishShop
 
         }
         #endregion
-
-
-        // 拆分物品
-        private void SplitItems(CommandArgs args)
-        {
-            TSPlayer op = args.Player;
-            if (args.Parameters.Count < 2)
-            {
-                return;
-            }
-
-            args.Parameters.RemoveAt(0);
-            int amount = 1;
-            if (args.Parameters.Count > 1)
-            {
-                int.TryParse(args.Parameters[1], out amount);
-            }
-        }
 
 
         private bool CheckShopUnlock(TSPlayer op)
@@ -763,183 +756,10 @@ namespace FishShop
         // 提供商品/服务
         private void ProvideGoods(TSPlayer player, ShopItem shopItem, int amount = 1)
         {
-            int id = shopItem.id;
-            if (id < -24)
-            {
-                // 自定义物品
-                switch (id)
-                {
-                    // 月相
-                    case ShopItemID.Moonphase1:
-                    case ShopItemID.Moonphase2:
-                    case ShopItemID.Moonphase3:
-                    case ShopItemID.Moonphase4:
-                    case ShopItemID.Moonphase5:
-                    case ShopItemID.Moonphase6:
-                    case ShopItemID.Moonphase7:
-                    case ShopItemID.Moonphase8:
-                    case ShopItemID.MoonphaseNext:
-                        FishHelper.ChangeMoonPhaseByID(player, id, amount);
-                        return;
-
-                    case ShopItemID.Firework: CmdHelper.Firework(player); return;
-                    case ShopItemID.FireworkRocket: CmdHelper.FireworkRocket(player); return;
-                    case ShopItemID.AnglerQuestSwap: FishHelper.AnglerQuestSwap(player); return;
-
-                    // 白天 中午 晚上 午夜
-                    case ShopItemID.TimeToDay: CmdHelper.SwitchTime(player, "day"); return;
-                    case ShopItemID.TimeToNoon: CmdHelper.SwitchTime(player, "noon"); return;
-                    case ShopItemID.TimeToNight: CmdHelper.SwitchTime(player, "night"); return;
-                    case ShopItemID.TimeToMidNight: CmdHelper.SwitchTime(player, "midnight"); return;
-
-                    //  =====
-                    // buff 类
-                    // ====
-                    // 好运来
-                    // 打神鞭
-                    // 逮虾户
-                    // 黄金矿工
-                    // 钓鱼佬
-                    // 兴奋剂
-                    case ShopItemID.BuffGoodLucky: BuffHelper.BuffGoodLucky(player, amount); return;
-                    case ShopItemID.BuffWhipPlayer: BuffHelper.BuffWhipPlayer(player, amount); return;
-                    case ShopItemID.BuffFaster: BuffHelper.BuffFaster(player, amount); return;
-                    case ShopItemID.BuffMining: BuffHelper.BuffMining(player, amount); return;
-                    case ShopItemID.BuffFishing: BuffHelper.BuffFishing(player, amount); return;
-                    case ShopItemID.BuffIncitant: BuffHelper.BuffIncitant(player, amount); return;
-
-                    // 雨
-                    case ShopItemID.RainingStart: CmdHelper.ToggleRaining(player, true); return;
-                    case ShopItemID.RainingStop: CmdHelper.ToggleRaining(player, false); return;
-
-                    // 血月
-                    case ShopItemID.BloodMoonStart: CmdHelper.ToggleBloodMoon(player, true); return;
-                    case ShopItemID.BloodMoonStop: CmdHelper.ToggleBloodMoon(player, false); return;
-
-                    // 跳过入侵
-                    case ShopItemID.InvasionStop: CmdHelper.StopInvasion(player); return;
-
-                    // 执行指令
-                    case ShopItemID.RawCmd: CmdHelper.ExecuteRawCmd(player, shopItem.prefix); return;
-
-                    // 复活NPC
-                    case ShopItemID.ReliveNPC: NPCHelper.ReliveNPC(player); return;
-
-                    // 集合打团
-                    case ShopItemID.TPHereAll: CmdHelper.TPHereAll(player); return;
-
-                    //  集体庆祝
-                    case ShopItemID.CelebrateAll: CmdHelper.CelebrateAll(player); return;
-
-
-                    // 召唤入侵
-                    case ShopItemID.InvasionGoblins:
-                    case ShopItemID.InvasionSnowmen:
-                    case ShopItemID.InvasionPirates:
-                    case ShopItemID.InvasionPumpkinmoon:
-                    case ShopItemID.InvasionFrostmoon:
-                    case ShopItemID.InvasionMartians:
-                        CmdHelper.StartInvasion(player, id);
-                        return;
-
-
-                    default:
-                        break;
-                }
-
-                // 召唤NPC类
-                int id2 = ShopItemID.GetRealSpawnID(id);
-                if (id2 != 0)
-                {
-                    NPCHelper.SpawnNPC(player, id2, amount);
-                    return;
-                }
-
-                // 清除NPC类
-                id2 = ShopItemID.GetRealClearNPCID(id);
-                if (id2 != 0)
-                {
-                    NPCHelper.ClearNPC(player, id2, amount);
-                    return;
-                }
-
-                // 获得buff类
-                id2 = ShopItemID.GetRealBuffID(id);
-                if (id2 != 0)
-                {
-                    BuffHelper.SetPlayerBuff(player, id2, shopItem.stack * amount);
-                    return;
-                }
-
-            }
+            if (shopItem.id < -24)
+                ShopItemID.ProvideGoods(player, shopItem, amount);  // 自定义商品
             else
-            {
-                // 下发物品
-                player.GiveItem(shopItem.id, shopItem.stack * amount, shopItem.GetPrefixInt());
-            }
-        }
-
-        // 检查是否需要购买
-        private bool CanBuy(TSPlayer player, ShopItem shopItem, int amount = 1)
-        {
-            int id = shopItem.id;
-            if (id < -24)
-            {
-                switch (id)
-                {
-                    case ShopItemID.Moonphase1:
-                    case ShopItemID.Moonphase2:
-                    case ShopItemID.Moonphase3:
-                    case ShopItemID.Moonphase4:
-                    case ShopItemID.Moonphase5:
-                    case ShopItemID.Moonphase6:
-                    case ShopItemID.Moonphase7:
-                    case ShopItemID.Moonphase8:
-                    case ShopItemID.MoonphaseNext:
-                        return FishHelper.NeedBuyChangeMoonPhase(player, id, amount);
-
-                    case ShopItemID.InvasionStop:
-                        return CmdHelper.NeedBuyStopInvasion(player);
-
-                    case ShopItemID.InvasionGoblins:
-                    case ShopItemID.InvasionSnowmen:
-                    case ShopItemID.InvasionPirates:
-                    case ShopItemID.InvasionPumpkinmoon:
-                    case ShopItemID.InvasionFrostmoon:
-                    case ShopItemID.InvasionMartians:
-                        return CmdHelper.NeedBuyStartInvasion(player);
-
-                    case ShopItemID.ReliveNPC:
-                        return NPCHelper.NeedBuyReliveNPC(player);
-
-                    case ShopItemID.BloodMoonStart:
-                        if (Main.bloodMoon)
-                        {
-                            player.SendInfoMessage("当前正处在血月，无需购买");
-                            return false;
-                        }
-                        return true;
-
-                    case ShopItemID.BloodMoonStop:
-                        if (!Main.bloodMoon)
-                        {
-                            player.SendInfoMessage("已经不是血月了，无需购买");
-                            return false;
-                        }
-                        return true;
-
-
-                    case ShopItemID.RainingStop:
-                        if (!Main.raining)
-                        {
-                            player.SendInfoMessage("没在下雨，无需购买");
-                            return false;
-                        };
-                        return true;
-                }
-            }
-
-            return true;
+                player.GiveItem(shopItem.id, shopItem.stack * amount, shopItem.GetPrefixInt()); // 下发物品
         }
 
         protected override void Dispose(bool disposing)

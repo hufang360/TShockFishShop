@@ -1,32 +1,32 @@
-using System.Collections.Generic;
 using System;
-using TShockAPI;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using Terraria;
 using Terraria.ID;
 using Terraria.Localization;
-using System.Reflection;
-using System.IO;
+using TShockAPI;
 
 
 namespace FishShop
 {
     public class utils
     {
-        public static List<string> moonPhases = new List<string>() {"满月","亏凸月","下弦月","残月","新月","娥眉月","上弦月","盈凸月"};
+        public static List<string> moonPhases = new List<string>() { "满月", "亏凸月", "下弦月", "残月", "新月", "娥眉月", "上弦月", "盈凸月" };
 
         public static void init()
         {
             // 支持第一分形
             // 清空弃用物品清单
-            Array.Clear(ItemID.Sets.Deprecated, 0, ItemID.Sets.Deprecated.Length-1);
+            Array.Clear(ItemID.Sets.Deprecated, 0, ItemID.Sets.Deprecated.Length - 1);
         }
         // public static string GetItemDescByShopItem(ShopItem item)
         // {
         //     return GetItemDesc(item.name, item.id, item.stack, item.prefix);
         // }
-        public static string GetItemDesc(string name="", int id=0, int stack=1, string prefix="", bool realPlayer=true)
+        public static string GetItemDesc(int id = 0, int stack = 1, string prefix = "", ShopItem shopItem = null)
         {
-            if (id==0)
+            if (id == 0)
                 return "";
 
             string s = "";
@@ -38,22 +38,22 @@ namespace FishShop
 
             // -24~5124 为泰拉原版的物品id
             // <-24 为本插件自定义id
-            if( id <-24 )
+            if (id < -24)
             {
                 s = IDSet.GetNameByID(id, prefix);
-            } else {
-                if(stack>1)
+            }
+            else
+            {
+                if (stack > 1)
                 {
                     s = $"[i/s{stack}:{id}]";
-                } else {
-                    int num = 0;
-                    if( int.TryParse( prefix, out num) && num!=0 )
-                    {
-                        prefix = GetPrefixInt(prefix).ToString();
-                        s = $"[i/p{prefix}:{id}]";
-                    } else {
+                }
+                else
+                {
+                    if (int.TryParse(prefix, out int num) && num != 0)
+                        s = $"[i/p{GetPrefixInt(prefix)}:{id}]";
+                    else
                         s = $"[i:{id}]";
-                    }
                 }
             }
 
@@ -62,59 +62,61 @@ namespace FishShop
 
         private static int GetPrefixInt(string prefix)
         {
-            int num = 0;
-            if ( int.TryParse( prefix, out num ) )
+            if (int.TryParse(prefix, out int num))
                 return num;
             else
                 return AffixNameToPrefix(prefix);
         }
-        
-        public static string GetMoneyDesc(int price, bool tagStyle=true){
+
+        public static string GetMoneyDesc(int price, bool tagStyle = true)
+        {
             string msg = "";
 
             // 铂金币
-            float num = price/1000000;
-            int stack = (int)Math.Floor( num );
-            if( stack>0 ){
-                price -= stack*1000000;
+            float num = price / 1000000;
+            int stack = (int)Math.Floor(num);
+            if (stack > 0)
+            {
+                price -= stack * 1000000;
                 msg = tagStyle ? $"[i/s{stack}:74]" : $"{stack}铂";
             }
 
             // 金币
-            num = price/10000;
-            stack = (int)Math.Floor( num );
-            if( stack>0 ){
-                price -= stack*10000;
+            num = price / 10000;
+            stack = (int)Math.Floor(num);
+            if (stack > 0)
+            {
+                price -= stack * 10000;
                 msg += tagStyle ? $"[i/s{stack}:73]" : $" {stack}金";
             }
 
             // 银币
-            num = price/100;
-            stack = (int)Math.Floor( num );
-            if( stack>0 ){
-                price -= stack*100;
+            num = price / 100;
+            stack = (int)Math.Floor(num);
+            if (stack > 0)
+            {
+                price -= stack * 100;
                 msg += tagStyle ? $"[i/s{stack}:72]" : $" {stack}银";
             }
 
             // 铜币
-            if( price>0 ){
+            if (price > 0)
+            {
                 msg += tagStyle ? $"[i/s{price}:71]" : $" {stack}铜币";
             }
 
             return msg;
         }
         // 数字补零
-        public static string AlignZero(int num){
-            if( num<10 ){
-                return $"00{num}";
-            } else if(num<100) {
-                return $"0{num}";
-            } else {
-                return $"{num}";
-            }
+        public static string AlignZero(int num)
+        {
+            if (num < 10) return $"00{num}";
+            else if (num < 100) return $"0{num}";
+            else return $"{num}";
         }
 
-        public static int AffixNameToPrefix( string affixname )
+        #region 词缀
+        public static int AffixNameToPrefix(string affixname)
         {
             switch (affixname)
             {
@@ -132,12 +134,12 @@ namespace FishShop
                 case "笨重": return 12;
                 case "可耻": return 13;
                 case "重": return 14;
-                case "轻": return 15;
+                case "轻": case "莱特": return 15;
                 case "精准": return 16;
                 case "迅速": return 17;
                 case "急速": return 18;
                 case "恐怖": return 19;
-                case "致命-远程": return 20;
+                case "致命": return 20;
                 case "可靠": return 21;
                 case "可畏": return 22;
                 case "无力": return 23;
@@ -160,7 +162,7 @@ namespace FishShop
                 case "破损": return 40;
                 case "粗劣": return 41;
                 case "迅捷": return 42;
-                case "致命": return 43;
+                case "致命2": return 43;
                 case "灵活": return 44;
                 case "灵巧": return 45;
                 case "残暴": return 46;
@@ -173,7 +175,7 @@ namespace FishShop
                 case "致伤": return 53;
                 case "强劲": return 54;
                 case "粗鲁": return 55;
-                case "虚弱": return 56;
+                case "虚弱": case "软弱": return 56;
                 case "无情": return 57;
                 case "暴怒": return 58;
                 case "神级": return 59;
@@ -192,6 +194,8 @@ namespace FishShop
                 case "险恶": return 72;
                 case "轻快": return 73;
                 case "快速": return 74;
+                case "急速2": return 75;
+                case "迅捷2": return 76;
                 case "狂野": return 77;
                 case "鲁莽": return 78;
                 case "勇猛": return 79;
@@ -199,13 +203,13 @@ namespace FishShop
                 case "传奇": return 81;
                 case "虚幻": return 82;
                 case "神话": return 83;
+                case "传奇2": return 84; // 泰拉悠悠球变体
             }
 
             // 纯数字
-            int num = 0;
-            if( int.TryParse(affixname, out num) )
+            if (int.TryParse(affixname, out int num))
             {
-                if( num<=83 && num>0 )
+                if (num <= 83 && num > 0)
                 {
                     return num;
                 }
@@ -213,9 +217,11 @@ namespace FishShop
 
             return 0;
         }
+        #endregion
 
 
-        public static void updatePlayerSlot(TSPlayer player, Item item, int slotIndex){
+        public static void updatePlayerSlot(TSPlayer player, Item item, int slotIndex)
+        {
             NetMessage.SendData((int)PacketTypes.PlayerSlot, -1, -1, NetworkText.FromLiteral(item.Name), player.Index, slotIndex, (float)item.prefix);
             NetMessage.SendData((int)PacketTypes.PlayerSlot, player.Index, -1, NetworkText.FromLiteral(item.Name), player.Index, slotIndex, (float)item.prefix);
         }
@@ -243,9 +249,11 @@ namespace FishShop
 
     }
 
-    class Log{
-        public static void info(string msg){
-            TShock.Log.ConsoleInfo("[fishshop]: "+msg);
+    class Log
+    {
+        public static void info(string msg)
+        {
+            TShock.Log.ConsoleInfo("[fishshop]: " + msg);
         }
     }
 }

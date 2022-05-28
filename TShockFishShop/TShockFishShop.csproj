@@ -54,12 +54,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config\ItemData.cs" />
     <Compile Include="Helper\LimitHelper.cs" />
+    <Compile Include="Limit\ConfigLimit.cs" />
+    <Compile Include="Limit\PlayerLimitData.cs" />
+    <Compile Include="Limit\LimitData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Settings\SetMappingData.cs" />
+    <Compile Include="Settings\SetConfig.cs" />
+    <Compile Include="Settings\Settings.cs" />
+    <Compile Include="Settings\SetShopData.cs" />
     <Compile Include="TShockFishShop.cs" />
-    <Compile Include="Config.cs" />
+    <Compile Include="Config\Config.cs" />
     <Compile Include="utils.cs" />
-    <Compile Include="Compatible.cs" />
     <Compile Include="ID\IDSet.cs" />
     <Compile Include="ID\ShopItemID.cs" />
     <Compile Include="ID\UnlockID.cs" />
@@ -76,6 +83,10 @@
     <None Remove="res\config.json" />
     <EmbeddedResource Include="res\settings.json" />
     <EmbeddedResource Include="res\config.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\README.md" />
+    <None Include="..\changelog.md" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,6 +1,8 @@
 # 鱼店
 
-指令商店，支持使用金币和物品来购买 物品、召唤boss、召唤入侵、生成NPC、获得buff、调时间 等。
+鱼店是一个指令商店，除出售物品外，还出售 召唤boss、召唤入侵、生成NPC、获得buff、调时间 等自定义商品。支持配置购买条件 和 支付条件。
+
+下载地址：[FishShop-v1.4.0.1.dll](https://gitee.com/hufang360/TShockFishShop/attach_files/1052580/download/FishShop-v1.4.0.1.dll)
 
 <br>
 
@@ -11,10 +13,16 @@
 /fish ask <商品编号>，询价;
 /fish buy <商品编号> [件数]，购买;
 
-/fish info, 查询钓鱼信息;
+/fish info, 显示钓鱼信息;
 
 /fish reload, 重载配置;
 /fish reset, 重置限量记录（1.4）;
+
+/fish special, 查看特别指令（仅管理员）;
+/fish finish <次数>，修改自己的渔夫任务完成次数（仅管理员）;
+/fish change，更换今天的任务鱼（仅管理员）;
+/fish changesuper <物品id|物品名>，指定今天的任务鱼（仅管理员）;
+/fish docs，生成参考文档（仅管理员）;
 
 /fish = /fishshop = /fs
 ```
@@ -30,6 +38,7 @@
 | fishshop.finish  | 修改钓鱼完成次数 |
 | fishshop.reload  | 重载鱼店配置 和 重置限量记录 |
 | fishshop.special  | 服主和开发者专用 |
+| fishshop.ignore.allowgroup  | 忽略用户组购买限制 |
 
 授权示意（服主默认拥有全部权限）：
 ```shell
@@ -38,11 +47,11 @@
 
 <br>
 
-商品配置说明：
+## 配置说明：
 
-[https://www.yuque.com/hufang/bv/tshock-fish-shop](https://www.yuque.com/hufang/bv/tshock-fish-shop)（由于gitee审核太严，经常发不出东西，以后插件说明会在语雀上更新）
+[https://www.yuque.com/hufang/bv/tshock-fish-shop](https://www.yuque.com/hufang/bv/tshock-fish-shop)
 
 <br>
 
-爱发电支持：
+## 支持：
 [https://afdian.net/@hufang360](https://afdian.net/@hufang360)

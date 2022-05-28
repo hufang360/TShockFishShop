@@ -1,8 +1,7 @@
 using System;
+using System.Collections.Generic;
 using Terraria;
 using TShockAPI;
-using System.Linq;
-using System.Collections.Generic;
 
 
 namespace FishShop
@@ -13,21 +12,21 @@ namespace FishShop
         public static int GetCoinsCount(TSPlayer player)
         {
             bool overFlowing;
-			long num = Terraria.Utils.CoinsCount(out overFlowing, player.TPlayer.inventory, 58, 57, 56, 55, 54);
-			long num2 = Terraria.Utils.CoinsCount(out overFlowing, player.TPlayer.bank.item);
-			long num3 = Terraria.Utils.CoinsCount(out overFlowing, player.TPlayer.bank2.item);
-			long num4 = Terraria.Utils.CoinsCount(out overFlowing, player.TPlayer.bank3.item);
-			long num5 = Terraria.Utils.CoinsCount(out overFlowing, player.TPlayer.bank4.item);
+            long num = Terraria.Utils.CoinsCount(out overFlowing, player.TPlayer.inventory, 58, 57, 56, 55, 54);
+            long num2 = Terraria.Utils.CoinsCount(out overFlowing, player.TPlayer.bank.item);
+            long num3 = Terraria.Utils.CoinsCount(out overFlowing, player.TPlayer.bank2.item);
+            long num4 = Terraria.Utils.CoinsCount(out overFlowing, player.TPlayer.bank3.item);
+            long num5 = Terraria.Utils.CoinsCount(out overFlowing, player.TPlayer.bank4.item);
             int total = ((int)Terraria.Utils.CoinsCombineStacks(out overFlowing, num, num2, num3, num4, num5));
 
             return total;
         }
 
         // 余额描述
-        public static string GetCoinsCountDesc(TSPlayer player, bool tagStyle=true)
+        public static string GetCoinsCountDesc(TSPlayer player, bool tagStyle = true)
         {
             int total = GetCoinsCount(player);
-            return utils.GetMoneyDesc( total, tagStyle);
+            return utils.GetMoneyDesc(total, tagStyle);
         }
 
         #region 检查钱是否足够
@@ -42,13 +41,14 @@ namespace FishShop
             int costMoney = shopItem.GetCostMoney(amount);
 
             // 建筑师购物价格打1折
-            if( player.Group.Name == "builder" || player.Group.Name=="architect" ){
+            if (player.Group.Name == "builder" || player.Group.Name == "architect")
+            {
                 float discountMoney = costMoney * 0.1f;
-                costMoney = (int)Math.Ceiling(  discountMoney );
+                costMoney = (int)Math.Ceiling(discountMoney);
             }
 
-			if (GetCoinsCount(player) < costMoney)
-			{
+            if (GetCoinsCount(player) < costMoney)
+            {
                 msg = "钱不够";
                 return false;
             }
@@ -57,27 +57,31 @@ namespace FishShop
             // 检查 对应的物品以及数量
             Item itemNet;
             ItemData itemData;
-            for (int i=0; i<NetItem.MaxInventory; i++)
+            for (int i = 0; i < NetItem.MaxInventory; i++)
             {
-                if( i>=NetItem.InventorySlots )
+                if (i >= NetItem.InventorySlots)
                     break;
 
                 itemNet = player.TPlayer.inventory[i];
-                if( itemNet.stack<1 )
+                if (itemNet.stack < 1)
                     continue;
 
                 itemData = shopItem.GetOneCostItem(costItems, itemNet.netID);
-                if( itemData.id !=0 )
+                if (itemData.id != 0)
                 {
-                    if( itemNet.stack>=itemData.stack ){
+                    if (itemNet.stack >= itemData.stack)
+                    {
                         costItems.Remove(itemData);
-                    } else {
+                    }
+                    else
+                    {
                         itemData.stack -= itemNet.stack;
                     }
                 }
 
             }
-            if( costItems.Count>0 ){
+            if (costItems.Count > 0)
+            {
                 msg = "物品不够";
                 return false;
             }
@@ -90,34 +94,38 @@ namespace FishShop
         }
         #endregion
 
+
         #region 减扣物品
         // 减扣物品
-        public static void DeductCost(TSPlayer player, ShopItem shopItem, int amount=1)
+        public static void DeductCost(TSPlayer player, ShopItem shopItem, int amount = 1)
         {
             // 取出要扣除的物品
             List<ItemData> costItems = shopItem.GetCostItem(amount);
 
             Item itemNet;
             ItemData itemData;
-            for (int i=0; i<NetItem.MaxInventory; i++)
+            for (int i = 0; i < NetItem.MaxInventory; i++)
             {
-                if( i>=NetItem.InventorySlots )
+                if (i >= NetItem.InventorySlots)
                     break;
 
                 itemNet = player.TPlayer.inventory[i];
-                if( itemNet.stack<1 )
+                if (itemNet.stack < 1)
                     continue;
 
-                if(itemNet.IsACoin)
+                if (itemNet.IsACoin)
                     continue;
 
                 itemData = shopItem.GetOneCostItem(costItems, itemNet.netID);
-                if( itemData.id !=0 )
+                if (itemData.id != 0)
                 {
-                    if( itemNet.stack>=itemData.stack ){
+                    if (itemNet.stack >= itemData.stack)
+                    {
                         itemNet.stack -= itemData.stack;
                         costItems.Remove(itemData);
-                    } else {
+                    }
+                    else
+                    {
                         itemNet.stack = 0;
                         itemData.stack -= itemNet.stack;
                     }
@@ -125,21 +133,34 @@ namespace FishShop
                 }
 
             }
-            if( costItems.Count>0 ){
+            if (costItems.Count > 0)
+            {
                 Log.info($"有 {costItems.Count} 个东西减扣失败！");
             }
 
             // 扣钱
             int costMoney = shopItem.GetCostMoney(amount);
             // 建筑师购物价格打1折
-            if( player.Group.Name == "builder" || player.Group.Name=="architect" ){
+            if (player.Group.Name == "builder" || player.Group.Name == "architect")
+            {
                 float discountMoney = costMoney * 0.1f;
-                costMoney = (int)Math.Ceiling(  discountMoney );
+                costMoney = (int)Math.Ceiling(discountMoney);
             }
 
             bool success = DeductMoney(player, costMoney);
-            if( !success ){
+            if (!success)
+            {
                 Log.info($"金币扣除失败！金额: {costMoney} 铜");
+            }
+
+            // 执行指令
+            List<string> cmds = shopItem.GetCostCMD();
+            for (int i = 0; i < amount; i++)
+            {
+                foreach (string cmd in cmds)
+                {
+                    CmdHelper.ExecuteRawCmd(player, cmd);
+                }
             }
 
             // NetMessage.SendData(4, -1, -1, NetworkText.FromLiteral(player.Name), player.Index, 0f, 0f, 0f, 0);
@@ -152,12 +173,12 @@ namespace FishShop
         #region 减扣金币
         private static bool DeductMoney(TSPlayer player, int price)
         {
-            
+
             int b1 = 0;
             int b2 = 0;
             int b3 = 0;
             int b4 = 0;
-            List <Item> items = new List<Item>();
+            List<Item> items = new List<Item>();
             List<int> indexs = new List<int>();
 
             // 找出当前货币的格子索引
@@ -171,23 +192,31 @@ namespace FishShop
             }
             for (int i = 0; i < 260; i++)
             {
-                if (i < 54){
+                if (i < 54)
+                {
                     record(player.TPlayer.inventory[i], i);
 
-                } else if (i >= 99 && i < 139){
+                }
+                else if (i >= 99 && i < 139)
+                {
                     record(player.TPlayer.bank.item[b1], i);
                     b1++;
 
-                } else if (i >= 139 && i < 179)
+                }
+                else if (i >= 139 && i < 179)
                 {
                     record(player.TPlayer.bank2.item[b2], i);
                     b2++;
 
-                } else if (i >= 180 && i < 220){
+                }
+                else if (i >= 180 && i < 220)
+                {
                     record(player.TPlayer.bank3.item[b3], i);
                     b3++;
 
-                } else if (i >= 220 && i < 260){
+                }
+                else if (i >= 220 && i < 260)
+                {
                     record(player.TPlayer.bank4.item[b4], i);
                     b4++;
                 }
@@ -223,22 +252,31 @@ namespace FishShop
 
             for (int i = 0; i < 260; i++)
             {
-                if (i < 54){
+                if (i < 54)
+                {
                     record2(player.TPlayer.inventory[i], i);
 
-                } else if (i >= 99 && i < 139){
+                }
+                else if (i >= 99 && i < 139)
+                {
                     record2(player.TPlayer.bank.item[b1], i);
                     b1++;
 
-                } else if (i >= 139 && i < 179){
+                }
+                else if (i >= 139 && i < 179)
+                {
                     record2(player.TPlayer.bank2.item[b2], i);
                     b2++;
 
-                } else if (i >= 180 && i < 220){
+                }
+                else if (i >= 180 && i < 220)
+                {
                     record2(player.TPlayer.bank3.item[b3], i);
                     b3++;
 
-                } else if (i >= 220 && i < 260){
+                }
+                else if (i >= 220 && i < 260)
+                {
                     record2(player.TPlayer.bank4.item[b4], i);
                     b4++;
                 }
@@ -246,12 +284,12 @@ namespace FishShop
 
             //player.SendInfoMessage( $"购买前：{string.Join(" ",indexs)}" );
             //player.SendInfoMessage( $"购买后：{string.Join(" ",indexs2)}" );
-            indexs.AddRange( indexs2 );
-            items.AddRange( items2 );
+            indexs.AddRange(indexs2);
+            items.AddRange(items2);
             //player.SendInfoMessage( $"合并：{string.Join(" ",indexs)}" );
 
             // 刷新背包和储蓄罐
-            for (int i =0; i<indexs.Count; i++)
+            for (int i = 0; i < indexs.Count; i++)
             {
                 utils.updatePlayerSlot(player, items[i], indexs[i]);
             }
@@ -259,4 +297,5 @@ namespace FishShop
         }
         #endregion
     }
+
 }
