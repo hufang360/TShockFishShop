@@ -542,7 +542,7 @@ namespace FishShop
 
             // [日志记录]
             Log.info(string.Format("{0} 要买{1}个 {2}", op.Name, goodsAmount, shopItem.GetItemDesc()));
-            Log.info($"item: {shopItem.name} {shopItem.id} {shopItem.stack} {shopItem.prefix} {shopItem.cmds}");
+            Log.info($"item: {shopItem.name} {shopItem.id} {shopItem.stack} {shopItem.prefix}");
             foreach (ItemData _d in shopItem.unlock)
                 Log.info($"unlock: {_d.name} {_d.id} {_d.stack}");
             foreach (ItemData _d in shopItem.cost)

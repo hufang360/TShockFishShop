@@ -16,7 +16,7 @@ namespace FishShop
         public int id = 0;
 
         // 单次最大购买数
-        public int buyMax = 0;
+        public int buyMax = 999;
 
         [DefaultValue("")]
         public string comment = "";
