@@ -7,7 +7,7 @@ namespace FishShop
     {
         [DefaultValue("")]
         public string name = "";
-        public List<LimitData> datas = new List<LimitData>();
+        public List<ServerLimitData> datas = new List<ServerLimitData>();
 
         public PlayerLimitData(string playerName)
         {

@@ -528,7 +528,7 @@ namespace FishShop
         {
             // 烟花
             // 随机烟花
-            int[] types = {
+            short[] types = {
                 ProjectileID.RocketFireworkRed,
                 ProjectileID.RocketFireworkGreen,
                 ProjectileID.RocketFireworkBlue,

@@ -2,7 +2,7 @@ using System.ComponentModel;
 
 namespace FishShop
 {
-    public class LimitData
+    public class ServerLimitData
     {
         [DefaultValue("")]
         public string name = "";
@@ -10,7 +10,7 @@ namespace FishShop
         public int count = 0;
         public int total = 0;
 
-        public LimitData(string _name, int _id, int _count)
+        public ServerLimitData(string _name, int _id, int _count)
         {
             name = _name;
             id = _id;

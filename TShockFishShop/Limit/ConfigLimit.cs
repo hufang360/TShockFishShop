@@ -8,7 +8,7 @@ namespace FishShop
     public class ConfigLimit
     {
         public List<PlayerLimitData> player = new List<PlayerLimitData>();
-        public List<LimitData> server = new List<LimitData>();
+        public List<ServerLimitData> server = new List<ServerLimitData>();
 
         public static ConfigLimit Load(string path)
         {

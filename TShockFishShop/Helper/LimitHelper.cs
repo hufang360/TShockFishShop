@@ -47,7 +47,7 @@ namespace FishShop
                 {
                     hasPlayer = true;
                     bool hasPlayerData = false;
-                    foreach (LimitData d in pd.datas)
+                    foreach (ServerLimitData d in pd.datas)
                     {
                         if (d.id == _id)
                         {
@@ -58,7 +58,7 @@ namespace FishShop
                     }
                     if (!hasPlayerData)
                     {
-                        pd.datas.Add( new LimitData(itemName, _id, _amount) );
+                        pd.datas.Add( new ServerLimitData(itemName, _id, _amount) );
                     }
                     break;
                 }
@@ -66,13 +66,13 @@ namespace FishShop
             if(!hasPlayer)
             {
                 PlayerLimitData pd = new PlayerLimitData(playerName);
-                pd.datas.Add(new LimitData(itemName, _id, _amount));
+                pd.datas.Add(new ServerLimitData(itemName, _id, _amount));
                 config.player.Add(pd);
             }
 
             // 全服限购
             bool hasData = false;
-            foreach (LimitData d in config.server)
+            foreach (ServerLimitData d in config.server)
             {
                 if (d.id == _id)
                 {
@@ -82,7 +82,7 @@ namespace FishShop
                 }
             }
             if (!hasData)
-                config.server.Add( new LimitData(itemName, _id, _amount) );
+                config.server.Add( new ServerLimitData(itemName, _id, _amount) );
             Save();
         }
 
@@ -93,7 +93,7 @@ namespace FishShop
             {
                 if (pd.name == playerName)
                 {
-                    foreach (LimitData d in pd.datas)
+                    foreach (ServerLimitData d in pd.datas)
                     {
                         if (d.id == _id)
                             return d.count;
@@ -107,7 +107,7 @@ namespace FishShop
         public static int GetServerRecord(int _id)
         {
             Load();
-            foreach (LimitData d in config.server)
+            foreach (ServerLimitData d in config.server)
             {
                 if (d.id == _id)
                     return d.count;
@@ -120,13 +120,13 @@ namespace FishShop
             Load();
             foreach (PlayerLimitData pd in config.player)
             {
-                foreach (LimitData d in pd.datas)
+                foreach (ServerLimitData d in pd.datas)
                 {
                     d.count = 0;
                 }
             }
 
-            foreach (LimitData d in config.server)
+            foreach (ServerLimitData d in config.server)
             {
                 d.count = 0;
             }
