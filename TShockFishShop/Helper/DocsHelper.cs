@@ -1,11 +1,11 @@
 using System.Collections.Generic;
-using System;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using Terraria;
 using Terraria.ID;
 using Terraria.Localization;
+using Terraria.Map;
 using TShockAPI;
 
 
@@ -22,7 +22,8 @@ namespace FishShop
 
             bool needRecover = true;
             GameCulture culture = Language.ActiveCulture;
-            if ( culture.LegacyId != (int)GameCulture.CultureName.Chinese ){
+            if (culture.LegacyId != (int)GameCulture.CultureName.Chinese)
+            {
                 LanguageManager.Instance.SetLanguage(GameCulture.FromCultureName(GameCulture.CultureName.Chinese));
                 needRecover = false;
             }
@@ -37,21 +38,21 @@ namespace FishShop
                 Path.Combine(path, "[fish]ProjectileList.txt"),
                 };
 
-            DumpShopItems( paths[0] );
-            DumpKeywords( paths[1] );
-            DumpItems( paths[2] );
-            DumpNPCs( paths[3] );
-            DumpBuffs( paths[4] );
-            DumpPrefixes( paths[5]);
-            DumpProjectiles( paths[6] );
+            DumpShopItems(paths[0]);
+            DumpKeywords(paths[1]);
+            DumpItems(paths[2]);
+            DumpNPCs(paths[3]);
+            DumpBuffs(paths[4]);
+            DumpPrefixes(paths[5]);
+            DumpProjectiles(paths[6]);
 
             op.SendInfoMessage($"已生成参考文档:\n{string.Join("\n", paths)}");
-            
-            if( needRecover )
+
+            if (needRecover)
                 LanguageManager.Instance.SetLanguage(culture);
         }
         private static void DumpShopItems(string path)
-		{
+        {
             Regex newLine = new Regex(@"\n");
 
             List<string> li = new List<string>() {
@@ -141,7 +142,7 @@ namespace FishShop
                 "-2907,击败霜月,×,√,×"
                 };
 
-			StringBuilder buffer = new StringBuilder();
+            StringBuilder buffer = new StringBuilder();
             foreach (var line in li)
             {
                 buffer.AppendLine(line);
@@ -204,10 +205,10 @@ namespace FishShop
         }
 
         private static void DumpItems(string path)
-		{
+        {
             Regex newLine = new Regex(@"\n");
-			StringBuilder buffer = new StringBuilder();
-			buffer.AppendLine("id,名称,描述");
+            StringBuilder buffer = new StringBuilder();
+            buffer.AppendLine("id,名称,描述");
 
             for (int i = 1; i < Main.maxItemTypes; i++)
             {
@@ -215,82 +216,82 @@ namespace FishShop
                 item.SetDefaults(i);
 
                 string tt = "";
-				for (int x = 0; x < item.ToolTip.Lines; x++) {
-					tt += item.ToolTip.GetLine(x) + "\n";
-				}
+                for (int x = 0; x < item.ToolTip.Lines; x++)
+                {
+                    tt += item.ToolTip.GetLine(x) + "\n";
+                }
 
-                buffer.AppendLine( $"{i},{newLine.Replace(item.Name, @" ")},{newLine.Replace(tt, @" ")}" );
+                buffer.AppendLine($"{i},{newLine.Replace(item.Name, @" ")},{newLine.Replace(tt, @" ").TrimEnd()}");
             }
 
             File.WriteAllText(path, buffer.ToString());
         }
 
         private static void DumpNPCs(string path)
-		{
-			StringBuilder buffer = new StringBuilder();
-			buffer.AppendLine("id,名称");
+        {
+            StringBuilder buffer = new StringBuilder();
+            buffer.AppendLine("id,名称");
 
-			for (int i = -65; i < Main.maxNPCTypes; i++)
-			{
-				NPC npc = new NPC();
-				npc.SetDefaults(i);
-				if (!string.IsNullOrEmpty(npc.FullName))
-				{
-					buffer.AppendLine( $"{i},{npc.FullName}");
-				}
-			}
+            for (int i = -65; i < Main.maxNPCTypes; i++)
+            {
+                NPC npc = new NPC();
+                npc.SetDefaults(i);
+                if (!string.IsNullOrEmpty(npc.FullName))
+                {
+                    buffer.AppendLine($"{i},{npc.FullName}");
+                }
+            }
 
             File.WriteAllText(path, buffer.ToString());
         }
 
         private static void DumpBuffs(string path)
-		{
-			StringBuilder buffer = new StringBuilder();
-			buffer.AppendLine("id,名称,描述");
+        {
+            StringBuilder buffer = new StringBuilder();
+            buffer.AppendLine("id,名称,描述");
 
-			for (int i = 0; i < Main.maxBuffTypes; i++)
-			{
-				if (!string.IsNullOrEmpty(Lang.GetBuffName(i)))
-				{
-					buffer.AppendLine( $"{i},{Lang.GetBuffName(i)},{Lang.GetBuffDescription(i)}" );
-				}
-			}
+            for (int i = 0; i < Main.maxBuffTypes; i++)
+            {
+                if (!string.IsNullOrEmpty(Lang.GetBuffName(i)))
+                {
+                    buffer.AppendLine($"{i},{Lang.GetBuffName(i)},{Lang.GetBuffDescription(i)}");
+                }
+            }
 
             File.WriteAllText(path, buffer.ToString());
         }
 
         private static void DumpPrefixes(string path)
-		{
-			StringBuilder buffer = new StringBuilder();
-			buffer.AppendLine("id,名称");
+        {
+            StringBuilder buffer = new StringBuilder();
+            buffer.AppendLine("id,名称");
+            for (int i = 0; i < PrefixID.Count; i++)
+            {
+                string prefix = Lang.prefix[i].ToString();
 
-			for (int i = 0; i < PrefixID.Count; i++)
-			{
-				string prefix = Lang.prefix[i].ToString();
-
-				if (!string.IsNullOrEmpty(prefix))
-				{
-					buffer.AppendLine( $"{i},{prefix}");
-				}
-			}
+                if (!string.IsNullOrEmpty(prefix))
+                {
+                    buffer.AppendLine($"{i},{prefix}");
+                }
+            }
 
             File.WriteAllText(path, buffer.ToString());
         }
 
         private static void DumpProjectiles(string path)
-		{
-			StringBuilder buffer = new StringBuilder();
-			buffer.AppendLine("id,射弹名称");
+        {
+            StringBuilder buffer = new StringBuilder();
+            buffer.AppendLine("id,射弹名称");
 
-			for (int i = 0; i < Main.maxProjectileTypes; i++)
-			{
-				Projectile projectile = new Projectile();
-				projectile.SetDefaults(i);
-				if (!string.IsNullOrEmpty(projectile.Name))
-				{
-					buffer.AppendLine( $"{i},{projectile.Name}");
-				}
-			}
+            for (int i = 0; i < Main.maxProjectileTypes; i++)
+            {
+                Projectile projectile = new Projectile();
+                projectile.SetDefaults(i);
+                if (!string.IsNullOrEmpty(projectile.Name))
+                {
+                    buffer.AppendLine($"{i},{projectile.Name}");
+                }
+            }
 
             File.WriteAllText(path, buffer.ToString());
         }
