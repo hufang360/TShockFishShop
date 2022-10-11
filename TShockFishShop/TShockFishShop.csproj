@@ -1,89 +1,57 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{17E7005A-4173-4791-8276-995A79BF2A46}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FishShop</RootNamespace>
-    <AssemblyName>FishShop</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
+    <TargetFramework>net6.0</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <!-- 
+      Version information for an assembly consists of the following four values:
+
+          Major Version
+          Minor Version 
+          Build Number
+          Starting in version 4.2.5, we are no longer including the fourth decimal
+          location, which previously held the date and time.
+
+      Also, be sure to release on github with the exact assembly version tag as below
+      so that the update manager works correctly (via the Github releases api and mimic)
+    -->
+    <Version>1.0.0</Version>
+    <AssemblyTitle>FishShop</AssemblyTitle>
+    <Company></Company>
+    <Product>FishShop</Product>
+    <Copyright>Copyright © 2022</Copyright>
+    <!-- extras for nuget -->
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageLicenseExpression></PackageLicenseExpression>
+    <Authors>hufang360</Authors>
+    <Description>FishShop</Description>
+    <PackageId>FishShop</PackageId> <!-- package name for nuget -->
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>1701;1702;1591</NoWarn>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <NoWarn>1701;1702;1591</NoWarn>
   </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>deps\144\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\@lib\1.4.4.5\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="OTAPI, Version=1.4.3.6, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>deps\144\OTAPI.dll</HintPath>
+    <Reference Include="OTAPI">
+      <HintPath>..\..\@lib\1.4.4.5\OTAPI.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="TerrariaServer, Version=1.4.3.6, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>deps\144\TerrariaServer.dll</HintPath>
+    <Reference Include="TerrariaServer">
+      <HintPath>..\..\@lib\1.4.4.5\TerrariaServer.dll</HintPath>
     </Reference>
-    <Reference Include="TShockAPI, Version=4.5.17.0, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>deps\144\TShockAPI.dll</HintPath>
+    <Reference Include="TShockAPI">
+      <HintPath>..\..\@lib\1.4.4.5\TShockAPI.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Config\ItemData.cs" />
-    <Compile Include="Helper\LimitHelper.cs" />
-    <Compile Include="Limit\ConfigLimit.cs" />
-    <Compile Include="Limit\PlayerLimitData.cs" />
-    <Compile Include="Limit\ServerLimitData.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Settings\SetMappingData.cs" />
-    <Compile Include="Settings\SetConfig.cs" />
-    <Compile Include="Settings\Settings.cs" />
-    <Compile Include="Settings\SetShopData.cs" />
-    <Compile Include="TShockFishShop.cs" />
-    <Compile Include="Config\Config.cs" />
-    <Compile Include="utils.cs" />
-    <Compile Include="ID\IDSet.cs" />
-    <Compile Include="ID\ShopItemID.cs" />
-    <Compile Include="ID\UnlockID.cs" />
-    <Compile Include="Helper\ShopHelper.cs" />
-    <Compile Include="Helper\NPCHelper.cs" />
-    <Compile Include="Helper\CmdHelper.cs" />
-    <Compile Include="Helper\FishHelper.cs" />
-    <Compile Include="Helper\BuffHelper.cs" />
-    <Compile Include="Helper\InventoryHelper.cs" />
-    <Compile Include="Helper\DocsHelper.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="res\settings.json" />
-    <None Remove="res\config.json" />
-    <EmbeddedResource Include="res\settings.json" />
-    <EmbeddedResource Include="res\config.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\README.md" />
-    <None Include="..\changelog.md" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
 </Project>
