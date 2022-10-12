@@ -5,9 +5,8 @@
 下载地址：
 | 文件名  | 适用版本  |
 |---|---|
-| [FishShop-v1.4.2.dll](https://gitee.com/hufang360/TShockFishShop/attach_files/1129153/download/FishShop_v1.4.2.dll)  | TShock4.5.17 - Terraria1.4.3.6  |
-| [FishShop-v1.4.2-1.4.3.2.dll](https://gitee.com/hufang360/TShockFishShop/attach_files/1129154/download/FishShop_v1.4.2-1.4.3.2.dll)  | TShock4.5.13 - Terraria1.4.3.2（建议1.4.3.2的服务器用这个）  |
-| [FishShop-v1.4.2-1.4.0.5.dll](https://gitee.com/hufang360/TShockFishShop/attach_files/1129155/download/FishShop_v1.4.2-1.4.0.5.dll)  | TShock4.4.0_Pre12_Terraria1.4.0.5（理论上支持，未做完整测试）  |
+| [FishShop-v1.4.3.dll](https://gitee.com/hufang360/TShockFishShop/releases/download/v1.4.3/FishShop-v1.4.3.dll)  | TShock5.0beta - Terraria1.4.4.x  |
+* Terraria 1.4.3.x 请下载 1.4.2及之前的版本
 
 
 <br>
