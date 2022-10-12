@@ -27,7 +27,7 @@ namespace FishShop
         public static readonly string PermissionGroupIgnore = "fishshop.ignore.allowgroup";
 
         public static readonly string savedir = Path.Combine(TShock.SavePath, "FishShop");
-        public static readonly string settingsFile = Path.Combine(savedir, "settings_v1.4.1.json");
+        public static readonly string settingsFile = Path.Combine(savedir, "settings.json");
         public static readonly string configFile = Path.Combine(savedir, "config.json");
         public static readonly string recordFile = Path.Combine(savedir, "record.json");
 
@@ -362,7 +362,7 @@ namespace FishShop
             if (args.Player != null)
                 args.Player.SendInfoMessage(msg);
             else
-                Log.info(msg);
+                utils.Log(msg);
         }
         #endregion
 
@@ -418,7 +418,7 @@ namespace FishShop
                         op.SendErrorMessage($"物品名/物品id: {itemNameOrId} 不正确");
                         return;
                     }
-                    Log.info(matchedItems.Count.ToString());
+                    utils.Log(matchedItems.Count.ToString());
                     foreach (Item item in matchedItems)
                     {
                         List<ShopItem2> finds = FindGoods(item.netID);
@@ -541,13 +541,13 @@ namespace FishShop
             ShopItem shopItem = goods[goodsSerial - 1];
 
             // [日志记录]
-            Log.info(string.Format("{0} 要买{1}个 {2}", op.Name, goodsAmount, shopItem.GetItemDesc()));
-            Log.info($"item: {shopItem.name} {shopItem.id} {shopItem.stack} {shopItem.prefix}");
+            utils.Log(string.Format("{0} 要买{1}个 {2}", op.Name, goodsAmount, shopItem.GetItemDesc()));
+            utils.Log($"item: {shopItem.name} {shopItem.id} {shopItem.stack} {shopItem.prefix}");
             foreach (ItemData _d in shopItem.unlock)
-                Log.info($"unlock: {_d.name} {_d.id} {_d.stack}");
+                utils.Log($"unlock: {_d.name} {_d.id} {_d.stack}");
             foreach (ItemData _d in shopItem.cost)
-                Log.info($"cost: {_d.name} {_d.id} {_d.stack}");
-            Log.info($"余额: {InventoryHelper.GetCoinsCountDesc(op, false)}");
+                utils.Log($"cost: {_d.name} {_d.id} {_d.stack}");
+            utils.Log($"余额: {InventoryHelper.GetCoinsCountDesc(op, false)}");
 
 
             // 检查解锁条件
@@ -635,6 +635,16 @@ namespace FishShop
                 return;
             }
 
+            // 最脏的块
+            if (shopItem.id == ShopItemID.DirtiestBlock)
+            {
+                if (!shopItem.CheckDirtiestMatrix(op))
+                {
+                    op.SendInfoMessage($"在你的周围未能找到臭臭矩阵！(7x7中空)");
+                    return;
+                }
+            }
+
             // 询价
             if (InventoryHelper.CheckCost(op, shopItem, goodsAmount, out msg))
             {
@@ -654,7 +664,7 @@ namespace FishShop
 
                 msg = $"你购买了 {goodsAmount}件 {shopItem.GetItemDesc()} | 花费: {shopItem.GetCostDesc(goodsAmount)}{s} | 余额: {InventoryHelper.GetCoinsCountDesc(op)}";
                 op.SendSuccessMessage(msg);
-                Log.info($"{op.Name} 买了 {shopItem.GetItemDesc()}");
+                utils.Log($"{op.Name} 买了 {shopItem.GetItemDesc()}");
                 LimitHelper.Record(op.Name, shopItem.name, shopItem.id, goodsAmount);
             }
             else
@@ -680,7 +690,7 @@ namespace FishShop
                 if (op != null)
                     op.SendInfoMessage($"【{_config.name}】已打烊，因为: {msg}");
                 else
-                    Log.info($"【{_config.name}】已打烊，因为: {msg}");
+                    utils.Log($"【{_config.name}】已打烊，因为: {msg}");
                 return false;
             }
             return true;

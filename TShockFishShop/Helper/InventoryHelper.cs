@@ -135,7 +135,7 @@ namespace FishShop
             }
             if (costItems.Count > 0)
             {
-                Log.info($"有 {costItems.Count} 个东西减扣失败！");
+                utils.Log($"有 {costItems.Count} 个东西减扣失败！");
             }
 
             // 扣钱
@@ -150,7 +150,7 @@ namespace FishShop
             bool success = DeductMoney(player, costMoney);
             if (!success)
             {
-                Log.info($"金币扣除失败！金额: {costMoney} 铜");
+                utils.Log($"金币扣除失败！金额: {costMoney} 铜");
             }
 
             // 执行指令

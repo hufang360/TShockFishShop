@@ -5,7 +5,7 @@
     <OutputType>Library</OutputType>
     <TargetFramework>net6.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <GenerateDocumentationFile>False</GenerateDocumentationFile>
     <!-- 
       Version information for an assembly consists of the following four values:
 
@@ -18,28 +18,44 @@
       Also, be sure to release on github with the exact assembly version tag as below
       so that the update manager works correctly (via the Github releases api and mimic)
     -->
-    <Version>1.0.0</Version>
+    <Version>1.4.3</Version>
     <AssemblyTitle>FishShop</AssemblyTitle>
     <Company></Company>
     <Product>FishShop</Product>
-    <Copyright>Copyright © 2022</Copyright>
+    <Copyright>Copyright © hufang360 2022</Copyright>
     <!-- extras for nuget -->
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <PackageLicenseExpression></PackageLicenseExpression>
     <Authors>hufang360</Authors>
-    <Description>FishShop</Description>
-    <PackageId>FishShop</PackageId> <!-- package name for nuget -->
+    <Description>指令商店，支持使用金币和物品来购买 物品、召唤boss、生成NPC、获得buff、调时间 等。</Description>
+    <PackageId>FishShop</PackageId>
+    <AssemblyName>FishShop</AssemblyName> <!-- package name for nuget -->
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <NoWarn>1701;1702;1591</NoWarn>
+    <DebugType>none</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <NoWarn>1701;1702;1591</NoWarn>
+    <DebugType>none</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="res\config.json" />
+    <None Remove="res\settings.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="res\config.json" />
+    <EmbeddedResource Include="res\settings.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="ModFramework">
+      <HintPath>..\..\@lib\1.4.4.5\ModFramework.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\@lib\1.4.4.5\Newtonsoft.Json.dll</HintPath>
     </Reference>

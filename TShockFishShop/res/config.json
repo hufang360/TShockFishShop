@@ -143,6 +143,7 @@
 {"name":"复活npc", "cost":[{"name":"金", "stack":5}]},
 {"name":"集合打团", "cost":[{"name":"金", "stack":5}]},
 {"name":"集体庆祝", "cost":[{"name":"银", "stack":10}]},
+{"name":"臭臭仪式", "limit":1, "cost":[{"name":"金", "stack":5}]},
 
 {"name":"跳过入侵", "cost":[{"name":"金", "stack":3}]},
 {"name":"召唤哥布林军队", "cost":[ {"name":"哥布林战旗", "id":361}, {"name":"金", "stack":10}]},

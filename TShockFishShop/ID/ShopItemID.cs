@@ -81,6 +81,8 @@ namespace FishShop
 
         public const int OverworldDayStart = -188;      // 风和日丽
 
+        public const int DirtiestBlock = -189;      // 最脏的块
+
 
         // ------------------------------------------------------------------------------------------
         // 召唤NPC
@@ -360,6 +362,17 @@ namespace FishShop
                 case ReliveNPC: NPCHelper.ReliveNPC(player); return;                    // 复活NPC
                 case TPHereAll: CmdHelper.TPHereAll(player); return;                    // 集合打团
                 case CelebrateAll: CmdHelper.CelebrateAll(player); return;              // 集体庆祝
+
+
+                case DirtiestBlock:
+                    bool flag = shopItem.FindDirtest();
+                    shopItem.MoveDirtest(flag);
+                    TSPlayer.All.SendInfoMessage($"{player.Name} 正在举行 [i:5395]臭臭仪式[i:5395]");
+                    if (flag)
+                        player.SendSuccessMessage("臭臭仪式完成，[i:5400]最脏的块 已生成(σﾟ∀ﾟ)σ");
+                    else
+                        player.SendErrorMessage("糟糕，找遍整个世界都没有发现 [i:5400]最脏的块 o(´^｀)o");
+                    return;
 
                 default: break;
             }

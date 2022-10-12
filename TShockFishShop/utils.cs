@@ -1,3 +1,4 @@
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -231,6 +232,8 @@ namespace FishShop
             get { return (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds; }
         }
 
+        public static Rectangle GetScreen(TSPlayer op) { return GetScreen(op.TileX, op.TileY); }
+        public static Rectangle GetScreen(int playerX, int playerY) { return new Rectangle(playerX - 61, playerY - 34 + 3, 122, 68); }
 
         public static int InvalidItemID { get { return -24; } }
 
@@ -247,13 +250,7 @@ namespace FishShop
             return streamReader.ReadToEnd();
         }
 
-    }
 
-    class Log
-    {
-        public static void info(string msg)
-        {
-            TShock.Log.ConsoleInfo("[fishshop]: " + msg);
-        }
+        public static void Log(string msg) { TShock.Log.ConsoleInfo("[fish]" + msg); }
     }
 }
