@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FishShop.Record;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -44,12 +45,13 @@ namespace FishShop
 
         public override void Initialize()
         {
-            Commands.ChatCommands.Add(new Command(new List<string>() { }, FishShop, "fishshop", "fish", "fs") { HelpText = "鱼店" });
+            Commands.ChatCommands.Add(new Command(FishShop, "fishshop", "fish", "fs", "鱼店") { HelpText = "鱼店" });
+            Commands.ChatCommands.Add(new Command(WishHelper.Manage, "wish") { HelpText = "许愿池" });
 
             if (!Directory.Exists(savedir)) Directory.CreateDirectory(savedir);
             Settings.Load(settingsFile);
             Config.GenConfig(configFile);
-            LimitHelper.recodFile = recordFile;
+            Records.RecodFile = recordFile;
             utils.init();
         }
 
@@ -64,13 +66,13 @@ namespace FishShop
                 op.SendInfoMessage("/fish ask <编号>，问价格");
                 op.SendInfoMessage("/fish buy <编号>，购买");
                 op.SendInfoMessage("/fish info，显示钓鱼信息");
+                op.SendInfoMessage("/fish rank，消费榜");
+                op.SendInfoMessage("/fish basket，鱼篓榜");
 
-                if (op.HasPermission(PermissionFinish))
-                    op.SendInfoMessage("/fish finish <次数>，修改自己的渔夫任务完成次数");
-                if (op.HasPermission(PermissionChange))
-                    op.SendInfoMessage("/fish change，更换今天的任务鱼");
-                if (op.HasPermission(PermissionChangeSuper))
-                    op.SendInfoMessage("/fish changesuper <物品id|物品名>，指定今天的任务鱼");
+                if (op.HasPermission(PermissionFinish)) op.SendInfoMessage("/fish finish <次数>，修改自己的渔夫任务完成次数");
+                if (op.HasPermission(PermissionChange)) op.SendInfoMessage("/fish change，更换今天的任务鱼");
+                if (op.HasPermission(PermissionChangeSuper)) op.SendInfoMessage("/fish changesuper <物品id|物品名>，指定今天的任务鱼");
+
                 if (op.HasPermission(PermissionReload))
                 {
                     op.SendInfoMessage("/fish reload，重载配置");
@@ -100,41 +102,20 @@ namespace FishShop
 
             switch (args.Parameters[0].ToLowerInvariant())
             {
-                // 帮助
-                case "h":
-                case "help":
-                    ShowHelpText();
-                    return;
-
                 default:
                     ListGoods(args);
                     op.SendInfoMessage("请输入 /fish help 查询用法");
                     break;
 
-                // 浏览
-                case "l":
-                case "list":
-                    ListGoods(args);
-                    break;
+                case "h": case "help": case "帮助": ShowHelpText(); return;  // 帮助
 
-                // 询价
-                case "a":
-                case "ask":
-                    AskGoods(args);
-                    break;
+                case "l": case "list": case "货架": case "逛店": ListGoods(args); break;  // 浏览
+                case "a": case "ask": case "询价": AskGoods(args); break;    // 询价
+                case "b": case "buy": case "购买": case "买": BuyGoods(args); break;    // 购买
 
-                // 购买
-                case "b":
-                case "buy":
-                    BuyGoods(args);
-                    break;
-
-
-                // 钓鱼信息
-                case "i":
-                case "info":
-                    FishHelper.FishInfo(op);
-                    break;
+                case "i": case "info": case "信息": FishHelper.FishInfo(op); break;  // 钓鱼信息
+                case "rank": case "消费榜": Records.ShowRank(args); break;    // 消费榜
+                case "basket": case "鱼篓榜": Records.ShowBasket(args); break;    // 鱼篓榜（用鱼消费的排行）
 
                 #region admin command
                 // 修改钓鱼次数
@@ -225,7 +206,7 @@ namespace FishShop
                     }
                     else
                     {
-                        LimitHelper.ResetRecord();
+                        Records.ResetRecord();
                         args.Player.SendSuccessMessage("[fishshop]已重置限购数据");
                     }
                     break;
@@ -366,7 +347,7 @@ namespace FishShop
         }
         #endregion
 
-        #region AskGoods
+        #region AskGoods（询价）
         // 询价
         private void AskGoods(CommandArgs args)
         {
@@ -438,7 +419,7 @@ namespace FishShop
                 string unlockDesc = shopItem.item.GetUnlockDesc();
                 string allowGroupDesc = shopItem.item.GetAllowGroupDesc();
                 string comment = shopItem.item.GetComment();
-                string limitDesc = shopItem.item.GetLimitDesc(op.Name);
+                string limitDesc = shopItem.item.GetLimitDesc(op);
                 string s = $"{shopItem.serial}.{iconDesc}{shopDesc} = {costDesc}";
                 if (unlockDesc != "")
                     s += $"\n解锁条件：需 {unlockDesc}";
@@ -459,7 +440,11 @@ namespace FishShop
             else
             {
                 if (op.RealPlayer)
-                    op.SendInfoMessage($"你的余额：{InventoryHelper.GetCoinsCountDesc(op)}");
+                {
+                    string remainDesc = InventoryHelper.GetCoinsCountDesc(op);
+                    if (string.IsNullOrEmpty(remainDesc))
+                        op.SendInfoMessage($"你的余额：{remainDesc}");
+                }
             }
         }
         #endregion
@@ -576,28 +561,34 @@ namespace FishShop
             // buff类死亡时不能买
             if (op.Dead && !shopItem.DeadCanBuyItem())
             {
-                op.SendInfoMessage($"请待复活后再购买此物品！");
+                op.SendInfoMessage("请待复活后再购买此物品！");
                 return;
             }
 
             // 坠落之星白天卖会消失
             if (shopItem.id == 75 && Main.dayTime)
             {
-                op.SendInfoMessage($"坠落之星 只能在晚上购买！");
+                op.SendInfoMessage("坠落之星 只能在晚上购买！");
+                return;
+            }
+
+            if( shopItem.id == ShopItemID.OneDamage && !NPCHelper.AnyBoss() )
+            {
+                op.SendInfoMessage("当前无任何boss存在！");
                 return;
             }
 
             // 仅晚上可以购买的商品
             if (!shopItem.DayCanBuyItem() && Main.dayTime)
             {
-                op.SendInfoMessage($"只能在晚上购买！");
+                op.SendInfoMessage("只能在晚上购买！");
                 return;
             }
 
             // 仅白天可以购买的商品
             if (!shopItem.NightCanBuyItem() && !Main.dayTime)
             {
-                op.SendInfoMessage($"只能在白天购买！");
+                op.SendInfoMessage("只能在白天购买！");
                 return;
             }
 
@@ -614,11 +605,11 @@ namespace FishShop
             if (shopItem.id > 0)
             {
                 // 检查物品堆叠上线
-                Item itemnet = new Item();
-                itemnet.SetDefaults(shopItem.id);
-                if (shopItem.stack * goodsAmount > itemnet.maxStack)
+                Item itemNet = new Item();
+                itemNet.SetDefaults(shopItem.id);
+                if (shopItem.stack * goodsAmount > itemNet.maxStack)
                 {
-                    float num = itemnet.maxStack / shopItem.stack;
+                    float num = itemNet.maxStack / shopItem.stack;
                     goodsAmount = (int)Math.Floor(num);
                     if (goodsAmount == 0)
                     {
@@ -629,7 +620,7 @@ namespace FishShop
             }
 
             // 限购
-            if (!shopItem.CheckLimitCanBuy(op.Name))
+            if (!shopItem.CheckLimitCanBuy(op))
             {
                 op.SendErrorMessage("噢噢，这件商品太抢手了，已经卖完了");
                 return;
@@ -648,24 +639,21 @@ namespace FishShop
             // 询价
             if (InventoryHelper.CheckCost(op, shopItem, goodsAmount, out msg))
             {
-                // 检查扣除
-                InventoryHelper.DeductCost(op, shopItem, goodsAmount);
+                // 扣除
+                InventoryHelper.DeductCost(op, shopItem, goodsAmount, out int costMoney, out int costFish);
                 // 提供商品/服务
                 ProvideGoods(op, shopItem, goodsAmount);
 
                 s = "";
-                if (op.Group.Name == "builder" || op.Group.Name == "architect")
+                if (InventoryHelper.IsBuilder(op))
                 {
-                    float discountMoney = shopItem.GetCostMoney(goodsAmount) * 0.1f;
-                    int discountMoneyInt = (int)Math.Ceiling(discountMoney);
-                    string s2 = utils.GetMoneyDesc(discountMoneyInt);
-                    s = $"（你是建筑师，享1折优惠，钱币只收 {s2}）";
+                    s = $"（你是建筑师，享1折优惠，钱币只收 {utils.GetMoneyDesc(costMoney)}）";
                 }
 
                 msg = $"你购买了 {goodsAmount}件 {shopItem.GetItemDesc()} | 花费: {shopItem.GetCostDesc(goodsAmount)}{s} | 余额: {InventoryHelper.GetCoinsCountDesc(op)}";
                 op.SendSuccessMessage(msg);
                 utils.Log($"{op.Name} 买了 {shopItem.GetItemDesc()}");
-                LimitHelper.Record(op.Name, shopItem.name, shopItem.id, goodsAmount);
+                Records.Record(op, shopItem, goodsAmount, costMoney, costFish);
             }
             else
             {
@@ -676,7 +664,10 @@ namespace FishShop
         #endregion
 
 
-        private bool CheckShopUnlock(TSPlayer op)
+        /// <summary>
+        /// 商店是否解锁
+        /// </summary>
+        bool CheckShopUnlock(TSPlayer op)
         {
             string msg = "";
             string s;
@@ -696,8 +687,11 @@ namespace FishShop
             return true;
         }
 
-        // 加载配置
-        private void LoadConfig(bool forceLoad = false)
+        /// <summary>
+        /// 加载配置
+        /// </summary>
+        /// <param name="forceLoad">强制加载</param>
+        void LoadConfig(bool forceLoad = false)
         {
             if (!isLoaded || forceLoad)
             {
@@ -705,24 +699,24 @@ namespace FishShop
 
                 foreach (ItemData d in _config.unlock)
                 {
-                    d.FixIDByName();
+                    d.FixIDByName(true);
                 }
 
                 foreach (ShopItem item in _config.shop)
                 {
                     item.Filling();
-                    foreach (ItemData d in item.cost)
-                    {
-                        d.FixIDByName();
-                    }
                     foreach (ItemData d in item.unlock)
                     {
-                        d.FixIDByName();
+                        d.FixIDByName(true);
+                    }
+                    foreach (ItemData d in item.cost)
+                    {
+                        d.FixIDByName(false);
                     }
                 }
                 isLoaded = true;
             }
-            LimitHelper.Load(forceLoad);
+            Records.Load(forceLoad);
         }
 
         /// 更新货架
@@ -763,7 +757,12 @@ namespace FishShop
         }
 
 
-        // 提供商品/服务
+        /// <summary>
+        /// 提供商品/服务
+        /// </summary>
+        /// <param name="player"></param>
+        /// <param name="shopItem"></param>
+        /// <param name="amount"></param>
         private void ProvideGoods(TSPlayer player, ShopItem shopItem, int amount = 1)
         {
             if (shopItem.id < -24)

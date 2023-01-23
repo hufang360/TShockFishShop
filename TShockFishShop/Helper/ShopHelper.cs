@@ -1,3 +1,4 @@
+using FishShop.Record;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 using System;
@@ -50,7 +51,7 @@ namespace FishShop
 
         public void Filling()
         {
-            if (id == 0) id = IDSet.GetIDByName(name);
+            if (id == 0) id = ShopItemID.GetIDByName(name);
 
             if (stack == 0) stack = 1;
 
@@ -64,7 +65,9 @@ namespace FishShop
                         name = "指令";
                 }
                 else if (!string.IsNullOrEmpty(prefix))
+                {
                     name = string.Format($"{_settings.name}{prefix}");
+                }
             }
             else if (id == ShopItemID.Buff)
             {
@@ -96,26 +99,15 @@ namespace FishShop
         public string GetItemDesc()
         {
             if (id == 0) Filling();
-            if (id == ShopItemID.RawCmd)
+
+            if (id < -24)
             {
-                if (cmds.Count > 0)
-                {
-                    // 如果名字是空的才取第一条指令做名字
-                    if (string.IsNullOrEmpty(name))
-                        return "指令";
-                    else
-                        return name;
-                }
-                else if (!string.IsNullOrEmpty(prefix))
-                    return string.Format($"{_settings.name}{prefix}");
-            }
-            else if (id == ShopItemID.Buff)
-            {
-                if (string.IsNullOrEmpty(name))
-                    return "增益";
-                else
+                if (id == ShopItemID.RawCmd || id == ShopItemID.Buff)
                     return name;
+
+                return ShopItemID.GetNameByID(id, prefix, stack);
             }
+
             return utils.GetItemDesc(id, stack, prefix, this);
         }
 
@@ -158,7 +150,10 @@ namespace FishShop
             return _settings.seconds;
         }
 
-        // 商品说明
+        /// <summary>
+        /// 商品说明
+        /// </summary>
+        /// <returns></returns>
         public string GetComment()
         {
             if (!string.IsNullOrEmpty(_settings.comment))
@@ -172,7 +167,10 @@ namespace FishShop
                 return comment;
         }
 
-        // 指令商品的 指令内容
+        /// <summary>
+        /// 指令商品的 指令内容
+        /// </summary>
+        /// <returns></returns>
         public List<string> GetCMD()
         {
             if (id == ShopItemID.RawCmd) return cmds;
@@ -201,7 +199,7 @@ namespace FishShop
                     continue;
 
                 // 任务鱼
-                if (_id == UnlockID.ItemIDQuestFish)
+                if (_id == CostID.QuestFish)
                 {
                     _id = Main.anglerQuestItemNetIDs[Main.anglerQuest];
                 }
@@ -211,54 +209,30 @@ namespace FishShop
             return _items;
         }
 
-        public string GetAnyItemDesc()
-        {
-            // 取出要扣除的物品id
-            List<ItemData> _costItems = new List<ItemData>();
-            string msg = "";
-            foreach (ItemData data in cost)
-            {
-                if (data.id == 0)
-                {
-                    switch (data.name)
-                    {
-                        // 任务鱼可以确定一个id
-                        // 其它物品可能得到多个id
-                        case "任务鱼":
-                            _costItems.Add(new ItemData("", Main.anglerQuestItemNetIDs[Main.anglerQuest], 1));
-                            break;
 
-                        case "宝匣":
-                        case "任意宝匣":
-                            msg += "任意宝匣[i:2334]";
-                            break;
-
-                        case "金色小动物":
-                        case "任意金色小动物":
-                            msg += "任意金色小动物[i:2889]";
-                            break;
-
-                        case "任意墓碑":
-                            msg += "任意墓碑[i:321]";
-                            break;
-                    }
-                }
-            }
-            return msg;
-        }
-
-
-        public ItemData GetOneCostItem(List<ItemData> _data, int _id)
+        /// <summary>
+        /// 挑出符合的物品减扣项（此处 处理任意类物品）
+        /// </summary>
+        public ItemData PickCostItem(List<ItemData> _data, int itemID)
         {
             for (int i = 0; i < _data.Count; i++)
             {
-                if (_data[i].id == _id)
+                if (_data[i].id == itemID)
                     return _data[i];
             }
+
+            // 处理任意类物品
+            int type = CostID.GetAnyType(itemID);
+            if (type != 0)
+                return PickCostItem(_data, type);
+
             return new ItemData();
         }
 
-        // 计算金钱消耗
+        /// <summary>
+        /// 计算金钱消耗
+        /// </summary>
+        /// <returns></returns>
         public int GetCostMoney(int goodsAmount)
         {
             int amount = 0;
@@ -268,26 +242,10 @@ namespace FishShop
                 {
                     switch (data.name)
                     {
-                        case "铜币":
-                        case "铜":
-                            id = 71;
-                            break;
-
-                        case "银币":
-                        case "银":
-                            id = 72;
-                            break;
-
-                        case "金币":
-                        case "金":
-                            id = 73;
-                            break;
-
-                        case "铂金币":
-                        case "铂金":
-                        case "铂":
-                            id = 74;
-                            break;
+                        case "铜币": case "铜": id = 71; break;
+                        case "银币": case "银": id = 72; break;
+                        case "金币": case "金": id = 73; break;
+                        case "铂金币": case "铂金": case "铂": id = 74; break;
                     }
                 }
                 switch (data.id)
@@ -301,9 +259,12 @@ namespace FishShop
             return amount * goodsAmount;
         }
 
+        /// <summary>
+        /// 列出要执行的指令
+        /// </summary>
+        /// <returns></returns>
         public List<string> GetCostCMD()
         {
-            // 列出要执行的指令
             List<string> cmds = new List<string>();
             foreach (ItemData d in cost)
             {
@@ -323,7 +284,11 @@ namespace FishShop
                 return utils.AffixNameToPrefix(prefix);
         }
 
-
+        /// <summary>
+        /// 获得花销描述
+        /// </summary>
+        /// <param name="amount"></param>
+        /// <returns></returns>
         public string GetCostDesc(int amount = 1)
         {
             // 钱
@@ -350,13 +315,17 @@ namespace FishShop
             // string s = GetAnyItemDesc();
             // if( s!="" )
             //     msg += $"{s} ";
-            if( id==ShopItemID.DirtiestBlock )
+            if (id == ShopItemID.DirtiestBlock)
             {
                 msg += ", 臭臭仪式";
             }
             return msg;
         }
 
+        /// <summary>
+        /// 获得 解锁描述
+        /// </summary>
+        /// <returns></returns>
         public string GetUnlockDesc()
         {
             string msg = "";
@@ -365,12 +334,16 @@ namespace FishShop
             {
                 if (msg != "")
                     s = "、";
-                msg += $"{s}{GetOneUnlockDesc(d)}";
+                msg += $"{s}{d.GetItemDesc()}";
             }
 
             return msg;
         }
 
+        /// <summary>
+        /// 获得用户组限制信息
+        /// </summary>
+        /// <returns></returns>
         public string GetAllowGroupDesc()
         {
             if (allowGroup.Count > 0)
@@ -380,59 +353,43 @@ namespace FishShop
         }
 
 
-        // 显示解锁条件
-        private string GetOneUnlockDesc(ItemData re)
+        /// <summary>
+        /// 获得限购信息
+        /// </summary>
+        /// <param name="op"></param>
+        /// <returns></returns>
+        public string GetLimitDesc(TSPlayer op)
         {
-            string s = IDSet.GetNameByID(re.id);
-
-            // 完成钓鱼任务
-            if (re.id == UnlockID.FishQuestCompleted)
-                s = string.Format(s, re.stack);
-
-            return s;
-        }
-
-
-        // 获得限购信息
-        public string GetLimitDesc(string playerName)
-        {
-            if (string.IsNullOrEmpty(playerName))
-                return "";
-
-            int count1 = Math.Max(0, LimitHelper.GetPlayerRecord(playerName, id));
-            int count2 = Math.Max(0, LimitHelper.GetServerRecord(id));
             List<string> msgs = new List<string>();
             if (limit > 0)
+            {
+                int count1 = Math.Max(0, Records.GetPlayerRecord(op, id));
                 msgs.Add($"个人 {count1}/{limit}");
+            }
             if (serverLimit > 0)
+            {
+                int count2 = Math.Max(0, Records.CountShopItemRecord(id));
                 msgs.Add($"全服 {count2}/{serverLimit}");
+            }
 
             return string.Join(", ", msgs);
         }
 
-        // 限购检查
-        public bool CheckLimitCanBuy(string playerName)
+        /// <summary>
+        /// 限购检查
+        /// </summary>
+        /// <param name="op"></param>
+        /// <returns></returns>
+        public bool CheckLimitCanBuy(TSPlayer op)
         {
-            if (string.IsNullOrEmpty(playerName))
+            if (string.IsNullOrEmpty(op.Name))
                 return true;
 
-            int count1 = LimitHelper.GetPlayerRecord(playerName, id);
-            if (limit > 0)
-            {
-                if (limit - count1 > 0)
-                    return true;
-                else
-                    return false;
-            }
+            if (limit > 0 && Records.GetPlayerRecord(op, id) >= limit)
+                return false;
 
-            int count2 = LimitHelper.GetServerRecord(id);
-            if (serverLimit > 0)
-            {
-                if (serverLimit - count2 > 0)
-                    return true;
-                else
-                    return false;
-            }
+            if (serverLimit > 0 && Records.CountShopItemRecord(id) >= serverLimit)
+                return false;
 
             return true;
         }

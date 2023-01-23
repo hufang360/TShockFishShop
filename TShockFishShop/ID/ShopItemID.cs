@@ -6,13 +6,17 @@ using TShockAPI;
 
 namespace FishShop
 {
+    /// <summary>
+    /// 商品ID
+    /// 说明：商品ID、解锁ID、交易物品ID 共用一套id规则，部分id即使解锁ID又是商品ID。
+    /// </summary>
     public class ShopItemID
     {
         // 自定义商品id
         // 月相、烟花起飞、更换任务鱼等
         // 召唤boss、召唤npc、召唤敌怪
         // ------------------------------------------------------------------------------------------
-        public const int MoonphaseStart = -131;     // 月相
+        public const int MoonphaseStart = -131;
         public const int MoonphaseNext = -139;      // 下个月相
         public const int Moonphase1 = -131;         // 满月
         public const int Moonphase2 = -132;         // 亏凸月
@@ -35,9 +39,9 @@ namespace FishShop
         public const int BloodMoonStart = -149;     // 召唤血月
         public const int BloodMoonStop = -150;      // 跳过血月
 
-        public const int Buff = -159;               // buff
-        public const int RawCmd = -160;             // 执行指令
-        
+        public const int Buff = -159;               // 增益
+        public const int RawCmd = -160;             // 指令
+
         public const int ReliveNPC = -161;          // 复活NPC
         public const int TPHereAll = -162;          // 集合打团
         public const int CelebrateAll = -163;       // 集体庆祝
@@ -81,7 +85,8 @@ namespace FishShop
 
         public const int OverworldDayStart = -188;      // 风和日丽
 
-        public const int DirtiestBlock = -189;      // 最脏的块
+        public const int DirtiestBlock = -189;          // 臭臭仪式
+        public const int OneDamage = -190;              // 灵犀一指
 
 
         // ------------------------------------------------------------------------------------------
@@ -111,7 +116,6 @@ namespace FishShop
 
         private static int GetSetBuffID(int id) { return -(5000 + id); }
         public static int GetRealBuffID(int id) { return id > SetBuffEnd && id < SetBuffStart ? SetBuffStart - id : 0; }
-
 
 
         public static string GetNameByID(int id, string prefix = "", int stack = 1)
@@ -363,7 +367,7 @@ namespace FishShop
                 case TPHereAll: CmdHelper.TPHereAll(player); return;                    // 集合打团
                 case CelebrateAll: CmdHelper.CelebrateAll(player); return;              // 集体庆祝
 
-
+                // 最脏的块
                 case DirtiestBlock:
                     bool flag = shopItem.FindDirtest();
                     shopItem.MoveDirtest(flag);
@@ -372,6 +376,19 @@ namespace FishShop
                         player.SendSuccessMessage("臭臭仪式完成，[i:5400]最脏的块 已生成(σﾟ∀ﾟ)σ");
                     else
                         player.SendErrorMessage("糟糕，找遍整个世界都没有发现 [i:5400]最脏的块 o(´^｀)o");
+                    return;
+
+                // 灵犀飞鱼
+                case OneDamage:
+                    for (int i = 0; i < Main.npc.Length; i++)
+                    {
+                        NPC npc = Main.npc[i];
+                        if (npc != null && npc.active && npc.boss)
+                        {
+                            NPCHelper.AttackBoss(player, npc);
+                            TSPlayer.All.SendInfoMessage($"{player.Name} 购买了{shopItem.GetItemDesc()}，对boss造成了1点点伤害！");
+                        }
+                    }
                     return;
 
                 default: break;

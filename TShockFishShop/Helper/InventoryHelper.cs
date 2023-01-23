@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Terraria;
 using TShockAPI;
 
@@ -41,7 +42,7 @@ namespace FishShop
             int costMoney = shopItem.GetCostMoney(amount);
 
             // 建筑师购物价格打1折
-            if (player.Group.Name == "builder" || player.Group.Name == "architect")
+            if (IsBuilder(player))
             {
                 float discountMoney = costMoney * 0.1f;
                 costMoney = (int)Math.Ceiling(discountMoney);
@@ -66,7 +67,7 @@ namespace FishShop
                 if (itemNet.stack < 1)
                     continue;
 
-                itemData = shopItem.GetOneCostItem(costItems, itemNet.netID);
+                itemData = shopItem.PickCostItem(costItems, itemNet.netID);
                 if (itemData.id != 0)
                 {
                     if (itemNet.stack >= itemData.stack)
@@ -96,40 +97,50 @@ namespace FishShop
 
 
         #region 减扣物品
-        // 减扣物品
-        public static void DeductCost(TSPlayer player, ShopItem shopItem, int amount = 1)
+        /// <summary>
+        /// 减扣物品
+        /// </summary>
+        public static void DeductCost(TSPlayer player, ShopItem shopItem, int amount, out int costMoney, out int costFish)
         {
             // 取出要扣除的物品
             List<ItemData> costItems = shopItem.GetCostItem(amount);
 
             Item itemNet;
             ItemData itemData;
+            costFish = 0;
             for (int i = 0; i < NetItem.MaxInventory; i++)
             {
-                if (i >= NetItem.InventorySlots)
-                    break;
+                if (i >= NetItem.InventorySlots) break;
 
                 itemNet = player.TPlayer.inventory[i];
-                if (itemNet.stack < 1)
-                    continue;
+                if (itemNet.stack < 1) continue;
+                if (itemNet.IsACoin) continue;
 
-                if (itemNet.IsACoin)
-                    continue;
-
-                itemData = shopItem.GetOneCostItem(costItems, itemNet.netID);
+                itemData = shopItem.PickCostItem(costItems, itemNet.netID);
                 if (itemData.id != 0)
                 {
+                    // 记录鱼减扣
+                    bool IsFish = CostID.Fishes.Contains(itemNet.netID);
+                    int stack;
                     if (itemNet.stack >= itemData.stack)
                     {
-                        itemNet.stack -= itemData.stack;
+                        stack = itemData.stack;
+                        
+                        itemNet.stack -= stack;
                         costItems.Remove(itemData);
+                        
+                        if (IsFish) costFish += stack;
                     }
                     else
                     {
+                        stack = itemNet.stack;
+
+                        itemData.stack -= stack;
                         itemNet.stack = 0;
-                        itemData.stack -= itemNet.stack;
+                        
+                        if (IsFish) costFish += stack;
                     }
-                    utils.updatePlayerSlot(player, itemNet, i);
+                    utils.PlayerSlot(player, itemNet, i);
                 }
 
             }
@@ -139,9 +150,9 @@ namespace FishShop
             }
 
             // 扣钱
-            int costMoney = shopItem.GetCostMoney(amount);
+            costMoney = shopItem.GetCostMoney(amount);
             // 建筑师购物价格打1折
-            if (player.Group.Name == "builder" || player.Group.Name == "architect")
+            if (IsBuilder(player))
             {
                 float discountMoney = costMoney * 0.1f;
                 costMoney = (int)Math.Ceiling(discountMoney);
@@ -167,6 +178,11 @@ namespace FishShop
             // NetMessage.SendData(4, player.Index, -1, NetworkText.FromLiteral(player.Name), player.Index, 0f, 0f, 0f, 0);
             // // RemoveItemOwner
             // NetMessage.SendData(39, player.Index, -1, NetworkText.Empty, 400);
+        }
+
+        public static bool IsBuilder(TSPlayer op)
+        {
+            return op.Group.Name == "builder" || op.Group.Name == "architect";
         }
         #endregion
 
@@ -291,7 +307,7 @@ namespace FishShop
             // 刷新背包和储蓄罐
             for (int i = 0; i < indexs.Count; i++)
             {
-                utils.updatePlayerSlot(player, items[i], indexs[i]);
+                utils.PlayerSlot(player, items[i], indexs[i]);
             }
             return success;
         }

@@ -40,9 +40,9 @@ namespace FishShop
         }
         public static int GetShopItemIDByName(string _name)
         {
-            foreach (var k in shopItem.Keys)
+            foreach (var obj in shopItem)
             {
-                if (shopItem[k].name == _name) return shopItem[k].id;
+                if (obj.Value.name == _name) return obj.Key;
             }
             return 0;
         }

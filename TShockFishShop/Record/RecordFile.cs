@@ -4,24 +4,23 @@ using System.IO;
 
 namespace FishShop
 {
-    // œﬁπ∫≈‰÷√
-    public class ConfigLimit
+    // Ë¥≠‰π∞ËÆ∞ÂΩï
+    public class RecordFile
     {
-        public List<PlayerLimitData> player = new List<PlayerLimitData>();
-        public List<ServerLimitData> server = new List<ServerLimitData>();
+        public List<PlayerRecordData> player = new List<PlayerRecordData>();
 
-        public static ConfigLimit Load(string path)
+        public static RecordFile Load(string path)
         {
             if (File.Exists(path))
             {
-                return JsonConvert.DeserializeObject<ConfigLimit>(File.ReadAllText(path), new JsonSerializerSettings()
+                return JsonConvert.DeserializeObject<RecordFile>(File.ReadAllText(path), new JsonSerializerSettings()
                 {
                     Error = (sender, error) => error.ErrorContext.Handled = true
                 });
             }
             else
             {
-                var c = new ConfigLimit();
+                var c = new RecordFile();
                 File.WriteAllText(path, JsonConvert.SerializeObject(c, Formatting.Indented, new JsonSerializerSettings
                 {
                     DefaultValueHandling = DefaultValueHandling.Ignore

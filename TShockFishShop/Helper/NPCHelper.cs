@@ -66,7 +66,7 @@ namespace FishShop
         private static int GetNPCIDByName(string name)
         {
             var found = new List<int>();
-            NPC npc = new NPC();
+            NPC npc = new();
             string nameLower = name.ToLowerInvariant();
             for (int i = -17; i < Main.maxNPCTypes; i++)
             {
@@ -78,7 +78,7 @@ namespace FishShop
                     return npc.netID;
                 if (npc.FullName.ToLowerInvariant().StartsWith(nameLower) || npc.TypeName.ToLowerInvariant().StartsWith(nameLower)
                     || englishName?.StartsWith(nameLower) == true)
-                    found.Add((int)npc.netID);
+                    found.Add(npc.netID);
             }
             for (int i = -17; i < Main.maxNPCTypes; i++)
             {
@@ -90,7 +90,7 @@ namespace FishShop
                     return npc.netID;
                 if (npc.FullName.ToLowerInvariant().StartsWith(nameLower) || npc.TypeName.ToLowerInvariant().StartsWith(nameLower)
                     || englishName?.StartsWith(nameLower) == true)
-                    found.Add((int)npc.netID);
+                    found.Add(npc.netID);
             }
 
             if (found.Count >= 1)
@@ -104,7 +104,7 @@ namespace FishShop
         // NPC重生
         public static void ReliveNPC(TSPlayer op)
         {
-            List<int> found = new List<int>();
+            List<int> found = new();
 
             // 向导
             found.Add(22);
@@ -155,7 +155,7 @@ namespace FishShop
                 found.Add(656);
 
             // 怪物图鉴解锁情况
-            List<int> remains = new List<int>() {
+            List<int> remains = new() {
                 // 22, //向导
                 19, //军火商
                 54, //服装商
@@ -197,10 +197,10 @@ namespace FishShop
             }
 
             // 生成npc
-            List<string> names = new List<string>();
+            List<string> names = new();
             foreach (int npcID in found)
             {
-                NPC npc = new NPC();
+                NPC npc = new();
                 npc.SetDefaults(npcID);
                 TSPlayer.Server.SpawnNPC(npc.type, npc.FullName, 1, op.TileX, op.TileY, 5, 2);
 
@@ -238,7 +238,7 @@ namespace FishShop
         public static bool NeedBuyReliveNPC(TSPlayer op)
         {
 
-            List<int> found = new List<int>();
+            List<int> found = new();
 
             // 向导
             found.Add(22);
@@ -289,7 +289,7 @@ namespace FishShop
                 found.Add(656);
 
             // 怪物图鉴解锁情况
-            List<int> remains = new List<int>() {
+            List<int> remains = new() {
                 // 22, //向导
                 19, //军火商
                 54, //服装商
@@ -331,7 +331,7 @@ namespace FishShop
             }
 
 
-            if (found.Count ==0)
+            if (found.Count == 0)
             {
                 op.SendInfoMessage("入住过的NPC都活着，无需购买");
                 return false;
@@ -347,7 +347,9 @@ namespace FishShop
 
 
 
-        // 生成NPC
+        /// <summary>
+        /// 生成NPC
+        /// </summary>
         public static void SpawnNPC(TSPlayer op, int npcID, int times = 0)
         {
             string bossType = "";
@@ -396,7 +398,7 @@ namespace FishShop
             if (!string.IsNullOrEmpty(bossType))
             {
                 // 召唤boss
-                List<string> args = new List<string>() { bossType };
+                List<string> args = new() { bossType };
                 if (times > 0)
                     args.Add(times.ToString());
                 SpawnBossRaw(new CommandArgs("", op, args));
@@ -404,7 +406,7 @@ namespace FishShop
             else
             {
                 // 生成npc
-                NPC npc = new NPC();
+                NPC npc = new();
                 npc.SetDefaults(npcID);
 
                 bool pass = true;
@@ -421,7 +423,12 @@ namespace FishShop
             }
         }
 
-        // 清除NPC
+        /// <summary>
+        /// 清除NPC
+        /// </summary>
+        /// <param name="op"></param>
+        /// <param name="npcID"></param>
+        /// <param name="times"></param>
         public static void ClearNPC(TSPlayer op, int npcID, int times = 0)
         {
             List<NPC> npcs = TShock.Utils.GetNPCByIdOrName(npcID.ToString());
@@ -457,7 +464,10 @@ namespace FishShop
             return cleared;
         }
 
-        // SpawnBoss
+        /// <summary>
+        /// SpawnBoss
+        /// </summary>
+        /// <param name="args"></param>
         private static void SpawnBossRaw(CommandArgs args)
         {
             if (args.Parameters.Count < 1 || args.Parameters.Count > 2)
@@ -476,7 +486,7 @@ namespace FishShop
             string message = "{0} 召唤了 {1} {2} 次";
             string spawnName = "";
             int npcID = 0;
-            NPC npc = new NPC();
+            NPC npc = new();
             switch (args.Parameters[0].ToLower())
             {
                 case "*":
@@ -680,6 +690,41 @@ namespace FishShop
             TSPlayer.All.SendSuccessMessage(message, args.Player.Name, spawnName, amount);
         }
 
+        /// <summary>
+        /// 模拟玩家攻击boss
+        /// </summary>
+        /// <param name="op">玩家对象</param>
+        /// <param name="npc">boss的npc对象</param>
+        public static void AttackBoss(TSPlayer op, NPC npc)
+        {
+            // itemid projectileid
+            // 279 48
+            // 3197 520
+            Item item = new();
+            item.SetDefaults(3197);
+            Vector2 pos = new(npc.position.X + (float)(npc.width * 0.5), npc.position.Y + (float)(npc.height * 0.5));
+            Vector2 vel = new(20, 0);
+            int pIndex = Projectile.NewProjectile(op.TPlayer.GetProjectileSource_Item(item), pos, vel, 520, 1, 0f, op.Index);
+            Main.projectile[pIndex].ai[0] = 2f;
+            Main.projectile[pIndex].timeLeft = 10;
+            Main.projectile[pIndex].friendly = true;
+            //Main.projectile[pIndex].penetrate = 3;
+            //Main.projectile[pIndex].ranged = true;
+            //Main.projectile[pIndex].coldDamage = true;
+            NetMessage.SendData(27, -1, -1, null, pIndex);
+        }
 
+        /// <summary>
+        /// 是否有boss存在
+        /// </summary>
+        public static bool AnyBoss()
+        {
+            foreach (NPC npc in Main.npc)
+            {
+                if (npc != null && npc.active && npc.boss)
+                    return true;
+            }
+            return false;
+        }
     }
 }

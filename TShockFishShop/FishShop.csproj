@@ -18,7 +18,7 @@
       Also, be sure to release on github with the exact assembly version tag as below
       so that the update manager works correctly (via the Github releases api and mimic)
     -->
-    <Version>1.4.3</Version>
+    <Version>1.4.4</Version>
     <AssemblyTitle>FishShop</AssemblyTitle>
     <Company></Company>
     <Product>FishShop</Product>
@@ -29,16 +29,17 @@
     <Authors>hufang360</Authors>
     <Description>指令商店，支持使用金币和物品来购买 物品、召唤boss、生成NPC、获得buff、调时间 等。</Description>
     <PackageId>FishShop</PackageId>
-    <AssemblyName>FishShop</AssemblyName> <!-- package name for nuget -->
+    <AssemblyName>FishShop</AssemblyName>
+    <ProduceReferenceAssembly>False</ProduceReferenceAssembly> <!-- package name for nuget -->
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <NoWarn>1701;1702;1591</NoWarn>
+    <NoWarn>1701;1702;1591;</NoWarn>
     <DebugType>none</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <NoWarn>1701;1702;1591</NoWarn>
+    <NoWarn>1701;1702;1591;</NoWarn>
     <DebugType>none</DebugType>
   </PropertyGroup>
 

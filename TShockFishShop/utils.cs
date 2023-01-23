@@ -25,6 +25,15 @@ namespace FishShop
         // {
         //     return GetItemDesc(item.name, item.id, item.stack, item.prefix);
         // }
+
+        /// <summary>
+        /// 获得物品描述
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="stack"></param>
+        /// <param name="prefix"></param>
+        /// <param name="shopItem"></param>
+        /// <returns></returns>
         public static string GetItemDesc(int id = 0, int stack = 1, string prefix = "", ShopItem shopItem = null)
         {
             if (id == 0)
@@ -41,7 +50,7 @@ namespace FishShop
             // <-24 为本插件自定义id
             if (id < -24)
             {
-                s = IDSet.GetNameByID(id, prefix);
+                s = IDSet.GetNameByID(id, prefix, stack);
             }
             else
             {
@@ -108,7 +117,11 @@ namespace FishShop
 
             return msg;
         }
-        // 数字补零
+        /// <summary>
+        /// 数字补零
+        /// </summary>
+        /// <param name="num"></param>
+        /// <returns></returns>
         public static string AlignZero(int num)
         {
             if (num < 10) return $"00{num}";
@@ -221,10 +234,11 @@ namespace FishShop
         #endregion
 
 
-        public static void updatePlayerSlot(TSPlayer player, Item item, int slotIndex)
+        public static void PlayerSlot(TSPlayer player, Item item, int slotIndex)
         {
-            NetMessage.SendData((int)PacketTypes.PlayerSlot, -1, -1, NetworkText.FromLiteral(item.Name), player.Index, slotIndex, (float)item.prefix);
-            NetMessage.SendData((int)PacketTypes.PlayerSlot, player.Index, -1, NetworkText.FromLiteral(item.Name), player.Index, slotIndex, (float)item.prefix);
+            NetMessage.SendData((int)PacketTypes.PlayerSlot, -1, -1, null, player.Index, slotIndex);
+            NetMessage.SendData((int)PacketTypes.PlayerSlot, player.Index, -1, null, player.Index, slotIndex);
+            //NetMessage.SendData((int)PacketTypes.PlayerSlot, player.Index, -1, NetworkText.FromLiteral(item.Name), player.Index, slotIndex, (float)item.prefix);
         }
 
         public static int GetUnixTimestamp
