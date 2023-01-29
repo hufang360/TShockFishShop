@@ -50,7 +50,8 @@ namespace FishShop
         public const int downedBoss1 = -2004;       // 克苏鲁之眼
         public const int downedDeerclops = -2668;   // 鹿角怪
         
-        public const int downedBoss2 = -2013;       // 世界吞噬者 13  克苏鲁之脑 266
+        public const int downedBoss2 = -2013;       // 世界吞噬者 13
+        public const int downedBoss2Brain = -2266;       // 克苏鲁之脑 266
         public const int downedQueenBee = -2222;    // 蜂王
         public const int downedBoss3 = -2035;       // 骷髅王
         
