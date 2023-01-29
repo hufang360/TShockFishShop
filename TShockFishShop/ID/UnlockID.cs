@@ -197,7 +197,12 @@ namespace FishShop
 
                 case downedBoss2:
                     if (!NPC.downedBoss2)
-                        s = "未击败 世界吞噬怪/克苏鲁之脑";
+                        s = "未击败 世界吞噬怪";
+                    break;
+
+                case downedBoss2Brain:
+                    if (!NPC.downedBoss2)
+                        s = "未击败 克苏鲁之脑";
                     break;
 
                 case downedQueenBee:
