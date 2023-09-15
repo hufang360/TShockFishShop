@@ -401,7 +401,6 @@ namespace FishShop
                 case FishQuestCompleted: if (player.RealPlayer && player.TPlayer.anglerQuestsFinished < data.stack) s = $"需要 完成{data.stack}次渔夫任务"; break;
                 case HpUnder400: if (player.RealPlayer && player.TPlayer.statLifeMax >= 400) s = "生命值 超过了400"; break;
 
-
                 default:
                     break;
             }
