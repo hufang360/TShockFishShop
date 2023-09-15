@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
@@ -10,7 +10,7 @@ namespace FishShop
     public class InventoryHelper
     {
         // 获取余额
-        public static int GetCoinsCount(TSPlayer player)
+        public static long GetCoinsCount(TSPlayer player)
         {
             bool overFlowing;
             long num = Terraria.Utils.CoinsCount(out overFlowing, player.TPlayer.inventory, 58, 57, 56, 55, 54);
@@ -18,7 +18,7 @@ namespace FishShop
             long num3 = Terraria.Utils.CoinsCount(out overFlowing, player.TPlayer.bank2.item);
             long num4 = Terraria.Utils.CoinsCount(out overFlowing, player.TPlayer.bank3.item);
             long num5 = Terraria.Utils.CoinsCount(out overFlowing, player.TPlayer.bank4.item);
-            int total = ((int)Terraria.Utils.CoinsCombineStacks(out overFlowing, num, num2, num3, num4, num5));
+            long total = ((int)Terraria.Utils.CoinsCombineStacks(out overFlowing, num, num2, num3, num4, num5));
 
             return total;
         }
@@ -26,20 +26,20 @@ namespace FishShop
         // 余额描述
         public static string GetCoinsCountDesc(TSPlayer player, bool tagStyle = true)
         {
-            int total = GetCoinsCount(player);
+            long total = GetCoinsCount(player);
             return utils.GetMoneyDesc(total, tagStyle);
         }
 
         #region 检查钱是否足够
-        public static bool CheckCost(TSPlayer player, ShopItem shopItem, int amount, out string msg)
+        public static bool CheckCost(TSPlayer player, ShopItemData shopItemData, int amount, out string msg)
         {
             // 取出要扣除的物品id
-            List<ItemData> costItems = shopItem.GetCostItem(amount);
+            List<ItemData> costItems = shopItemData.GetCostItem(amount);
 
             msg = "";
 
             // 计算金钱
-            int costMoney = shopItem.GetCostMoney(amount);
+            int costMoney = shopItemData.GetCostMoney(amount);
 
             // 建筑师购物价格打1折
             if (IsBuilder(player))
@@ -67,7 +67,7 @@ namespace FishShop
                 if (itemNet.stack < 1)
                     continue;
 
-                itemData = shopItem.PickCostItem(costItems, itemNet.netID);
+                itemData = shopItemData.PickCostItem(costItems, itemNet.netID);
                 if (itemData.id != 0)
                 {
                     if (itemNet.stack >= itemData.stack)
@@ -96,14 +96,26 @@ namespace FishShop
         #endregion
 
 
+        /// <summary>
+        /// 退钱
+        /// </summary>
+        public static void Refund(TSPlayer op, long price)
+        {
+            utils.GetMoneyStack(price, out int stack1, out int stack2, out int stack3, out int stack4);
+            if (stack1 > 0) op.GiveItem(71, stack1);
+            if (stack2 > 0) op.GiveItem(72, stack2);
+            if (stack3 > 0) op.GiveItem(73, stack3);
+            if (stack4 > 0) op.GiveItem(74, stack4);
+        }
+
         #region 减扣物品
         /// <summary>
         /// 减扣物品
         /// </summary>
-        public static void DeductCost(TSPlayer player, ShopItem shopItem, int amount, out int costMoney, out int costFish)
+        public static void DeductCost(TSPlayer player, ShopItemData shopItemData, int amount, out int costMoney, out int costFish)
         {
             // 取出要扣除的物品
-            List<ItemData> costItems = shopItem.GetCostItem(amount);
+            List<ItemData> costItems = shopItemData.GetCostItem(amount);
 
             Item itemNet;
             ItemData itemData;
@@ -116,7 +128,7 @@ namespace FishShop
                 if (itemNet.stack < 1) continue;
                 if (itemNet.IsACoin) continue;
 
-                itemData = shopItem.PickCostItem(costItems, itemNet.netID);
+                itemData = shopItemData.PickCostItem(costItems, itemNet.netID);
                 if (itemData.id != 0)
                 {
                     // 记录鱼减扣
@@ -125,10 +137,10 @@ namespace FishShop
                     if (itemNet.stack >= itemData.stack)
                     {
                         stack = itemData.stack;
-                        
+
                         itemNet.stack -= stack;
                         costItems.Remove(itemData);
-                        
+
                         if (IsFish) costFish += stack;
                     }
                     else
@@ -137,7 +149,7 @@ namespace FishShop
 
                         itemData.stack -= stack;
                         itemNet.stack = 0;
-                        
+
                         if (IsFish) costFish += stack;
                     }
                     utils.PlayerSlot(player, itemNet, i);
@@ -150,7 +162,7 @@ namespace FishShop
             }
 
             // 扣钱
-            costMoney = shopItem.GetCostMoney(amount);
+            costMoney = shopItemData.GetCostMoney(amount);
             // 建筑师购物价格打1折
             if (IsBuilder(player))
             {
@@ -165,7 +177,7 @@ namespace FishShop
             }
 
             // 执行指令
-            List<string> cmds = shopItem.GetCostCMD();
+            List<string> cmds = shopItemData.GetCostCMD();
             for (int i = 0; i < amount; i++)
             {
                 foreach (string cmd in cmds)
@@ -187,15 +199,15 @@ namespace FishShop
         #endregion
 
         #region 减扣金币
-        private static bool DeductMoney(TSPlayer player, int price)
+        public static bool DeductMoney(TSPlayer player, int price)
         {
 
             int b1 = 0;
             int b2 = 0;
             int b3 = 0;
             int b4 = 0;
-            List<Item> items = new List<Item>();
-            List<int> indexs = new List<int>();
+            List<Item> items = new();
+            List<int> indexs = new();
 
             // 找出当前货币的格子索引
             void record(Item _item, int _index)
@@ -248,8 +260,8 @@ namespace FishShop
             b2 = 0;
             b3 = 0;
             b4 = 0;
-            List<Item> items2 = new List<Item>();
-            List<int> indexs2 = new List<int>();
+            List<Item> items2 = new();
+            List<int> indexs2 = new();
 
             void record2(Item _item, int _index)
             {

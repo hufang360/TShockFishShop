@@ -1,7 +1,8 @@
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.GameContent.Events;
+using Terraria.ID;
 using TShockAPI;
 
 
@@ -91,7 +92,8 @@ namespace FishShop
         public const int downedBoss1 = -2004;       // 克苏鲁之眼
         public const int downedDeerclops = -2668;   // 鹿角怪
 
-        public const int downedBoss2 = -2013;       // 世界吞噬者 13  克苏鲁之脑 266
+        public const int downedBoss2 = -2013;       // 世界吞噬者 13
+        public const int downedBoss2Brain = -2266;       // 克苏鲁之脑 266
         public const int downedQueenBee = -2222;    // 蜂王
         public const int downedBoss3 = -2035;       // 骷髅王
 
@@ -303,7 +305,8 @@ namespace FishShop
             {
                 case downedSlimeKing: if (!NPC.downedSlimeKing) s = "未击败 史莱姆王"; break;
                 case downedBoss1: if (!NPC.downedBoss1) s = "未击败 克苏鲁之眼"; break;
-                case downedBoss2: if (!NPC.downedBoss2) s = "未击败 世界吞噬怪/克苏鲁之脑"; break;
+                case downedBoss2: if (!NPC.downedBoss2) s = "未击败 世界吞噬怪"; break;
+                case downedBoss2Brain: if (!NPC.downedBoss2) s = "未击败 克苏鲁之脑"; break;
                 case downedBoss3: if (!NPC.downedBoss3) s = "未击败 骷髅王"; break;
                 case downedDeerclops: if (!NPC.downedDeerclops) s = "未击败 鹿角怪"; break;
                 case downedQueenBee: if (!NPC.downedQueenBee) s = "未击败 蜂王"; break;
@@ -410,7 +413,7 @@ namespace FishShop
                 passed = NPCHelper.CheckNPCActive(npcID.ToString());
                 if (!passed)
                 {
-                    if (npcID < Main.maxNPCTypes)
+                    if (npcID < NPCID.Count)
                         s = $"{TShock.Utils.GetNPCById(npcID).FullName} 不在场";
                     else
                         s = $"找不到id为 {npcID} 的NPC";

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
@@ -54,21 +54,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="ModFramework">
-      <HintPath>..\..\@lib\1.4.4.5\ModFramework.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\@lib\1.4.4.5\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="OTAPI">
-      <HintPath>..\..\@lib\1.4.4.5\OTAPI.dll</HintPath>
-    </Reference>
-    <Reference Include="TerrariaServer">
-      <HintPath>..\..\@lib\1.4.4.5\TerrariaServer.dll</HintPath>
-    </Reference>
-    <Reference Include="TShockAPI">
-      <HintPath>..\..\@lib\1.4.4.5\TShockAPI.dll</HintPath>
-    </Reference>
+    <PackageReference Include="TShock" Version="5.1.3" />
   </ItemGroup>
 
 </Project>

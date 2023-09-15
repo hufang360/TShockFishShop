@@ -1,6 +1,6 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
-namespace FishShop
+namespace FishShop.Record
 {
     public class RecordData
     {
@@ -9,12 +9,12 @@ namespace FishShop
         /// </summary>
         [DefaultValue("")]
         public string name = "";
-        
+
         /// <summary>
         /// 商品id
         /// </summary>
         public int id = 0;
-        
+
         /// <summary>
         /// 购买次数
         /// </summary>
@@ -34,4 +34,5 @@ namespace FishShop
             count += num;
         }
     }
+
 }

@@ -1,9 +1,9 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 
-namespace FishShop
+namespace FishShop.Record
 {
-    public class PlayerRecordData
+    public class RecordPlayerData
     {
         /// <summary>
         /// 玩家名
@@ -26,7 +26,7 @@ namespace FishShop
         /// </summary>
         public List<RecordData> datas = new List<RecordData>();
 
-        public PlayerRecordData(string plrName)
+        public RecordPlayerData(string plrName)
         {
             name = plrName;
         }

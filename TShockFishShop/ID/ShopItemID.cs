@@ -1,3 +1,4 @@
+﻿using FishShop.Shop;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
@@ -86,7 +87,8 @@ namespace FishShop
         public const int OverworldDayStart = -188;      // 风和日丽
 
         public const int DirtiestBlock = -189;          // 臭臭仪式
-        public const int OneDamage = -190;              // 灵犀一指
+        public const int OneDamage = -190;              // 灵犀一指（无效）
+        public const int Forge = -191;              // 十连敲
 
 
         // ------------------------------------------------------------------------------------------
@@ -232,46 +234,10 @@ namespace FishShop
             return 0;
         }
 
-        // 检查是否需要购买
-        public static bool CanBuy(TSPlayer op, ShopItem shopItem, int amount = 1)
-        {
-            int id = shopItem.id;
-            if (id >= -24) return true;
-            switch (id)
-            {
-                case Moonphase1:
-                case Moonphase2:
-                case Moonphase3:
-                case Moonphase4:
-                case Moonphase5:
-                case Moonphase6:
-                case Moonphase7:
-                case Moonphase8:
-                case MoonphaseNext: return FishHelper.NeedBuyChangeMoonPhase(op, id, amount);
+        
 
 
-                case InvasionGoblins:
-                case InvasionSnowmen:
-                case InvasionPirates:
-                case InvasionPumpkinmoon:
-                case InvasionFrostmoon:
-                case InvasionMartians: return CmdHelper.NeedBuyStartInvasion(op);
-
-                case InvasionStop: return CmdHelper.NeedBuyStopInvasion(op);
-                case ReliveNPC: return NPCHelper.NeedBuyReliveNPC(op);
-
-                case BloodMoonStart: if (Main.bloodMoon) { op.SendInfoMessage("正处在血月，无需购买"); return false; } break;
-                case BloodMoonStop: if (!Main.bloodMoon) { op.SendInfoMessage("没发生血月，无需购买"); return false; } break;
-
-                case RainingStart: if (Main.raining) { op.SendInfoMessage("正在下雨，无需购买"); return false; }; break;
-                case RainingStop: if (!Main.raining) { op.SendInfoMessage("没在下雨，无需购买"); return false; }; break;
-            }
-
-            return true;
-        }
-
-
-        public static void ProvideGoods(TSPlayer player, ShopItem shopItem, int amount = 1)
+        public static void ProvideGoods(TSPlayer player, ShopItemData shopItem, int amount = 1)
         {
             int id = shopItem.id;
             // 自定义物品
@@ -369,13 +335,13 @@ namespace FishShop
 
                 // 最脏的块
                 case DirtiestBlock:
-                    bool flag = shopItem.FindDirtest();
-                    shopItem.MoveDirtest(flag);
-                    TSPlayer.All.SendInfoMessage($"{player.Name} 正在举行 [i:5395]臭臭仪式[i:5395]");
-                    if (flag)
-                        player.SendSuccessMessage("臭臭仪式完成，[i:5400]最脏的块 已生成(σﾟ∀ﾟ)σ");
-                    else
-                        player.SendErrorMessage("糟糕，找遍整个世界都没有发现 [i:5400]最脏的块 o(´^｀)o");
+                    //bool flag = shopItem.FindDirtest();
+                    //shopItem.MoveDirtest(flag);
+                    //TSPlayer.All.SendInfoMessage($"{player.Name} 正在举行 [i:5395]臭臭仪式[i:5395]");
+                    //if (flag)
+                    //    player.SendSuccessMessage("臭臭仪式完成，[i:5400]最脏的块 已生成(σﾟ∀ﾟ)σ");
+                    //else
+                    //    player.SendErrorMessage("糟糕，找遍整个世界都没有发现 [i:5400]最脏的块 o(´^｀)o");
                     return;
 
                 // 灵犀飞鱼

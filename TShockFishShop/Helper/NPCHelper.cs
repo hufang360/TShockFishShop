@@ -1,8 +1,9 @@
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
 using Terraria.GameContent.Bestiary;
+using Terraria.ID;
 using TShockAPI;
 using TShockAPI.Localization;
 
@@ -57,7 +58,7 @@ namespace FishShop
 
         private static string GetNPCNameValue(int id)
         {
-            if (id < Main.maxNPCTypes && id != 0)
+            if (id < NPCID.Count && id != 0)
                 return Lang.GetNPCNameValue(id);
             return "";
         }
@@ -68,7 +69,7 @@ namespace FishShop
             var found = new List<int>();
             NPC npc = new();
             string nameLower = name.ToLowerInvariant();
-            for (int i = -17; i < Main.maxNPCTypes; i++)
+            for (int i = -17; i < NPCID.Count; i++)
             {
                 string englishName = EnglishLanguage.GetNpcNameById(i).ToLowerInvariant();
 
@@ -80,7 +81,7 @@ namespace FishShop
                     || englishName?.StartsWith(nameLower) == true)
                     found.Add(npc.netID);
             }
-            for (int i = -17; i < Main.maxNPCTypes; i++)
+            for (int i = -17; i < NPCID.Count; i++)
             {
                 string englishName = Lang.GetNPCNameValue(i);
 
@@ -344,6 +345,25 @@ namespace FishShop
             return Main.BestiaryDB.FindEntryByNPCID(npcId).UIInfoProvider.GetEntryUICollectionInfo().UnlockState > BestiaryEntryUnlockState.NotKnownAtAll_0;
         }
 
+
+
+        /// <summary>
+        /// 找出附近的指定NPC
+        /// </summary>
+        /// <returns>未找到返回null</returns>
+        public static NPC FindNearNPC(TSPlayer op, int npcID)
+        {
+            Rectangle rect = new(op.TileX - 59, op.TileY - 35 + 3, 120, 68);
+            foreach (var npc in Main.npc.Where(npc => npc != null && npc.active && npc.netID == npcID))
+            {
+                Point pos = new((int)(npc.position.X / 16), (int)(npc.position.Y / 16));
+                if (rect.Contains(pos))
+                {
+                    return npc;
+                }
+            }
+            return null;
+        }
 
 
 
