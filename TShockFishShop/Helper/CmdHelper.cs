@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Terraria;
 using Terraria.GameContent.Events;
 using Terraria.ID;

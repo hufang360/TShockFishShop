@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
@@ -18,7 +18,7 @@
       Also, be sure to release on github with the exact assembly version tag as below
       so that the update manager works correctly (via the Github releases api and mimic)
     -->
-    <Version>1.4.3</Version>
+    <Version>1.4.4</Version>
     <AssemblyTitle>FishShop</AssemblyTitle>
     <Company></Company>
     <Product>FishShop</Product>
@@ -29,16 +29,17 @@
     <Authors>hufang360</Authors>
     <Description>指令商店，支持使用金币和物品来购买 物品、召唤boss、生成NPC、获得buff、调时间 等。</Description>
     <PackageId>FishShop</PackageId>
-    <AssemblyName>FishShop</AssemblyName> <!-- package name for nuget -->
+    <AssemblyName>FishShop</AssemblyName>
+    <ProduceReferenceAssembly>False</ProduceReferenceAssembly> <!-- package name for nuget -->
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <NoWarn>1701;1702;1591</NoWarn>
+    <NoWarn>1701;1702;1591;</NoWarn>
     <DebugType>none</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <NoWarn>1701;1702;1591</NoWarn>
+    <NoWarn>1701;1702;1591;</NoWarn>
     <DebugType>none</DebugType>
   </PropertyGroup>
 
@@ -53,21 +54,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="ModFramework">
-      <HintPath>..\..\@lib\1.4.4.5\ModFramework.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\@lib\1.4.4.5\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="OTAPI">
-      <HintPath>..\..\@lib\1.4.4.5\OTAPI.dll</HintPath>
-    </Reference>
-    <Reference Include="TerrariaServer">
-      <HintPath>..\..\@lib\1.4.4.5\TerrariaServer.dll</HintPath>
-    </Reference>
-    <Reference Include="TShockAPI">
-      <HintPath>..\..\@lib\1.4.4.5\TShockAPI.dll</HintPath>
-    </Reference>
+    <PackageReference Include="TShock" Version="5.1.3" />
   </ItemGroup>
 
 </Project>
