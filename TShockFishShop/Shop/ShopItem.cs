@@ -146,6 +146,7 @@ public class ShopItem
     /// </summary>
     virtual public void ProvideGoods()
     {
+        ShopItemID.ProvideGoods(op, shopItemData, amount);
     }
 
 
