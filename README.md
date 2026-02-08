@@ -5,7 +5,7 @@
 下载地址：
 | 文件名  | 适用版本  |
 |---|---|
-| [FishShop-v1.4.3.dll](https://gitee.com/hufang360/TShockFishShop/releases/download/v1.4.3/FishShop-v1.4.3.dll)  | TShock5.0beta - Terraria1.4.4.x  |
+| [FishShop-v1.4.3.1.dll](https://github.com/hufang360/TShockFishShop/releases/download/v1.4.3/FishShop-v1.4.3.1.dll)  | TShock5.0beta - Terraria1.4.4.x  |
 * Terraria 1.4.3.x 请下载 1.4.2及之前的版本
 
 
