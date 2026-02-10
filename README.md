@@ -2,11 +2,7 @@
 
 鱼店是一个指令商店，除出售物品外，还出售 召唤boss、召唤入侵、生成NPC、获得buff、调时间 等自定义商品。支持配置购买条件 和 支付条件。
 
-下载地址：
-| 文件名  | 适用版本  |
-|---|---|
-| [FishShop-v1.4.3.1.dll](https://github.com/hufang360/TShockFishShop/releases/download/v1.4.3/FishShop-v1.4.3.1.dll)  | TShock5.0beta - Terraria1.4.4.x  |
-* Terraria 1.4.3.x 请下载 1.4.2及之前的版本
+下载地址：[FishShop-v1.5-1453-special.dll](https://github.com/hufang360/TShockFishShop/releases/download/v1.5/FishShop-v1.5-1453-special.dll)
 
 
 <br>
