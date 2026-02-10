@@ -18,7 +18,7 @@
       Also, be sure to release on github with the exact assembly version tag as below
       so that the update manager works correctly (via the Github releases api and mimic)
     -->
-    <Version>1.5 beta</Version>
+    <Version>1.5-beta</Version>
     <AssemblyTitle>FishShop</AssemblyTitle>
     <Company></Company>
     <Product>FishShop</Product>
