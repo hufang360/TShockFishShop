@@ -102,7 +102,8 @@ public class Prefix
             if (num <= 84 && num > 0)
             {
                 return num;
-            }else
+            }
+            else
             {
                 return 0;
             }
@@ -133,7 +134,7 @@ public class Prefix
 
     public static bool CanHavePrefixes(Item item)
     {
-        if (item.type != 0 && item.maxStack == 1)
+        if (item.type != 0)
         {
             if (item.damage <= 0)
             {

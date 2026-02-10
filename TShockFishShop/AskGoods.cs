@@ -62,7 +62,7 @@ public partial class Plugin
                 utils.Log(matchedItems.Count.ToString());
                 foreach (Item item in matchedItems)
                 {
-                    goods.AddRange(FindGoods(item.netID));
+                    goods.AddRange(FindGoods(item.type));
                 }
             }
         }

@@ -67,7 +67,7 @@ namespace FishShop
                 if (itemNet.stack < 1)
                     continue;
 
-                itemData = shopItemData.PickCostItem(costItems, itemNet.netID);
+                itemData = shopItemData.PickCostItem(costItems, itemNet.type);
                 if (itemData.id != 0)
                 {
                     if (itemNet.stack >= itemData.stack)
@@ -128,11 +128,11 @@ namespace FishShop
                 if (itemNet.stack < 1) continue;
                 if (itemNet.IsACoin) continue;
 
-                itemData = shopItemData.PickCostItem(costItems, itemNet.netID);
+                itemData = shopItemData.PickCostItem(costItems, itemNet.type);
                 if (itemData.id != 0)
                 {
                     // 记录鱼减扣
-                    bool IsFish = CostID.Fishes.Contains(itemNet.netID);
+                    bool IsFish = CostID.Fishes.Contains(itemNet.type);
                     int stack;
                     if (itemNet.stack >= itemData.stack)
                     {

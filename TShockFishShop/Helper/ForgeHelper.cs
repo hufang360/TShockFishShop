@@ -19,7 +19,7 @@ public class ForgeHelper
 
         List<string> msgs = new();
         Item forgeItem = args.Player.TPlayer.inventory[0];
-        int id = forgeItem.netID;
+        int id = forgeItem.type;
         if (id == 0)
         {
             msgs.Add("需将要重铸的物品，放在背包的第1格！");

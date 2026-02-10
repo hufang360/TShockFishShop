@@ -56,7 +56,7 @@ namespace FishShop
 
                 } else {
                     // 有可能搜到2个或更多的物品，这里简单处理，取搜索到的一个
-                    itemID = found[0].netID;
+                    itemID = found[0].type;
                 }
             }
 

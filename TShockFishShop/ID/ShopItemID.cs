@@ -229,12 +229,12 @@ namespace FishShop
         private static int GetItemIDByName(string name)
         {
             List<Item> items = TShock.Utils.GetItemByName(name);
-            if (items.Count > 0) return items[0].netID;
+            if (items.Count > 0) return items[0].type;
 
             return 0;
         }
 
-        
+
 
 
         public static void ProvideGoods(TSPlayer player, ShopItemData shopItem, int amount = 1)

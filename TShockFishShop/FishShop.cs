@@ -111,7 +111,15 @@ public partial class Plugin : TerrariaPlugin
             case "rank": case "消费榜": Records.ShowRank(args); break;    // 消费榜
             case "basket": case "鱼篓榜": Records.ShowBasket(args); break;    // 鱼篓榜（用鱼消费的排行）
 
-            case "forge": ForgeHelper.Manage(args); break; // 10连敲
+            // 10连敲
+            case "forge":
+                if (!op.HasPermission(Permissions.Special))
+                {
+                    op.SendErrorMessage("你无权执行该指令！");
+                    break;
+                }
+                ForgeHelper.Manage(args);
+                break;
 
             #region admin command
             // 修改钓鱼次数
