@@ -1,4 +1,5 @@
 ﻿using FishShop.Record;
+using FishShop.Shop;
 using System;
 using System.IO;
 using System.Reflection;
@@ -266,7 +267,7 @@ public partial class Plugin : TerrariaPlugin
                 if (!op.HasPermission(Permissions.Special))
                     op.SendErrorMessage("你无权执行此指令！");
                 else
-                    NPCHelper.ReliveNPC(op);
+                    ReliveNPCItem.ReliveNPC(op);
                 break;
 
             case "tpall":

@@ -1,25 +1,20 @@
-﻿using FishShop.Record;
+﻿using System.Linq;
+using FishShop.Record;
 using Terraria;
 using TShockAPI;
 
 namespace FishShop.Shop;
 
-public class ShopItem
+public class ShopItem(ShopItemData si)
 {
     /// <summary>
     /// 数据项
     /// </summary>
-    protected readonly ShopItemData shopItemData;
+    protected readonly ShopItemData shopItemData = si;
 
     public TSPlayer op;
     public int amount = 1;
     public string extra = "";
-
-
-    public ShopItem(ShopItemData si)
-    {
-        shopItemData = si;
-    }
 
     /// <summary>
     /// 能否购买
@@ -146,9 +141,138 @@ public class ShopItem
     /// </summary>
     virtual public void ProvideGoods()
     {
-        ShopItemID.ProvideGoods(op, shopItemData, amount);
-    }
+        int id = shopItemData.id;
+        // 自定义物品
+        switch (id)
+        {
+            // 月相
+            case ShopItemID.Moonphase1:
+            case ShopItemID.Moonphase2:
+            case ShopItemID.Moonphase3:
+            case ShopItemID.Moonphase4:
+            case ShopItemID.Moonphase5:
+            case ShopItemID.Moonphase6:
+            case ShopItemID.Moonphase7:
+            case ShopItemID.Moonphase8:
+            case ShopItemID.MoonphaseNext: FishHelper.ChangeMoonPhaseByID(op, id, amount); return;
 
+            case ShopItemID.Firework: CmdHelper.Firework(op); return;
+            case ShopItemID.FireworkRocket: CmdHelper.FireworkRocket(op); return;
+            case ShopItemID.AnglerQuestSwap: FishHelper.AnglerQuestSwap(op); return;
+
+            // 白天 中午 晚上 午夜
+            case ShopItemID.TimeToDay: CmdHelper.SwitchTime(op, "day"); return;
+            case ShopItemID.TimeToNoon: CmdHelper.SwitchTime(op, "noon"); return;
+            case ShopItemID.TimeToNight: CmdHelper.SwitchTime(op, "night"); return;
+            case ShopItemID.TimeToMidNight: CmdHelper.SwitchTime(op, "midnight"); return;
+
+            // =====
+            // buff 类
+            // ====
+            // 好运来、打神鞭、逮虾户、黄金矿工、钓鱼佬、兴奋剂
+            case ShopItemID.BuffGoodLucky:
+            case ShopItemID.BuffWhipPlayer:
+            case ShopItemID.BuffFaster:
+            case ShopItemID.BuffMining:
+            case ShopItemID.BuffFishing:
+            case ShopItemID.BuffIncitant:
+            case ShopItemID.Buff:
+                BuffHelper.BuffCommon(op, shopItemData.GetBuff(), shopItemData.GetBuffSecond(), amount);
+                return;
+
+
+            // 雨来、雨停
+            case ShopItemID.RainingStart: CmdHelper.ToggleRaining(op, true); return;
+            case ShopItemID.RainingStop: CmdHelper.ToggleRaining(op, false); return;
+
+            // 血月
+            case ShopItemID.BloodMoonStart: CmdHelper.ToggleBloodMoon(op, true); return;
+            case ShopItemID.BloodMoonStop: CmdHelper.ToggleBloodMoon(op, false); return;
+
+
+            // 雨、史莱姆雨、 沙尘暴、大风天、雷雨、血月、日食、派对、陨石、流星雨、灯笼夜
+            case ShopItemID.ToggleRain: CmdHelper.ToggleRaining(op, true, true); return;
+            case ShopItemID.ToggleSlimeRain: CmdHelper.ToggleSlimeRain(op, true, true); return;
+            case ShopItemID.ToggleSandStorm: CmdHelper.ToggleSandstorm(op, true, true); return;
+            case ShopItemID.ToggleWindyDay: CmdHelper.ToggleWindyDay(op, true, true); return;
+            case ShopItemID.ToggleStorming: CmdHelper.ToggleStorming(op, true, true); return;
+
+
+            case ShopItemID.ToggleBloodMoon: CmdHelper.ToggleBloodMoon(op, true, true); return;
+            case ShopItemID.ToggleEclipse: CmdHelper.ToggleEclipse(op, true, true); return;
+
+
+            case ShopItemID.ToggleParty: CmdHelper.ToggleParty(op, true, true); return;
+            case ShopItemID.TriggerDropMeteor: CmdHelper.DropMeteor(op); return;
+            case ShopItemID.StarfallStart: CmdHelper.Starfall(op); return;
+            case ShopItemID.LanternsNightStart: CmdHelper.LanternsNightStart(op); return;
+
+            case ShopItemID.OverworldDayStart: CmdHelper.OverworldDay(op); return;
+
+
+            // 入侵
+            case ShopItemID.InvasionStop: CmdHelper.StopInvasion(op); return;
+            case ShopItemID.InvasionGoblins:
+            case ShopItemID.InvasionSnowmen:
+            case ShopItemID.InvasionPirates:
+            case ShopItemID.InvasionPumpkinmoon:
+            case ShopItemID.InvasionFrostmoon:
+            case ShopItemID.InvasionMartians: CmdHelper.StartInvasion(op, id); return;
+
+            // 执行指令
+            case ShopItemID.RawCmd:
+                if (shopItemData.cmds.Count > 0)
+                {
+                    foreach (string cmd in shopItemData.cmds)
+                    {
+                        CmdHelper.ExecuteRawCmd(op, cmd);
+                    }
+                }
+                else if (!string.IsNullOrEmpty(shopItemData.prefix)) CmdHelper.ExecuteRawCmd(op, shopItemData.prefix);
+                return;
+
+            case ShopItemID.TPHereAll: CmdHelper.TPHereAll(op); return;                    // 集合打团
+            case ShopItemID.CelebrateAll: CmdHelper.CelebrateAll(op); return;              // 集体庆祝
+
+            default: break;
+        }
+
+        // 召唤NPC类
+        int id2 = ShopItemID.GetRealSpawnID(id);
+        if (id2 != 0)
+        {
+            NPCHelper.SpawnNPC(op, id2, amount);
+            return;
+        }
+
+        // 清除NPC类
+        id2 = ShopItemID.GetRealClearNPCID(id);
+        if (id2 != 0)
+        {
+            NPCHelper.ClearNPC(op, id2, amount);
+            return;
+        }
+
+        // 获得buff类
+        id2 = ShopItemID.GetRealBuffID(id);
+        if (id2 != 0)
+        {
+            BuffHelper.SetPlayerBuff(op, id2, shopItemData.stack * amount);
+            return;
+        }
+
+        // 玩家自定义商品
+        // 指令清单 和 buff 清单
+        if (id <= -600 && id >= -999)
+        {
+            foreach (string s in shopItemData.GetCMD().Where(s => !string.IsNullOrEmpty(s)))
+            {
+                CmdHelper.ExecuteRawCmd(op, s);
+            }
+
+            BuffHelper.BuffCommon(op, shopItemData.GetBuff(), shopItemData.GetBuffSecond(), amount);
+        }
+    }
 
     /// <summary>
     /// 检查钱是否足够

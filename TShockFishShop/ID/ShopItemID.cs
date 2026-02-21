@@ -59,7 +59,6 @@ namespace FishShop
 
         // ------------------------------------------------------------------------------------------
         // 召唤入侵
-
         public const int InvasionGoblins = -171;        // 召唤 哥布林军队
         public const int InvasionSnowmen = -172;        // 召唤 雪人军团
         public const int InvasionPirates = -173;        // 召唤 海盗入侵
@@ -235,166 +234,22 @@ namespace FishShop
         }
 
 
-
-
-        public static void ProvideGoods(TSPlayer player, ShopItemData shopItem, int amount = 1)
+        /// <summary>
+        /// 创建商品对象 根据id分配对应对象
+        /// </summary>
+        public static ShopItem Create(ShopItemData data)
         {
-            int id = shopItem.id;
-            // 自定义物品
-            switch (id)
+            if (data.id > 0) return new NormalItem(data); //泰拉普通物品
+
+            return data.id switch
             {
-                // 月相
-                case Moonphase1:
-                case Moonphase2:
-                case Moonphase3:
-                case Moonphase4:
-                case Moonphase5:
-                case Moonphase6:
-                case Moonphase7:
-                case Moonphase8:
-                case MoonphaseNext: FishHelper.ChangeMoonPhaseByID(player, id, amount); return;
+                Forge => new ForgeItem(data), // 十连敲
+                DirtiestBlock => new DirtiestItem(data), // 臭臭仪式
+                OneDamage => new OneDamageItem(data), // 灵犀飞鱼
 
-                case Firework: CmdHelper.Firework(player); return;
-                case FireworkRocket: CmdHelper.FireworkRocket(player); return;
-                case AnglerQuestSwap: FishHelper.AnglerQuestSwap(player); return;
-
-                // 白天 中午 晚上 午夜
-                case TimeToDay: CmdHelper.SwitchTime(player, "day"); return;
-                case TimeToNoon: CmdHelper.SwitchTime(player, "noon"); return;
-                case TimeToNight: CmdHelper.SwitchTime(player, "night"); return;
-                case TimeToMidNight: CmdHelper.SwitchTime(player, "midnight"); return;
-
-                // =====
-                // buff 类
-                // ====
-                // 好运来、打神鞭、逮虾户、黄金矿工、钓鱼佬、兴奋剂
-                case BuffGoodLucky:
-                case BuffWhipPlayer:
-                case BuffFaster:
-                case BuffMining:
-                case BuffFishing:
-                case BuffIncitant:
-                case Buff:
-                    BuffHelper.BuffCommon(player, shopItem.GetBuff(), shopItem.GetBuffSecond(), amount);
-                    return;
-
-
-                // 雨来、雨停
-                case RainingStart: CmdHelper.ToggleRaining(player, true); return;
-                case RainingStop: CmdHelper.ToggleRaining(player, false); return;
-
-                // 血月
-                case BloodMoonStart: CmdHelper.ToggleBloodMoon(player, true); return;
-                case BloodMoonStop: CmdHelper.ToggleBloodMoon(player, false); return;
-
-
-                // 雨、史莱姆雨、 沙尘暴、大风天、雷雨、血月、日食、派对、陨石、流星雨、灯笼夜
-                case ToggleRain: CmdHelper.ToggleRaining(player, true, true); return;
-                case ToggleSlimeRain: CmdHelper.ToggleSlimeRain(player, true, true); return;
-                case ToggleSandStorm: CmdHelper.ToggleSandstorm(player, true, true); return;
-                case ToggleWindyDay: CmdHelper.ToggleWindyDay(player, true, true); return;
-                case ToggleStorming: CmdHelper.ToggleStorming(player, true, true); return;
-
-
-                case ToggleBloodMoon: CmdHelper.ToggleBloodMoon(player, true, true); return;
-                case ToggleEclipse: CmdHelper.ToggleEclipse(player, true, true); return;
-
-
-                case ToggleParty: CmdHelper.ToggleParty(player, true, true); return;
-                case TriggerDropMeteor: CmdHelper.DropMeteor(player); return;
-                case StarfallStart: CmdHelper.Starfall(player); return;
-                case LanternsNightStart: CmdHelper.LanternsNightStart(player); return;
-
-                case OverworldDayStart: CmdHelper.OverworldDay(player); return;
-
-
-                // 入侵
-                case InvasionStop: CmdHelper.StopInvasion(player); return;
-                case InvasionGoblins:
-                case InvasionSnowmen:
-                case InvasionPirates:
-                case InvasionPumpkinmoon:
-                case InvasionFrostmoon:
-                case InvasionMartians: CmdHelper.StartInvasion(player, id); return;
-
-                // 执行指令
-                case RawCmd:
-                    if (shopItem.cmds.Count > 0)
-                    {
-                        foreach (string cmd in shopItem.cmds)
-                        {
-                            CmdHelper.ExecuteRawCmd(player, cmd);
-                        }
-                    }
-                    else if (!string.IsNullOrEmpty(shopItem.prefix)) CmdHelper.ExecuteRawCmd(player, shopItem.prefix);
-                    return;
-
-                case ReliveNPC: NPCHelper.ReliveNPC(player); return;                    // 复活NPC
-                case TPHereAll: CmdHelper.TPHereAll(player); return;                    // 集合打团
-                case CelebrateAll: CmdHelper.CelebrateAll(player); return;              // 集体庆祝
-
-                // 最脏的块
-                case DirtiestBlock:
-                    //bool flag = shopItem.FindDirtest();
-                    //shopItem.MoveDirtest(flag);
-                    //TSPlayer.All.SendInfoMessage($"{player.Name} 正在举行 [i:5395]臭臭仪式[i:5395]");
-                    //if (flag)
-                    //    player.SendSuccessMessage("臭臭仪式完成，[i:5400]最脏的块 已生成(σﾟ∀ﾟ)σ");
-                    //else
-                    //    player.SendErrorMessage("糟糕，找遍整个世界都没有发现 [i:5400]最脏的块 o(´^｀)o");
-                    return;
-
-                // 灵犀飞鱼
-                case OneDamage:
-                    for (int i = 0; i < Main.npc.Length; i++)
-                    {
-                        NPC npc = Main.npc[i];
-                        if (npc != null && npc.active && npc.boss)
-                        {
-                            NPCHelper.AttackBoss(player, npc);
-                            TSPlayer.All.SendInfoMessage($"{player.Name} 购买了{shopItem.GetItemDesc()}，对boss造成了1点点伤害！");
-                        }
-                    }
-                    return;
-
-                default: break;
-            }
-
-            // 召唤NPC类
-            int id2 = GetRealSpawnID(id);
-            if (id2 != 0)
-            {
-                NPCHelper.SpawnNPC(player, id2, amount);
-                return;
-            }
-
-            // 清除NPC类
-            id2 = GetRealClearNPCID(id);
-            if (id2 != 0)
-            {
-                NPCHelper.ClearNPC(player, id2, amount);
-                return;
-            }
-
-            // 获得buff类
-            id2 = GetRealBuffID(id);
-            if (id2 != 0)
-            {
-                BuffHelper.SetPlayerBuff(player, id2, shopItem.stack * amount);
-                return;
-            }
-
-            // 玩家自定义商品
-            // 指令清单 和 buff 清单
-            if (id <= -600 && id >= -999)
-            {
-                foreach (string s in shopItem.GetCMD().Where(s => !string.IsNullOrEmpty(s)))
-                {
-                    CmdHelper.ExecuteRawCmd(player, s);
-                }
-
-                BuffHelper.BuffCommon(player, shopItem.GetBuff(), shopItem.GetBuffSecond(), amount);
-            }
+                ReliveNPC => new ReliveNPCItem(data), // 复活NPC
+                _ => new ShopItem(data),
+            };
         }
 
     }

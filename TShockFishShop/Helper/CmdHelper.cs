@@ -125,11 +125,14 @@ namespace FishShop
         public static void ToggleSandstorm(TSPlayer op, bool on, bool toggleMode = false)
         {
             if (toggleMode) on = !Sandstorm.Happening;
-            if ( on )
+            if (on)
             {
-                if(!Sandstorm.Happening)
+                if (!Sandstorm.Happening)
                 {
-                    Sandstorm.StartSandstorm();
+                    Sandstorm.Happening = true;
+                    Sandstorm.TimeLeft = 86400;
+                    Sandstorm.ChangeSeverityIntentions();
+
                     TSPlayer.All.SendData(PacketTypes.WorldInfo);
                     TSPlayer.All.SendInfoMessage("{0} 召唤了沙尘暴", op.Name);
                 }
@@ -138,7 +141,7 @@ namespace FishShop
             }
             else
             {
-                if( Sandstorm.Happening)
+                if (Sandstorm.Happening)
                 {
                     Sandstorm.StopSandstorm();
                     TSPlayer.All.SendData(PacketTypes.WorldInfo);
@@ -156,7 +159,7 @@ namespace FishShop
             {
                 if (!Main.IsItStorming)
                 {
-                    Main.rainTime = 3600;
+                    Main.rainTime = 86400;
                     Main.ChangeRain();
                     Main.raining = true;
                     Main.cloudAlpha = 1.0f;
@@ -246,9 +249,9 @@ namespace FishShop
         }
 
         // 史莱姆雨
-        public static void ToggleSlimeRain(TSPlayer op, bool on, bool toggleMode=false)
+        public static void ToggleSlimeRain(TSPlayer op, bool on, bool toggleMode = false)
         {
-            if( toggleMode ) on = !Main.slimeRain;
+            if (toggleMode) on = !Main.slimeRain;
 
             if (on)
             {
@@ -298,7 +301,7 @@ namespace FishShop
         // 灯笼夜
         public static void LanternsNightStart(TSPlayer op)
         {
-            if( !LanternNight.LanternsUp)
+            if (!LanternNight.LanternsUp)
             {
                 LanternNight.ToggleManualLanterns();
                 TSPlayer.All.SendData(PacketTypes.WorldInfo);
@@ -342,7 +345,7 @@ namespace FishShop
         }
         public static bool NeedBuyStopInvasion(TSPlayer player)
         {
-            if(Main.invasionSize == 0)
+            if (Main.invasionSize == 0)
             {
                 player.SendInfoMessage("当前没有任何入侵事件，无需购买");
                 return false;
@@ -455,7 +458,7 @@ namespace FishShop
             // if( times>0 )
             // 	args.Add( times.ToString() );
             // SpawnBossRaw( new CommandArgs("", player, args ) );
-            if( string.IsNullOrEmpty(rawCmd) )
+            if (string.IsNullOrEmpty(rawCmd))
             {
                 op.SendInfoMessage("指令内容为空");
                 return;

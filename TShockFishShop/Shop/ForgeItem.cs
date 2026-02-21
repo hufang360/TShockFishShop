@@ -5,6 +5,9 @@ using Terraria;
 
 namespace FishShop.Shop;
 
+/// <summary>
+/// 十连敲
+/// </summary>
 public class ForgeItem : ShopItem
 {
     public ForgeItem(ShopItemData si) : base(si)

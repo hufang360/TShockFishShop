@@ -84,7 +84,7 @@ public partial class Plugin
 
 
         // 创建商店物品（一些逻辑处理）
-        ShopItem shopItem = ShopItemCreate.Create(shopItemData);
+        ShopItem shopItem = ShopItemID.Create(shopItemData);
         shopItem.op = args.Player;
         shopItem.amount = amount;
         shopItem.extra = extra;
@@ -117,7 +117,7 @@ public partial class Plugin
 
         // 询价
         string msg = shopItem.CheckCost();
-        if (msg=="")
+        if (msg == "")
         {
             // 扣钱
             shopItem.DeductCost(out int costMoney, out int costFish);

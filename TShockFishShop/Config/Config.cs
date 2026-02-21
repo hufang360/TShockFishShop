@@ -1,7 +1,5 @@
-﻿using FishShop.Shop;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 
 
@@ -19,10 +17,10 @@ public class Config
     public int rowSlots = 10;
 
     // 解锁条件
-    public List<ItemData> unlock = new List<ItemData>();
+    public List<ItemData> unlock = [];
 
     // 货架物品
-    public List<ShopItemData> shop = new List<ShopItemData>();
+    public List<ShopItemData> shop = [];
 
 
     public static Config Load(string path)
@@ -31,7 +29,11 @@ public class Config
         {
             return JsonConvert.DeserializeObject<Config>(File.ReadAllText(path), new JsonSerializerSettings()
             {
-                Error = (sender, error) => error.ErrorContext.Handled = true
+                Error = (sender, error) =>
+                {
+                    utils.Log($"JSON解析错误: {error.ErrorContext.Error.Message}");
+                    error.ErrorContext.Handled = true;
+                }
             });
         }
         else
@@ -40,7 +42,11 @@ public class Config
             string text = utils.FromEmbeddedPath("FishShop.res.config.json");
             Config c = JsonConvert.DeserializeObject<Config>(text, new JsonSerializerSettings()
             {
-                Error = (sender, error) => error.ErrorContext.Handled = true
+                Error = (sender, error) =>
+                {
+                    utils.Log($"内嵌配置JSON解析错误: {error.ErrorContext.Error.Message}");
+                    error.ErrorContext.Handled = true;
+                }
             });
 
             // 将内嵌配置文件拷出
