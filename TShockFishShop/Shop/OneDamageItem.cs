@@ -44,8 +44,8 @@ public class OneDamageItem(ShopItemData si) : ShopItem(si)
     /// <param name="npc">boss的npc对象</param>
     public static void AttackBoss(TSPlayer op, NPC npc)
     {
-        int rawX = op.TileX;
-        int rawY = op.TileY;
+        float rawX = op.TPlayer.position.X;
+        float rawY = op.TPlayer.position.X;
         // 传送到boss身边，不然射弹不会生成
         op.Teleport(npc.position.X, npc.position.Y);
 
@@ -70,7 +70,7 @@ public class OneDamageItem(ShopItemData si) : ShopItem(si)
 
 
         // 回到原坐标
-        op.Teleport(rawX, rawY);
+        // op.Teleport(rawX, rawY);
 
     }
 

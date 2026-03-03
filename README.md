@@ -2,7 +2,7 @@
 
 鱼店是一个指令商店，除出售物品外，还出售 召唤boss、召唤入侵、生成NPC、获得buff、调时间 等自定义商品。支持配置购买条件 和 支付条件。
 
-下载地址：[FishShop-v1.5-1453-special.dll](https://github.com/hufang360/TShockFishShop/releases/download/v1.5/FishShop-v1.5-1453-special.dll)
+下载地址：[FishShop-v1.5-145x.dll](https://github.com/hufang360/TShockFishShop/releases/download/v1.5.1/FishShop-v1.5.1-145x.dll)
 
 
 <br>
