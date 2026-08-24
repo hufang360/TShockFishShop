@@ -19,7 +19,7 @@ public class utils
     {
         // 支持第一分形
         // 清空弃用物品清单
-        Array.Clear(ItemID.Sets.Deprecated, 0, ItemID.Sets.Deprecated.Length - 1);
+        Array.Clear(ItemID.Sets.Deprecated);
     }
     // public static string GetItemDescByShopItem(ShopItem item)
     // {
